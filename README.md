@@ -1,21 +1,9 @@
-# <App_Name>  
-## <App short description>  
+# ..\_Core\  
+## All classes functions and modules together  
 
-[![GitHub](https://img.shields.io/github/license/OlimilO1402/<App_Name>?style=plastic)](https://github.com/OlimilO1402/<App_Name>/blob/master/LICENSE) 
-[![GitHub release (latest by date)](https://img.shields.io/github/v/release/OlimilO1402/<App_Name>?style=plastic)](https://github.com/OlimilO1402/<App_Name>/releases/latest)
-[![Github All Releases](https://img.shields.io/github/downloads/OlimilO1402/<App_Name>/total.svg)](https://github.com/OlimilO1402/<App_Name>/releases/download/v1.0.0/<App_Name>_v1.0.0.zip)
+[![GitHub](https://img.shields.io/github/license/OlimilO1402/_Core?style=plastic)](https://github.com/OlimilO1402/_Core/blob/master/LICENSE) 
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/OlimilO1402/_Core?style=plastic)](https://github.com/OlimilO1402/_Core/releases/latest)
+[![Github All Releases](https://img.shields.io/github/downloads/OlimilO1402/_Core/total.svg)](https://github.com/OlimilO1402/_Core/releases/download/v1.0.0/_Core_v2026.10.17.zip)
 ![GitHub followers](https://img.shields.io/github/followers/OlimilO1402?style=social)
 
-
-Project started around mid 2012.  
-This example shows how to implement the IEnumVariant-Interface for supporting the "for each"-language-feature in your own list class, by using a lightweight-object. The contained list-class is just an example of a prototype of a list.  
-
-```vba
-Public Function Foo() As Variant
-	'
-End Function
-```
-
-[Link text Here](https://link-url-here.org) 
-
-![IEnumVarImpl Image](Resources/IEnumVarImpl.png "IEnumVarImpl Image")
+All essential classes functions and modules used in many repos togehter in one directory _Core.  
