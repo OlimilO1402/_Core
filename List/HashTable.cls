@@ -214,6 +214,9 @@ End Sub
 Public Function Contains(Key As String) As Boolean
     Contains = Me.ContainsKey(Key)
 End Function
+Public Function Inc(val As Long) As Long
+    Inc = val + 1
+End Function
 Public Function ContainsKey(Key As String) As Boolean
     Dim num As Long
     Dim num2 As Long

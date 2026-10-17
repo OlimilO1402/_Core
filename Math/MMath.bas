@@ -134,6 +134,18 @@ Private mMinDecFrcn 'As Decimal = CDec("-0,0000000000000000000000000001")
 '    Dim bigDec6: bigDec6 = CDec("-0,0000000000000000000000000001")
 
 
+'
+Private Const MillimeterPerInch As Double = 25.4
+Private Const CentimeterPerInch As Double = 2.54
+
+Public Enum ERound
+    eRoundDown = -1 'Abrunden
+    eRoundMath = 0  'kaufmännisch/mathematisch runden 0-4 =Ab, 5-9=Auf
+    eRoundUp = 1    'Aufrunden
+    'eRoundBin = 2   'binär Runden wie in VBA.Math.Round 'No, not implemented
+End Enum
+
+
 'Mathematical constants
 'https://de.wikipedia.org/wiki/Mathematische_Konstante
 'https://de.wikipedia.org/wiki/Liste_besonderer_Zahlen
@@ -1118,6 +1130,44 @@ Public Function RoundDown(ByVal Value As Double, Optional ByVal NumDigitsAfterDe
         If Value < RoundDown Then RoundDown = RoundDown - 10 ^ -NumDigitsAfterDecimal
     End If
 End Function
+
+Public Function RRound(ByVal v As Double, Optional ByVal digits As Long = 0, Optional ByVal er As ERound = eRoundMath) As Double
+    'rundet auf die angegebene Stellenanzahl
+    'negative Stellen = Stellen vor dem Komma
+    'positive Stellen = Stellen nach dem Komma
+    If IsNaN(v) Then Exit Function
+    If IsPosINF(v) Then Exit Function
+    If IsNegINF(v) Then Exit Function
+    RRound = v
+    If digits <> 0 Then RRound = RRound * 10 ^ digits
+    Select Case er
+    'Case eRoundDown
+        'r = Int(v * 10 ^ digits) / 10 ^ digits
+        'r = Int(r)
+    Case eRoundMath
+        'r = Int(v * 10 ^ digits + 0.5) / 10 ^ digits
+        RRound = RRound + 0.5
+    Case eRoundUp
+        'r = Int(v * 10 ^ digits + 1) / 10 ^ digits
+        If RRound <> 0 Then If Abs(RRound / Int(RRound)) <> 1 Then RRound = RRound + 1
+    'Case eRoundBin
+    '    r = VBA.Math.Round(v, Abs(digits))
+    End Select
+    RRound = Int(RRound)
+    If digits <> 0 Then RRound = RRound / 10 ^ digits
+End Function
+
+Public Function Round5(ByVal v As Double, Optional ByVal digits As Long = 0, Optional ByVal er As ERound = eRoundMath) As Double
+    'rundet auf die angegebene Stellenanzahl
+    'negative Stellen = Stellen vor dem Komma
+    'positive Stellen = Stellen nach dem Komma
+    Round5 = RRound(v / 5, digits) * 5
+End Function
+
+Public Function RoundUp5(ByVal v As Double, ByVal digits As Long) As Double
+    RoundUp5 = RoundUp(v / 5, digits) * 5
+End Function
+
 ' ^ ############################## ^ '    Rounding functions     ' ^ ############################## ^ '
 
 ' v ############################## v ' IEEE754-INFINITY functions ' v ############################## v '
@@ -1131,20 +1181,20 @@ End Function
 
 ' or without error handling:
 Public Function GetINF(Optional ByVal sign As Long = 1) As Double
-    Dim l(1 To 2) As Long
+    Dim L(1 To 2) As Long
     If Sgn(sign) > 0 Then
-        l(2) = &H7FF00000
+        L(2) = &H7FF00000
     ElseIf Sgn(sign) < 0 Then
-        l(2) = &HFFF00000
+        L(2) = &HFFF00000
     End If
-    Call RtlMoveMemory(GetINF, l(1), 8)
+    Call RtlMoveMemory(GetINF, L(1), 8)
 End Function
 
 Public Sub GetNaN(ByRef Value As Double)
-    Dim l(1 To 2) As Long
-    l(1) = 1
-    l(2) = &H7FF00000
-    Call RtlMoveMemory(Value, l(1), 8)
+    Dim L(1 To 2) As Long
+    L(1) = 1
+    L(2) = &H7FF00000
+    Call RtlMoveMemory(Value, L(1), 8)
 End Sub
 
 Public Sub GetINDef(ByRef Value As Double)
@@ -1253,9 +1303,26 @@ Public Function IsEven(ByVal Value As Long) As Boolean
     IsEven = Not Value And 1& ' Mod 2 = 0
 End Function
 
+Public Function IsPositive(ByVal v As Double) As Boolean
+    If IsPosINF(v) Then IsPositive = True: Exit Function
+    If IsNegINF(v) Then IsPositive = False: Exit Function
+    
+    IsPositive = Sgn(v) > 0
+End Function
+
 ' ^ ############################## ^ '      Bool functions      ' ^ ############################## ^ '
 
-'Bit-functions also look MString
+Public Function CMM(ByVal ValueInInch As Double) As Double
+    'converts inch to millimeter
+    CMM = ValueInInch * MillimeterPerInch
+End Function
+
+Public Function CInch(ByVal ValueInMM As Double) As Double
+    'converts millimeter to inch
+    CInch = ValueInMM / MillimeterPerInch
+End Function
+
+'Bit-functions also have a look into MString
 
 Public Function Bits(b00 As Bit, b01 As Bit, b02 As Bit, b03 As Bit, b04 As Bit, b05 As Bit, b06 As Bit, b07 As Bit, b08 As Bit, b09 As Bit, _
                      b10 As Bit, b11 As Bit, b12 As Bit, b13 As Bit, b14 As Bit, b15 As Bit, b16 As Bit, b17 As Bit, b18 As Bit, b19 As Bit, _
@@ -1269,12 +1336,12 @@ Public Function Bits(b00 As Bit, b01 As Bit, b02 As Bit, b03 As Bit, b04 As Bit,
     'Bits = Bits Or b31 * 2 ^ 31
     If b31 = b1 Then Bits = -Bits
 End Function
-Public Sub CheckBits(ByVal l As Long)
+Public Sub CheckBits(ByVal L As Long)
     'e.g.
     'check Bits(0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
     On Error Resume Next
-    Dim s As Single: s = LongToSingle(l)
-    Debug.Print l & " = &H" & Hex(l) & " = " & s & " ?isdenorm: " & IsDenormalisedSng(s)
+    Dim s As Single: s = LongToSingle(L)
+    Debug.Print L & " = &H" & Hex(L) & " = " & s & " ?isdenorm: " & IsDenormalisedSng(s)
     '170 = &HAA = 2,382207E-43 ?isdenorm: Wahr
 End Sub
 
@@ -1316,9 +1383,9 @@ End Sub
 Public Function IsDenormalisedSng(ByVal Value As Single) As Boolean
     'Dim ts As TSingle: ts.Value = SngVal
     'Dim tl As TLong:    LSet tl = ts
-    Dim l As Long
-    RtlMoveMemory l, Value, 4
-    IsDenormalisedSng = ((l And &H7F800000) = 0)
+    Dim L As Long
+    RtlMoveMemory L, Value, 4
+    IsDenormalisedSng = ((L And &H7F800000) = 0)
 End Function
 
 Public Sub UndenormaliseSng(ByRef value_inout As Single)
@@ -1857,6 +1924,18 @@ End Function
 '    }
 '}
 
+'Pascal'sches Dreieck was the name I was teached in school
+'other names of inventors long before Blaise Pascal are:
+'Hindu: Pingala, Al-Karaji: China: Yang-Hui; Italy: Tartalia
+'Dreieck von Mucusor(?); Khayam-triangle;
+'arabic: Abracadbra, fibonacci, pentagonal&triangular, sun numbers, magic squares,
+'abra=(arabic)to pass, to cross over
+'Hayyam-triangle
+'Meru Prastaara (755) Raghunath Library
+'Pi=3+2/3*(1/4-1/20+1/56-1/120-1/220-1/365+1/560...)
+'binomial theorem:
+'(1+x)^n=1+nx+(n*(n-1)*x²)/(2!) + (n*(n-1)*(n-2)*x³)/(3!) + (n*(n-1)*(n-2*(n-3)*x^4)/(4!) + (n*(n-1)*(n-2*(n-3)*(n-4)*x^5)/(5!)...
+'
 Public Function PascalTriangle(ByVal nrows As Integer) As Variant()
     If nrows > 1030 Then
         MsgBox nrows & ": overflow!" & vbCrLf & "The pascal-triangle will be computed with a maximum of 1030 rows."
