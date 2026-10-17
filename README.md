@@ -1,4 +1,4 @@
-# ..\_Core\  
+# ..\\_Core\  
 ## All classes functions and modules together  
 
 [![GitHub](https://img.shields.io/github/license/OlimilO1402/_Core?style=plastic)](https://github.com/OlimilO1402/_Core/blob/master/LICENSE) 
