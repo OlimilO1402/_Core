@@ -18,9 +18,13 @@ Option Explicit 'lines of code: 2024-08-14: 1286; 2025-03-01: 1404;
 
 'Public Declare Function ColorRGBToHLS Lib "shlwapi.dll" (ByVal clrRGB As Long, pwHue As Long, pwLuminance As Long, pwSaturation As Long) As Long
 'Public Declare Function ColorHLSToRGB Lib "shlwapi.dll" (ByVal wHue As Long, ByVal wLuminance As Long, ByVal wSaturation As Long) As Long
-
-Private Declare Sub ColorRGBToHLS Lib "shlwapi" (ByVal clrRGB As Long, ByRef pwHue_out As Integer, ByRef pwLuminance_out As Integer, ByRef pwSaturation_out As Integer)
-Private Declare Function ColorHLSToRGB Lib "shlwapi" (ByVal wHue As Integer, ByVal wLuminance As Integer, ByVal wSaturation As Integer) As Long
+#If VBA7 Then
+    Private Declare PtrSafe Sub ColorRGBToHLS Lib "shlwapi" (ByVal clrRGB As Long, ByRef pwHue_out As Integer, ByRef pwLuminance_out As Integer, ByRef pwSaturation_out As Integer)
+    Private Declare PtrSafe Function ColorHLSToRGB Lib "shlwapi" (ByVal wHue As Integer, ByVal wLuminance As Integer, ByVal wSaturation As Integer) As Long
+#Else
+    Private Declare Sub ColorRGBToHLS Lib "shlwapi" (ByVal clrRGB As Long, ByRef pwHue_out As Integer, ByRef pwLuminance_out As Integer, ByRef pwSaturation_out As Integer)
+    Private Declare Function ColorHLSToRGB Lib "shlwapi" (ByVal wHue As Integer, ByVal wLuminance As Integer, ByVal wSaturation As Integer) As Long
+#End If
 
 Public Type ColorValueRange
     RangeMin   As Single

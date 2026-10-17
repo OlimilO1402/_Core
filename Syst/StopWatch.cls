@@ -12,51 +12,56 @@ Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
-'Class System.Diagnostics.StopWatch
-'The datatype Currency in VB is a 64Bit-Datatype with a fixed point
-'part. this means at the Bit.value &H2710 (resp decimal 10000) the value 1
-'is defined. The smallest positive value of currency is 0.0001
-
-'because ticks contains the factor 10000 as well, so the VB-datatype Currency
-'is the right datatype for time measurements wit hthe QueryPerformance-API
-
-'the correcting factor for the datatype Currency:
-Private Const CurCorrect          As Long = 10000
-Private Const TicksPerMillisecond As Long = 10000 / CurCorrect '= 1 '&H2710
-Private Const TicksPerSecond      As Long = 10000000 / CurCorrect   '&H989680
-
+'Class StopWatch
+'Namespace System.Diagnostics
+'The datatype Currency in VB is a 64Bit-integer-type with a fixed point.
+'The value 1 is defined at the integer value &H2710 (resp decimal 10000)
+'The smallest possible positive value of the datatype Currency is 0.0001
+'The unit ticks also contains the parameter 10000, and so Currency is
+'the best datatype for using it with the QueryPerformance-API in VB
+'In der gleichnamigen VB.Net-Klasse wird hier der Datentyp Long, bzw Int64 verwendet.
 'in the .net class of the same name here the datatype long resp Int64 will be used.
-Private m_elapsed          As Currency
-Private m_startTimeStamp   As Currency
-Private m_isRunning        As Boolean
-Private m_frequency        As Currency
-Private m_isHighResolution As Boolean
-Private m_tickFrequency    As Double
+Private m_Frequency        As Currency
+Private m_IsHighResolution As Boolean
+Private m_IsRunning        As Boolean
+Private m_StartTimeStamp   As Currency
+Private m_Elapsed          As Currency
+Private m_TickFrequency    As Double
 
-Private Declare Function QueryPerformanceCounter Lib "kernel32" (ByRef lpPerformanceCount As Currency) As Long
-Private Declare Function QueryPerformanceFrequency Lib "kernel32" (ByRef lpFrequency As Currency) As Long
+'Der Korrekturfaktor für den Datentyp Currency
+Private Const CurCorrect          As Long = 10000
+Private Const TicksPerMillisecond As Long = 10000 / CurCorrect    '&H2710
+Private Const TicksPerSecond      As Long = 10000000 / CurCorrect '&H989680
+
+#If VBA7 = 0 Then
+    Private Declare Function QueryPerformanceCounter Lib "kernel32" (ByRef lpPerformanceCount As Currency) As Long
+    Private Declare Function QueryPerformanceFrequency Lib "kernel32" (ByRef lpFrequency As Currency) As Long
+    Private Declare Sub RtlMoveMemory Lib "kernel32" (ByRef pDst As Any, ByRef pSrc As Any, ByVal bytLength As Long)
+#Else
+    Private Declare PtrSafe Function QueryPerformanceCounter Lib "kernel32" (ByRef lpPerformanceCount As Currency) As Long
+    Private Declare PtrSafe Function QueryPerformanceFrequency Lib "kernel32" (ByRef lpFrequency As Currency) As Long
+    Private Declare PtrSafe Sub RtlMoveMemory Lib "kernel32" (ByRef pDst As Any, ByRef pSrc As Any, ByVal bytLength As Long)
+#End If
 
 Private Sub Class_Initialize()
-    If Not (QueryPerformanceFrequency(m_frequency) = 1) Then
-        m_isHighResolution = False
-        m_frequency = TicksPerSecond
-        m_tickFrequency = 1
+    If Not (QueryPerformanceFrequency(m_Frequency) = 1) Then
+        m_IsHighResolution = False
+        m_Frequency = TicksPerSecond
+        m_TickFrequency = 1
     Else
-        m_isHighResolution = True
-        m_tickFrequency = (TicksPerSecond / CDbl(m_frequency))
+        m_IsHighResolution = True
+        m_TickFrequency = (TicksPerSecond / CDbl(m_Frequency))
     End If
 End Sub
 
 ' #################### '   Public Shared Properties   ' #################### '
 Public Property Get Frequency() As Currency
-    'Diese Multiplikation mit CurCorrect ist nur dazu da, die Klasse
-    'nach außen hin konsistent zu halten mit der gleichnamigen Klasse
-    'aus dem .netFX
-    Frequency = m_frequency * CurCorrect
+    'Diese Multiplikation mit CurCorrect ist nur dazu da, die Klasse nach außen
+    'hin konsistent zu halten mit der gleichnamigen Klasse aus dem .netFX
+    Frequency = m_Frequency * CurCorrect
 End Property
-'Shared-Member Properties
 Public Property Get IsHighResolution() As Boolean
-    IsHighResolution = m_isHighResolution
+    IsHighResolution = m_IsHighResolution
 End Property
 
 ' #################### '      Public Properties       ' #################### '
@@ -64,9 +69,9 @@ Public Property Get Elapsed() As Currency
     Elapsed = GetElapsedDateTimeTicks
 End Property
 
-Public Property Get ElapsedToString() As String 'TimeSpan
+Public Property Get Elapsed_ToStr() As String 'TimeSpan
     Dim edt As Currency: edt = GetElapsedDateTimeTicks
-    ElapsedToString = TimeSpanToString(edt)
+    Elapsed_ToStr = TimeSpan_ToStr(edt)
 End Property
 
 Public Property Get ElapsedMilliseconds() As Currency 'Long 'LongInt
@@ -78,7 +83,7 @@ Public Property Get ElapsedTicks() As Currency 'As Long 'LongInt
 End Property
 
 Public Property Get IsRunning() As Boolean
-    IsRunning = m_isRunning
+    IsRunning = m_IsRunning
 End Property
 
 ' #################### '   Public Functions    ' #################### '
@@ -92,9 +97,9 @@ Public Function GetElapsedTime(ByVal startTimeStamp As Currency, Optional ByVal 
 End Function
 
 Public Sub Start()
-    If Not m_isRunning Then
-        m_startTimeStamp = pGetTimestamp
-        m_isRunning = True
+    If Not m_IsRunning Then
+        m_StartTimeStamp = pGetTimestamp
+        m_IsRunning = True
     End If
 End Sub
 
@@ -104,34 +109,34 @@ Public Function StartNew() As StopWatch
 End Function
 
 Public Sub SStop()
-    If m_isRunning Then
+    If m_IsRunning Then
         Dim pts As Currency: pts = pGetTimestamp
-        Dim sts As Currency: sts = m_startTimeStamp
+        Dim sts As Currency: sts = m_StartTimeStamp
         Dim c As Currency: c = (pts - sts)
-        m_elapsed = m_elapsed + c
-        m_isRunning = False
+        m_Elapsed = m_Elapsed + c
+        m_IsRunning = False
     End If
 End Sub
 
 Public Sub Reset()
-    m_elapsed = 0
-    m_isRunning = False
-    m_startTimeStamp = 0
+    m_Elapsed = 0
+    m_IsRunning = False
+    m_StartTimeStamp = 0
 End Sub
 
 ' #################### '   Private Functions    ' #################### '
 Private Function pGetTimestamp() As Currency
-    If m_isHighResolution Then
+    If m_IsHighResolution Then
         QueryPerformanceCounter pGetTimestamp
     Else
         pGetTimestamp = Timer 'DateTime.Now 'or Timer
     End If
 End Function
 
-Private Function TimeSpanToString(ByVal ticks As Currency) As String
+Private Function TimeSpan_ToStr(ByVal ticks As Currency) As String
     Dim b As String
     Dim h As Long, m As Long, s As Long, n As Long
-    Dim days As Long:  days = CLng((ticks / 86400000))
+    Dim days As Long:     days = CLng((ticks / 86400000))
     Dim time As Currency: time = (ticks Mod 86400000)
     
     If (ticks < 0) Then
@@ -146,15 +151,15 @@ Private Function TimeSpanToString(ByVal ticks As Currency) As String
     
     'hours
     h = CInt(((time \ 3600000) Mod 24))
-    b = b & IntToString(h, 2) & ":"
+    b = b & Int_ToStr(h, 2) & ":"
     
     'minutes
     m = CInt(((time \ 60000) Mod 60))
-    b = b & IntToString(m, 2) & ":"
+    b = b & Int_ToStr(m, 2) & ":"
     
     'seconds
     s = CInt(((time \ 1000) Mod 60))
-    b = b & IntToString(s, 2)
+    b = b & Int_ToStr(s, 2)
     
     n = (ticks - (CCur(h) * CCur(3600000)) _
                - (CCur(m) * CCur(60000)) _
@@ -162,22 +167,22 @@ Private Function TimeSpanToString(ByVal ticks As Currency) As String
                
     If (n <> 0) Then
         b = b & "."
-        b = b & IntToString(n, 7)
+        b = b & Int_ToStr(n, 7)
     End If
-    TimeSpanToString = b
+    TimeSpan_ToStr = b
 End Function
 
-Private Function IntToString(ByVal n As Long, ByVal digits As Long) As String
-    IntToString = CStr(n)
-    Dim l As Long: l = Len(IntToString)
-    If l < digits Then IntToString = String$(digits - l, "0") & IntToString
+Private Function Int_ToStr(ByVal n As Long, ByVal digits As Long) As String
+    Int_ToStr = CStr(n)
+    Dim l As Long: l = Len(Int_ToStr)
+    If l < digits Then Int_ToStr = String$(digits - l, "0") & Int_ToStr
 End Function
 
 Private Function GetElapsedDateTimeTicks() As Currency
     Dim rawElapsedTicks As Currency: rawElapsedTicks = GetRawElapsedTicks
-    If m_isHighResolution Then
+    If m_IsHighResolution Then
         Dim d As Double: d = CDbl(rawElapsedTicks)
-        d = (d * m_tickFrequency) ' m_tickFrequency = 1
+        d = (d * m_TickFrequency) ' m_tickFrequency = 1
         GetElapsedDateTimeTicks = CCur(d)
     Else
         GetElapsedDateTimeTicks = rawElapsedTicks
@@ -185,10 +190,10 @@ Private Function GetElapsedDateTimeTicks() As Currency
 End Function
 
 Private Function GetRawElapsedTicks() As Currency
-    Dim Elapsed As Currency: Elapsed = m_elapsed
-    If m_isRunning Then
+    Dim Elapsed As Currency: Elapsed = m_Elapsed
+    If m_IsRunning Then
         Dim ts As Currency: ts = pGetTimestamp
-        Dim c As Currency: c = (ts - m_startTimeStamp)
+        Dim c  As Currency:  c = (ts - m_StartTimeStamp)
         Elapsed = (Elapsed + c)
     End If
     GetRawElapsedTicks = Elapsed
