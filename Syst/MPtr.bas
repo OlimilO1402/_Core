@@ -182,9 +182,16 @@ End Type
     Public Declare Sub SBO_RotateUDTArray Lib "SwapByteOrder" Alias "SwapByteOrderUDTArray" (ByRef Arr() As Any, ByRef udtDescription() As Integer)
     
 #End If
+' ^ ############################## ^ '    MByteSwapper Declarations    ' ^ ############################## ^ '
+
+#If VBA7 Then
+    '  http://visualbasic.happycodings.com/code-snippets/code5.html
+    Private Declare ptrsafe Function IsNTAdmin Lib "advpack.dll" (ByVal dwReserved As Long, ByRef lpdwReserved As Any) As Long
+#Else
+    Private Declare Function IsNTAdmin Lib "advpack.dll" (ByVal dwReserved As Long, ByRef lpdwReserved As Any) As Long
+#End If
 Private m_Col As Collection
 
-' ^ ############################## ^ '    MByteSwapper Declarations    ' ^ ############################## ^ '
 
 
 
@@ -1157,3 +1164,11 @@ Public Function RndInt64() 'As Decimal
     Randomize Timer
     RndInt64 = CDec(CDec(Rnd) * CDec("18446744073709551614")) - CDec("9223372036854775808")
 End Function
+' ^ ############################## ^ '    Random Functions   ' ^ ############################## ^ '
+
+' v ############################## v '    Special Functions    ' v ############################## v '
+Public Function IsAdmin() As Boolean
+    IsAdmin = CBool(IsNTAdmin(ByVal 0&, ByVal 0&))
+End Function
+' ^ ############################## ^ '    Special Functions    ' ^ ############################## ^ '
+
