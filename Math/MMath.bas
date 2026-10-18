@@ -1090,6 +1090,7 @@ Public Function LogN(ByVal x As Double, Optional ByVal base As Double = 10#) As 
     If base = 1 Or base = 0 Then Exit Function
     LogN = VBA.Math.Log(x) / VBA.Math.Log(base)
 End Function
+
 'Public Shared Function Log(ByVal d As Double) As Double
 'Public Shared Function Log(ByVal a As Double, ByVal newBase As Double) As Double
 Public Static Function Log(ByVal d As Double, ByVal newBase As Double) As Double 'cDouble
