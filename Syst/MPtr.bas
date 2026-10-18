@@ -780,6 +780,20 @@ Public Property Let ObjectAddressOf(ByVal obj As Object, ByVal Index As Long, By
     RtlMoveMemory ByVal pVTable + (7 + Index) * SizeOf_LongPtr, Value, SizeOf_LongPtr
 End Property
 
+Public Function IsIUnknown(vObj) As Boolean
+Try: On Error GoTo Catch
+    IsIUnknown = TypeOf vObj Is IUnknown
+    Exit Function
+Catch:
+End Function
+
+Public Function IsIDispatch(vObj) As Boolean
+Try: On Error GoTo Catch
+    IsIDispatch = TypeOf vObj Is Object
+    Exit Function
+Catch:
+End Function
+
 ' ^ ############################## ^ '  Object-WeakPtr Funcs  ' ^ ############################## ^ '
 
 
