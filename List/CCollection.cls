@@ -27,10 +27,10 @@ Private Sub Class_Initialize()
     Set m_Col = New Collection
 End Sub
 
-Friend Sub New_(IsHashed As Boolean, Optional col As Collection = Nothing, Optional Name As String = "", Optional OptionBaseLBound As Long = 1)
+Friend Sub New_(IsHashed As Boolean, Optional Col As Collection = Nothing, Optional Name As String = "", Optional OptionBaseLBound As Long = 1)
     'works as a wrapper and extends existing VBA.Collection.
     'The default LBound aka Option Base of a VBA.Collection is 1, and so is here, but now you are free to define other LBound as well
-    m_Name = Name: m_IsHashed = IsHashed: If Not col Is Nothing Then Set m_Col = col
+    m_Name = Name: m_IsHashed = IsHashed: If Not Col Is Nothing Then Set m_Col = Col
     m_LowB = OptionBaseLBound - 1
 End Sub
 
@@ -39,25 +39,26 @@ End Sub
 '    Set CCollection = New CCollection: CCollection.New_ IsHashed, Col, Name, OptionBaseLBound
 'End Function
 
-Public Sub NewC(other As CCollection)
-    Dim i As Long
-    With other
+Public Sub NewC(Other As CCollection, Optional deep As Boolean = False)
+    Dim i As Long, obj As Object
+    With Other
         m_Name = .Name
         m_IsHashed = .IsHashed
         m_LowB = .LLBound
         For i = .LLBound To .UUBound
-            m_Col.Add .Item(i + m_LowB)
+            Set obj = .Item(i + m_LowB)
+            m_Col.Add obj.Clone(deep)
         Next
     End With
 End Sub
 
 'Optional includingObjects As Boolean = False
-Public Function Clone() As CCollection
-    Set Clone = New CCollection: Clone.NewC Me
+Public Function Clone(Optional deep As Boolean = False) As CCollection
+    Set Clone = New CCollection: Clone.NewC Me, deep
 End Function
 
-Public Function Compare(other As CCollection) As Long
-    Compare = StrComp(Me.Name, other.Name, vbBinaryCompare)
+Public Function Compare(Other As CCollection) As Long
+    Compare = StrComp(Me.Name, Other.Name, vbBinaryCompare)
 End Function
 
 Public Property Get Name() As String
@@ -69,17 +70,17 @@ End Property
 
 Public Function Find(Text As String) As CCollection
     Set Find = MNew.CCollection(Me.IsHashed)
-    Dim Obj As Object
-    For Each Obj In m_Col
-        If Obj.Find(Text) Then Find.Add Obj
+    Dim obj As Object
+    For Each obj In m_Col
+        If obj.Find(Text) Then Find.Add obj
     Next
 End Function
 
-Public Function Equals(other As CCollection) As Boolean
-    If Not other.Count = Me.Count Then Exit Function
+Public Function Equals(Other As CCollection) As Boolean
+    If Not Other.Count = Me.Count Then Exit Function
     Dim i As Long
     For i = 1 To m_Col.Count
-        If m_Col.Item(i) <> other.Item(i) Then Exit Function
+        If m_Col.Item(i) <> Other.Item(i) Then Exit Function
     Next
     Equals = True
 End Function
@@ -113,8 +114,8 @@ Private Function DataType_ToStr(ByVal vt As VbVarType) As String
     Case VbVarType.vbInteger:         s = "Integer"
     Case VbVarType.vbLong:            s = "Long"
     Case VbVarType.vbNull:            s = "Null"
-    Case VbVarType.vbObject:  Dim Obj As Object: Set Obj = m_Col.Item(1)
-                                      s = "Object(" & TypeName(Obj) & ")"
+    Case VbVarType.vbObject:  Dim obj As Object: Set obj = m_Col.Item(1)
+                                      s = "Object(" & TypeName(obj) & ")"
     Case VbVarType.vbSingle:          s = "Single"
     Case VbVarType.vbString:          s = "String"
     Case VbVarType.vbUserDefinedType: s = "UserDefinedType"
@@ -125,10 +126,10 @@ End Function
 
 Public Function Add(Item, Optional Key, Optional Before, Optional After)
     If IsObject(Item) Then
-        Dim Obj As Object: Set Obj = Item
-        Set Add = Obj
+        Dim obj As Object: Set obj = Item
+        Set Add = obj
         If m_IsHashed Then
-            If IsMissing(Key) Then Key = Obj.Key
+            If IsMissing(Key) Then Key = obj.Key
         End If
     End If
     If IsMissing(Key) Then
@@ -155,26 +156,26 @@ Public Function Add(Item, Optional Key, Optional Before, Optional After)
     IncVersion
 End Function
 
-Public Function AddKey(Obj As Object) As Object
+Public Function AddKey(obj As Object) As Object
     ' the object needs to have a Public Function/PropertyGet Key As String
-    Set AddKey = Obj: m_Col.Add Obj, Obj.Key
+    Set AddKey = obj: m_Col.Add obj, obj.Key
     IncVersion
 End Function
 
-Public Function AddOrGet(Obj As Object) As Object
-    Dim Key As String: Key = Obj.Key ' the object needs to have a Public Function/PropertyGet Key As String
+Public Function AddOrGet(obj As Object) As Object
+    Dim Key As String: Key = obj.Key ' the object needs to have a Public Function/PropertyGet Key As String
     If Me.Contains(Key) Then
         Set AddOrGet = m_Col.Item(Key)
     Else
-        Set AddOrGet = Obj
-        m_Col.Add Obj, Key
+        Set AddOrGet = obj
+        m_Col.Add obj, Key
         m_Version = m_Version + CDec(1)
     End If
 End Function
 
-Public Function TryAddObject(Obj As Object, ByVal Key As String) As Boolean
+Public Function TryAddObject(obj As Object, ByVal Key As String) As Boolean
 Try: On Error GoTo Catch
-    m_Col.Add Obj, Key
+    m_Col.Add obj, Key
     TryAddObject = True
     IncVersion
 Catch: On Error GoTo 0
@@ -235,11 +236,11 @@ End Property
 '    UpperBound = Me.Count - m_OptBase
 'End Property
 
-Public Function IndexFromObject(Obj As Object) As Long
+Public Function IndexFromObject(obj As Object) As Long
     Dim i As Long, V, o As Object
     For Each V In m_Col
         Set o = V
-        If o.Key = Obj.Key Then
+        If o.Key = obj.Key Then
             IndexFromObject = i
             Exit Function
         End If
@@ -410,7 +411,7 @@ End Sub
 Public Sub ToListCtrl(ComboBoxOrListBox, Optional ByVal addEmptyLineFirst As Boolean = False, Optional ByVal doPtrToItemData As Boolean = False)
     Dim i As Long, c As Long: c = m_Col.Count: If c = 0 Then Exit Sub
     Dim vt As VbVarType: vt = VarType(m_Col.Item(1))
-    Dim V, Obj As Object
+    Dim V, obj As Object
     With ComboBoxOrListBox
         If .ListCount Then .Clear
         If addEmptyLineFirst Then .AddItem vbNullString
@@ -421,9 +422,9 @@ Public Sub ToListCtrl(ComboBoxOrListBox, Optional ByVal addEmptyLineFirst As Boo
             Next
         Case vbObject
             For i = 1 To c
-                Set Obj = m_Col.Item(i)
-                .AddItem Obj.ToStr ' the object needs to have a Public Function ToStr As String
-                If doPtrToItemData Then .ItemData(i - 1) = Obj.Ptr ': Debug.Print Obj.Ptr ' and a Public Function Ptr As LongPtr
+                Set obj = m_Col.Item(i)
+                .AddItem obj.ToStr ' the object needs to have a Public Function ToStr As String
+                If doPtrToItemData Then .ItemData(i - 1) = obj.Ptr ': Debug.Print Obj.Ptr ' and a Public Function Ptr As LongPtr
                 ' ItemData can only be of type Long no String
             Next
         End Select
@@ -445,11 +446,11 @@ Public Function ToStr(Optional ByVal isLong As Boolean = False) As String
 End Function
 
 Public Function Data_ToStr() As String 'Col As Collection) As String
-    Dim s As String, V, Obj As Object
+    Dim s As String, V, obj As Object
     For Each V In m_Col
         If IsObject(V) Then
-            Set Obj = V
-            s = s & Obj.ToStr & vbCrLf
+            Set obj = V
+            s = s & obj.ToStr & vbCrLf
         Else
             s = s & CStr(V) & vbCrLf
         End If
@@ -485,11 +486,11 @@ End Sub
     
 ' The recursive data-independent QuickSort for primitive data-variables
 Private Sub QuickSortVar(ByVal i1 As Long, ByVal i2 As Long)
-    Dim t As Long
+    Dim T As Long
     If i2 > i1 Then
-        t = DivideVar(i1, i2)
-        QuickSortVar i1, t - 1
-        QuickSortVar t + 1, i2
+        T = DivideVar(i1, i2)
+        QuickSortVar i1, T - 1
+        QuickSortVar T + 1, i2
     End If
 End Sub
 
@@ -531,11 +532,11 @@ End Sub
 
 ' The recursive data-independent QuickSort for strings
 Private Sub QuickSortStr(ByVal i1 As Long, ByVal i2 As Long)
-    Dim t As Long
+    Dim T As Long
     If i1 < i2 Then
-        t = DivideStr(i1, i2)
-        QuickSortStr i1, t - 1
-        QuickSortStr t + 1, i2
+        T = DivideStr(i1, i2)
+        QuickSortStr i1, T - 1
+        QuickSortStr T + 1, i2
     End If
 End Sub
 
@@ -579,11 +580,11 @@ End Sub
 
 ' The recursive data-independent QuickSort for objects
 Private Sub QuickSortObj(ByVal i1 As Long, ByVal i2 As Long)
-    Dim t As Long
+    Dim T As Long
     If i2 > i1 Then
-        t = DivideObj(i1, i2)
-        QuickSortObj i1, t - 1
-        QuickSortObj t + 1, i2
+        T = DivideObj(i1, i2)
+        QuickSortObj i1, T - 1
+        QuickSortObj T + 1, i2
     End If
 End Sub
 
