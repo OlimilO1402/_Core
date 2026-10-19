@@ -12,6 +12,10 @@ Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
+'#If ListAsCCollection Then
+'Implements CCollection
+'#End If
+
 #If ListAsStack Then
 'Wenn der VB-Compiler meldet: "Benutzerdefinierter Typ nicht definiert", dann liegt das vermutlich an Class List Implements Stack
 'dann dieses Implements deaktivieren durch auskommentieren, dort wo Stack gebraucht wird, wieder aktivieren.
@@ -148,10 +152,10 @@ End Sub
 'End Function
 
 '
-Friend Sub NewC(other As List)
+Friend Sub NewC(Other As List)
     'copy-c'tor will be called by function Clone
-    With other
-        Me.New_ .DataType, other, .IsHashed
+    With Other
+        Me.New_ .DataType, Other, .IsHashed
     End With
 End Sub
 
@@ -421,16 +425,16 @@ Public Sub AddRange(aArr) 'As List
             'für String
             If VarType(aArr) = vbString Then
                 Dim bl As Long: bl = LenB(aArr)
-                Dim l As Long: l = bl / 2
+                Dim L As Long: L = bl / 2
                 If m_IsHashed Then
-                    For i = 1 To l
+                    For i = 1 To L
                         Me.Add AscW(Mid$(aArr, i, 1))
                     Next
                 Else
-                    EnsureCapacity m_Count + l
+                    EnsureCapacity m_Count + L
                     Dim pDst As Long: pDst = DataPtrI(m_Count)
                     RtlMoveMemory ByVal pDst, ByVal StrPtr(aArr), bl
-                    m_Count = m_Count + l
+                    m_Count = m_Count + L
                 End If
             End If
         ElseIf m_DataType = vbUserDefinedType Then
@@ -1116,12 +1120,12 @@ End Sub
 Private Sub QuickSortVar(ByVal i1 As Long, ByVal i2 As Long)
     Dim t As Long
     If i2 > i1 Then
-        t = divideVar(i1, i2)
+        t = DivideVar(i1, i2)
         Call QuickSortVar(i1, t - 1)
         Call QuickSortVar(t + 1, i2)
     End If
 End Sub
-Private Function divideVar(ByVal i1 As Long, ByVal i2 As Long) As Long
+Private Function DivideVar(ByVal i1 As Long, ByVal i2 As Long) As Long
     Dim i As Long: i = i1 - 1
     Dim j As Long: j = i2
     Dim p As Long: p = j
@@ -1135,7 +1139,7 @@ Private Function divideVar(ByVal i1 As Long, ByVal i2 As Long) As Long
         If i < j Then Call SwapVar(i, j)
     Loop While (i < j)
     Call SwapVar(i, p)
-    divideVar = i
+    DivideVar = i
 End Function
 Private Function CompareVar(i1 As Long, i2 As Long)
     CompareVar = m_Arr(i1) - m_Arr(i2)
@@ -1149,12 +1153,12 @@ End Sub
 Private Sub QuickSortStr(ByVal i1 As Long, ByVal i2 As Long)
     Dim t As Long
     If i2 > i1 Then
-        t = divideStr(i1, i2)
+        t = DivideStr(i1, i2)
         Call QuickSortStr(i1, t - 1)
         Call QuickSortStr(t + 1, i2)
     End If
 End Sub
-Private Function divideStr(ByVal i1 As Long, ByVal i2 As Long) As Long
+Private Function DivideStr(ByVal i1 As Long, ByVal i2 As Long) As Long
     Dim i As Long: i = i1 - 1
     Dim j As Long: j = i2
     Dim p As Long: p = j
@@ -1168,7 +1172,7 @@ Private Function divideStr(ByVal i1 As Long, ByVal i2 As Long) As Long
         If i < j Then Call SwapStr(i, j)
     Loop While (i < j)
     Call SwapStr(i, p)
-    divideStr = i
+    DivideStr = i
 End Function
 Private Function CompareStr(i1 As Long, i2 As Long)
     CompareStr = StrComp(m_Arr(i1), m_Arr(i2))
@@ -1182,12 +1186,12 @@ End Sub
 Private Sub QuickSortObj(ByVal i1 As Long, ByVal i2 As Long)
     Dim t As Long
     If i2 > i1 Then
-        t = divideObj(i1, i2)
+        t = DivideObj(i1, i2)
         Call QuickSortObj(i1, t - 1)
         Call QuickSortObj(t + 1, i2)
     End If
 End Sub
-Private Function divideObj(ByVal i1 As Long, ByVal i2 As Long) As Long
+Private Function DivideObj(ByVal i1 As Long, ByVal i2 As Long) As Long
     Dim i As Long: i = i1 - 1
     Dim j As Long: j = i2
     Dim p As Long: p = j
@@ -1201,7 +1205,7 @@ Private Function divideObj(ByVal i1 As Long, ByVal i2 As Long) As Long
         If i < j Then Call SwapObj(i, j)
     Loop While (i < j)
     Call SwapObj(i, p)
-    divideObj = i
+    DivideObj = i
 End Function
 Private Function CompareObj(ByVal i1 As Long, ByVal i2 As Long) As Long
     Dim Obj1 As Object: Set Obj1 = m_Arr(i1)
@@ -1242,7 +1246,7 @@ Private Sub priv_Reverse()
     End If
 End Sub
 
-Public Sub ToListbox(aLBorCB, Optional ByVal UseListIndex As Boolean = False, Optional lambObj As Object = Nothing, Optional FuncName As String = vbNullString)
+Public Sub ToListBox(aLBorCB, Optional ByVal UseListIndex As Boolean = False, Optional lambObj As Object = Nothing, Optional FuncName As String = vbNullString)
 'ToListbox Me.LstPerson, True
     Dim i As Long
     aLBorCB.Clear
@@ -1963,4 +1967,172 @@ Private Function Queue_Peek() As Variant
         Queue_Peek = Me.QPeek
     End If
 End Function
+
+' ############################## '    Implements CCollection    ' ############################## '
+'Private Sub CCollection_NewC(Other As CCollection, Optional deep As Boolean = False)
+'End Sub
+
+Private Function CCollection_Add(Item As Variant, Optional Key As Variant, Optional Before As Variant, Optional After As Variant) As Variant
+    '
+End Function
+
+Private Function CCollection_AddKey(obj As Object) As Object
+    '
+End Function
+
+Private Function CCollection_AddOrGet(obj As Object) As Object
+    '
+End Function
+
+Private Sub CCollection_ChangeKey(OldIndexKey As Variant, NewKey As String)
+    '
+End Sub
+
+Private Sub CCollection_Clear()
+    '
+End Sub
+
+'Private Function CCollection_Clone(Optional deep As Boolean = False) As CCollection
+'    '
+'End Function
+
+'Private Function CCollection_Compare(Other As CCollection) As Long
+'    '
+'End Function
+
+Private Function CCollection_Contains(ByVal Key As String) As Boolean
+    '
+End Function
+
+Private Property Get CCollection_Count() As Long
+    '
+End Property
+
+Private Function CCollection_Data_ToStr() As String
+    '
+End Function
+
+Private Property Get CCollection_DataType() As VbVarType
+    '
+End Property
+
+'Private Function CCollection_Equals(Other As CCollection) As Boolean
+'    '
+'End Function
+
+'Private Function CCollection_Find(text As String) As CCollection
+'    '
+'End Function
+
+Private Function CCollection_IndexFromObject(obj As Object) As Long
+    '
+End Function
+
+Private Sub CCollection_Insert(ByVal Index As Long, ValueOrObj As Variant)
+    '
+End Sub
+
+Private Property Get CCollection_IsHashed() As Boolean
+    '
+End Property
+
+Private Property Set CCollection_Item(IndexOrKey As Variant, RHS As Object)
+    '
+End Property
+
+Private Property Let CCollection_Item(IndexOrKey As Variant, RHS As Variant)
+    Me.Item(IndexOrKey) = RHS
+End Property
+
+Private Property Get CCollection_Item(IndexOrKey As Variant) As Variant
+    CCollection_Item = Me.Item(IndexOrKey)
+End Property
+
+Private Property Get CCollection_Key() As String
+    'CCollection_Key = Me.Key
+End Property
+
+Private Property Get CCollection_LLBound() As Long
+    'CCollection_LLBound = Me.lLBound
+End Property
+
+Private Sub CCollection_MoveDown(ByVal i As Long)
+    Me.MoveDown i
+End Sub
+
+Private Sub CCollection_MoveDownKey(ByVal i As Long)
+    Me.MoveDown i
+End Sub
+
+Private Sub CCollection_MoveUp(ByVal i As Long)
+    Me.MoveUp i
+End Sub
+
+Private Sub CCollection_MoveUpKey(ByVal i As Long)
+    Me.MoveUp i
+End Sub
+
+Private Property Let CCollection_Name(ByVal RHS As String)
+    Me.Name = RHS
+End Property
+
+Private Property Get CCollection_Name() As String
+    CCollection_Name = Me.Name
+End Property
+
+Private Function CCollection_NewEnum() As stdole.IUnknown
+    'Set CCollection_NewEnum = Me.NewEnum
+End Function
+
+Private Property Get CCollection_ObjectFromListCtrl(ComboBoxOrListBox As Variant, i_out As Long) As Object
+    'CCollection_ObjectFromListCtrl = Me.Obj
+End Property
+
+Private Property Get CCollection_Ptr() As Variant
+    'CCollection_Ptr = Me.Ptr
+End Property
+
+Private Function CCollection_Remove(IndexOrKey As Variant) As Variant
+    'CCollection_Remove = Me.Remove(IndexOrKey)
+End Function
+
+Private Sub CCollection_Sort(Optional SortDirectionDown As Boolean = False)
+    'Me.Sort SortDirectionDown
+End Sub
+
+Private Sub CCollection_SwapItems(ByVal i1 As Long, ByVal i2 As Long)
+    Me.Swap i1, i2
+End Sub
+
+Private Sub CCollection_SwapItemsKey(ByVal i1 As Long, ByVal Key1 As String, ByVal i2 As Long, ByVal Key2 As String)
+    Me.Swap i1, i2
+End Sub
+
+Private Sub CCollection_ToComboBox(aCB As ComboBox, Optional ByVal addEmptyLineFirst As Boolean = False, Optional ByVal doPtrToItemData As Boolean = False)
+    'Me.ToComboBox aCB, addEmptyLineFirst, doPtrToItemData
+End Sub
+
+Private Sub CCollection_ToListBox(aLB As ListBox, Optional ByVal addEmptyLineFirst As Boolean = False, Optional ByVal doPtrToItemData As Boolean = False)
+    'Me.ToListBox aLB, addEmptyLineFirst, doPtrToItemData
+End Sub
+
+Private Sub CCollection_ToListCtrl(ComboBoxOrListBox As Variant, Optional ByVal addEmptyLineFirst As Boolean = False, Optional ByVal doPtrToItemData As Boolean = False)
+    'Me.ToListCtrl ComboBoxOrListBox, addEmptyLineFirst, doPtrToItemData
+End Sub
+
+Private Function CCollection_ToStr(Optional ByVal isLong As Boolean = False) As String
+    'CCollection_ToStr = Me.ToStr(isLong)
+End Function
+
+Private Function CCollection_TryAddObject(obj As Object, ByVal Key As String) As Boolean
+    'CCollection_TryAddObject = Me.TryAddObject(obj, Key)
+End Function
+
+Private Property Get CCollection_UUBound() As Long
+    'CCollection_UUBound = Me.UUBound
+End Property
+
+Private Property Get CCollection_Version() As Variant
+    'CCollection_Version = Me.Version
+End Property
 
