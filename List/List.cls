@@ -152,16 +152,30 @@ End Sub
 'End Function
 
 '
-Friend Sub NewC(Other As List)
+Friend Sub NewC(Other As List, Optional ByVal deep As Boolean = False)
     'copy-c'tor will be called by function Clone
     With Other
-        Me.New_ .DataType, Other, .IsHashed
+        m_DataType = .DataType
+        m_IsHashed = .IsHashed
+        Dim i As Long, obj As Object
+        If deep Then
+            For i = .LLBound To .UUBound
+                Set obj = .Item(i)
+                Me.Add obj.Clone(deep)
+            Next
+        Else
+            For i = .LLBound To .UUBound
+                Set obj = .Item(i)
+                Me.Add obj
+            Next
+        End If
+        'Me.New_ .DataType, Other, .IsHashed
     End With
 End Sub
 
-Private Sub InitGenericArray(t As EDataType)
+Private Sub InitGenericArray(T As EDataType)
     Dim u As Long: u = m_Capacity + 1
-    Select Case t
+    Select Case T
     Case EDataType.vbInteger:    ReDim m_Arr(0 To u) As Integer:   m_bytLen = 2
     Case EDataType.vbUInteger:   ReDim m_Arr(0 To u) As Integer:   m_bytLen = 2
     Case EDataType.vbLong:       ReDim m_Arr(0 To u) As Long:      m_bytLen = 4
@@ -191,7 +205,7 @@ Private Sub InitGenericArray(t As EDataType)
     'wait for Add
     'Case vbArray:
     Case Else 'Fehlermeldung ausgeben
-        MsgBox "Datatype not supported yet: " & EDataType_ToStr(t)
+        MsgBox "Datatype not supported yet: " & EDataType_ToStr(T)
     End Select
     'm_bytLen = LenB(m_Arr(0))
 End Sub
@@ -226,9 +240,9 @@ Friend Function GetType() As String
 End Function
 
 'Siehe auch Extra Projekt in der diese Funktion ausgiebig getestet wird
-Private Function EDataType_ToStr(t As EDataType) As String
+Private Function EDataType_ToStr(T As EDataType) As String
     Dim s As String
-    Select Case t
+    Select Case T
     Case vbInteger:         s = "Integer"    ' vbInteger    = 2
     Case vbLong:            s = "Long"       ' vbLong       = 3
     Case vbSingle:          s = "Single"     ' vbSingle     = 4
@@ -255,8 +269,8 @@ Private Function EDataType_ToStr(t As EDataType) As String
     Case vbWChar:           s = "WChar"
     'Case vbArray:      s = "Array"      ' vbArray      = 8192 (&H2000)
     Case Else:
-        If t And vbByRef Then s = "ByRef "
-        If t And vbArray Then s = "Array As " Else s = "Type still undefined"
+        If T And vbByRef Then s = "ByRef "
+        If T And vbArray Then s = "Array As " Else s = "Type still undefined"
     End Select
     EDataType_ToStr = s
 End Function
@@ -415,10 +429,10 @@ End Property
 Public Sub AddRange(aArr) 'As List
     ' Fügt die Elemente der angegebenen Auflistung der List hinzu
     If VBA.Information.IsEmpty(aArr) Then Exit Sub
-    Dim i As Long, v
+    Dim i As Long, V
     If TypeOf aArr Is List Then
-        For Each v In aArr.GetEnumerator
-            Me.Add v
+        For Each V In aArr.GetEnumerator
+            Me.Add V
         Next
     Else
         If m_DataType = vbWChar Then
@@ -439,13 +453,13 @@ Public Sub AddRange(aArr) 'As List
             End If
         ElseIf m_DataType = vbUserDefinedType Then
             For i = 0 To UBound(aArr)
-                v = aArr(i)
-                Me.Add v
+                V = aArr(i)
+                Me.Add V
             Next
         Else
             'für Collection oder Array
-            For Each v In aArr
-                Me.Add v
+            For Each V In aArr
+                Me.Add V
             Next
         End If
     End If
@@ -475,9 +489,9 @@ Public Sub Clear()
     ReDim m_Arr(0 To m_Capacity - 1)
 End Sub
 
-Public Function Clone() As List
+Public Function Clone(Optional ByVal deep As Boolean = False) As List
     'erzeugt eine flache Kopie der Liste und gibt sie zurück
-    Set Clone = New List: Clone.NewC Me
+    Set Clone = New List: Clone.NewC Me, deep
 End Function
 
 Public Function ContainsEqualObj(obj As Object) As Boolean
@@ -565,6 +579,10 @@ Public Function GetEnumerator() 'As Variant ' 'As IUnknown
     GetEnumerator = m_Arr 'm_Arr() '.[_NewEnum]
 End Function
 
+Public Property Get LLBound() As Long
+    'gibt den Lower Bound, die unterste Schranke, den kleinsten Index des internen Arrays zurück
+    LLBound = LBound(m_Arr)
+End Property
 Public Property Get UUBound() As Long
     'ähnlich wie Capacity
     'gibt den Upper Bound, die oberste Schranke, den größten Index des internen Arrays zurück
@@ -1118,11 +1136,11 @@ End Sub
 
 ' Die Rekursive datenunabhängige Methode QuickSort
 Private Sub QuickSortVar(ByVal i1 As Long, ByVal i2 As Long)
-    Dim t As Long
+    Dim T As Long
     If i2 > i1 Then
-        t = DivideVar(i1, i2)
-        Call QuickSortVar(i1, t - 1)
-        Call QuickSortVar(t + 1, i2)
+        T = DivideVar(i1, i2)
+        Call QuickSortVar(i1, T - 1)
+        Call QuickSortVar(T + 1, i2)
     End If
 End Sub
 Private Function DivideVar(ByVal i1 As Long, ByVal i2 As Long) As Long
@@ -1151,11 +1169,11 @@ End Sub
 
 ' Die Rekursive datenunabhängige Methode QuickSort für Strings
 Private Sub QuickSortStr(ByVal i1 As Long, ByVal i2 As Long)
-    Dim t As Long
+    Dim T As Long
     If i2 > i1 Then
-        t = DivideStr(i1, i2)
-        Call QuickSortStr(i1, t - 1)
-        Call QuickSortStr(t + 1, i2)
+        T = DivideStr(i1, i2)
+        Call QuickSortStr(i1, T - 1)
+        Call QuickSortStr(T + 1, i2)
     End If
 End Sub
 Private Function DivideStr(ByVal i1 As Long, ByVal i2 As Long) As Long
@@ -1184,11 +1202,11 @@ End Sub
 
 ' Die Rekursive datenunabhängige Methode QuickSort
 Private Sub QuickSortObj(ByVal i1 As Long, ByVal i2 As Long)
-    Dim t As Long
+    Dim T As Long
     If i2 > i1 Then
-        t = DivideObj(i1, i2)
-        Call QuickSortObj(i1, t - 1)
-        Call QuickSortObj(t + 1, i2)
+        T = DivideObj(i1, i2)
+        Call QuickSortObj(i1, T - 1)
+        Call QuickSortObj(T + 1, i2)
     End If
 End Sub
 Private Function DivideObj(ByVal i1 As Long, ByVal i2 As Long) As Long
