@@ -927,7 +927,7 @@ End Function
 'Private Function ByteArray_ToHex(Bytes() As Byte) As String
 Private Function ByteArray_ToHex(Value) As String
 Try: On Error GoTo Catch
-    If VarType(Value) <> (vbArray Or vbByte) Then Exit Function
+    If VarType(Value) <> (VbVarType.vbArray Or VbVarType.vbByte) Then Exit Function
     Dim Bytes() As Byte: Bytes = Value
     Dim i As Long, s As String
     Dim lb As Long: lb = LBound(Bytes)
@@ -2290,8 +2290,8 @@ End Function
 Public Function GetTabbedText(s As String, Optional onlyNewLine As Boolean = False, Optional NumOnly As Boolean = False) As String
     'takes any string, first replaces any vbtab into normal space
     'then separates every value in the string with tabs, lines with vbcrlf
-    Dim T As String: T = Replace(s, vbTab, " ")
-    Dim lines() As String: lines = Split(T, vbCrLf)
+    Dim t As String: t = Replace(s, vbTab, " ")
+    Dim lines() As String: lines = Split(t, vbCrLf)
     Dim i As Long
     'Dim onlyNewLine As Boolean: onlyNewLine = False 'Me.cbNewlineOnly.Value
     Dim svbCrLf As String: If onlyNewLine Then svbCrLf = vbCrLf

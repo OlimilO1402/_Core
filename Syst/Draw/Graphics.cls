@@ -10,7 +10,7 @@ Attribute VB_Name = "Graphics"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
-Attribute VB_Exposed = True
+Attribute VB_Exposed = False
 Option Explicit
 'in AXdll Instancing: 2 - PublicNotCreatable '6 - GlobalMultiUse
 Public Type TIdentMapEntry

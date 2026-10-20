@@ -10,7 +10,7 @@ Attribute VB_Name = "TBrushRecall"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
-Attribute VB_Exposed = True
+Attribute VB_Exposed = False
 Option Explicit
 '  TBrushRecall = Class(TRecall)
 Implements TRecall

@@ -66,7 +66,7 @@ Private Const NMPWAIT_WAIT_FOREVER          As Long = &HFFFFFFFF ' Waits indefin
 Private Const INVALID_HANDLE_VALUE          As Long = -1 '((Handle) - 1)
 Private Const ERROR_INVALID_PARAMETER       As Long = 87
 Private Const PIPE_UNLIMITED_INSTANCES      As Long = 255
-Private Const NMPWAIT_USE_DEFAULT_WAIT      As Long = &H0
+'Private Const NMPWAIT_USE_DEFAULT_WAIT      As Long = &H0
 
 Private Type SECURITY_DESCRIPTOR
     Revision As Byte
@@ -214,8 +214,8 @@ End Sub
 'End Function
 
 Public Property Get FullName() As String
-    Dim p As String: p = PathPipe & IIf(m_IsLocal, PathLocal, "")
-    FullName = p & m_Name
+    Dim P As String: P = PathPipe & IIf(m_IsLocal, PathLocal, "")
+    FullName = P & m_Name
 End Property
 Public Property Get Name() As String
     Name = m_Name

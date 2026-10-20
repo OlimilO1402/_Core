@@ -10,7 +10,7 @@ Attribute VB_Name = "TPenRecall"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
-Attribute VB_Exposed = True
+Attribute VB_Exposed = False
 Option Explicit
 '  TPenRecall = Class(TRecall)
 Implements TRecall

@@ -10,7 +10,7 @@ Attribute VB_Name = "MyThread"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
-Attribute VB_Exposed = True
+Attribute VB_Exposed = False
 Option Explicit
 'Private Declare Sub Sleep Lib "kernel32" (ByVal dwMilliSeconds As Long)
 Private mIThreading As IThreading
@@ -20,7 +20,7 @@ Private Declare Function WSAStartup2 Lib "Ws2_32" Alias "WSAStartup" (ByVal Vers
 Private Declare Function WSACleanup2 Lib "Ws2_32" Alias "WSACleanup" () As Long
 Private Declare Function inet_addr2 Lib "Ws2_32" Alias "inet_addr" (ByVal s As String) As Long
 Private Declare Function getnameinfo Lib "Ws2_32" (ByRef sa As sockaddr_in, ByVal salen As Long, ByVal Host As String, ByVal hostlen As Long, ByVal serv As String, ByVal servlen As Long, ByVal flags As Long) As Long
-Private Declare Sub RtlZeroMemory Lib "KERNEL32" (dest As Any, ByVal numBytes As Long)
+Private Declare Sub RtlZeroMemory Lib "kernel32" (Dest As Any, ByVal numBytes As Long)
 
 Private Const WSADescription_Len As Long = 256
 Private Const WSASYS_Status_Len  As Long = 128
@@ -50,7 +50,7 @@ Private mEndTime    As Single
 
 Private mIP         As String
 Private mName       As String
-Private mErr        As String
+Private MErr        As String
 
 Private Sub Class_Initialize()
     Set mFrmHelp = New frmHelp
@@ -79,7 +79,7 @@ Public Property Get StartDate() As Date
 End Property
 
 Public Property Get MyError() As String
-    MyError = mErr
+    MyError = MErr
 End Property
 
 Public Property Get IP() As String
@@ -101,7 +101,7 @@ Public Property Get DurationMs() As Single
 End Property
 
 Friend Sub DoAction()
-Try: On Error GoTo Catch
+try: On Error GoTo Catch
     mStartDate = Now
     mStartTime = Timer
     mIThreading.ActionStarted mIP ' mIndex
@@ -117,11 +117,11 @@ Try: On Error GoTo Catch
     mIThreading.ActionCompleted mIP 'mIndex
     Exit Sub
 Catch:
-    MsgBox "Error in " & TypeName(Me) & "::DoAction" & mErr & " " & Err.Number & " " & Err.Description & vbCrLf & WSAGetLastError
+    MsgBox "Error in " & TypeName(Me) & "::DoAction" & MErr & " " & Err.Number & " " & Err.Description & vbCrLf & WSAGetLastError
 End Sub
  
 Private Function GetNameFromIP(ByVal strIP As String) As String
-Try: On Error GoTo Catch
+try: On Error GoTo Catch
     Const WS_VERSION_REQD2   As Long = &H202
     Const SOCKET_ERROR       As Long = -1
     Const IP_SUCCESS         As Long = 0&
@@ -153,19 +153,19 @@ Try: On Error GoTo Catch
             GetNameFromIP = RemoveNullChars(lsHostname)
             Exit Function
         Else
-            mErr = "Invalid IP"
+            MErr = "Invalid IP"
         End If
         WSACleanup2
     Else
-        mErr = "Error Startup"
+        MErr = "Error Startup"
     End If
     Exit Function
 Catch:
-    MsgBox "Error in " & TypeName(Me) & "::GetNameFromIP " & mErr & " " & Err.Number & " " & Err.Description & vbCrLf & WSAGetLastError
+    MsgBox "Error in " & TypeName(Me) & "::GetNameFromIP " & MErr & " " & Err.Number & " " & Err.Description & vbCrLf & WSAGetLastError
 End Function
 
 Function RemoveNullChars(ByVal s As String) As String
-    Dim slen As Long: slen = InStr(1, s, vbNullChar) - 1
-    If slen > 0 Then RemoveNullChars = Left(s, slen) Else RemoveNullChars = s
+    Dim sLen As Long: sLen = InStr(1, s, vbNullChar) - 1
+    If sLen > 0 Then RemoveNullChars = Left(s, sLen) Else RemoveNullChars = s
 End Function
 

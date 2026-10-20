@@ -94,9 +94,9 @@ End Sub
 '    Set VVariantVt = New VVariant: VVariantVt.NewVt vt, aValue
 'End Function
 
-Friend Sub NewC(other As VVariant)
-    New_ other.Value
-    Me.VarType = other.VarType
+Friend Sub NewC(Other As VVariant)
+    New_ Other.Value
+    Me.VarType = Other.VarType
 End Sub
 
 Friend Function Clone() As VVariant
@@ -250,7 +250,7 @@ Public Function VAdd(Value) As VVariant
         'vRes = MUnsigned.UInt32_Add(CLng(m_Var.Value), CLng(Value))
         Me.VarType = EVbVarType.vbULong
         Exit Function
-    Case vbByte, vbInteger, vbLong, vbSingle, vbDouble
+    Case EVbVarType.vbByte, EVbVarType.vbInteger, EVbVarType.vbLong, EVbVarType.vbSingle, EVbVarType.vbDouble
         hr = VarAdd(m_Var.Value, Value, ByVal VarPtr(vRes))
     End Select
     If hr = S_OK Then

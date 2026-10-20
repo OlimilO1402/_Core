@@ -45,10 +45,18 @@ Public Sub NewC(Other As CCollection, Optional deep As Boolean = False)
         m_Name = .Name
         m_IsHashed = .IsHashed
         m_LowB = .LLBound
-        For i = .LLBound To .UUBound
-            Set obj = .Item(i + m_LowB)
-            m_Col.Add obj.Clone(deep)
-        Next
+        Set m_Col = New Collection
+        If deep Then
+            For i = .LLBound To .UUBound
+                Set obj = .Item(i + m_LowB)
+                m_Col.Add obj.Clone(deep)
+            Next
+        Else
+            For i = .LLBound To .UUBound
+                Set obj = .Item(i + m_LowB)
+                m_Col.Add obj
+            Next
+        End If
     End With
 End Sub
 
