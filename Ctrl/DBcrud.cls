@@ -48,8 +48,8 @@ Public Event OnFound(found As CCollection)
 
 'should we have the listbox also in here
 'should we have the list also in here
-Friend Sub New_(Col As CCollection, ListBox, BtnAdd, Optional BtnAddClone, Optional BtnInsert, Optional BtnInsertClone, Optional BtnEdit, Optional BtnDelete, Optional BtnMoveUp, Optional BtnMoveDown, Optional BtnSortUp, Optional BtnSortDown, Optional BtnSearch, Optional TxtSearch)
-    Set m_List = Col: m_IsHashed = m_List.IsHashed: Set mListBox = ListBox
+Friend Sub New_(aList As CCollection, ListBox, BtnAdd, Optional BtnAddClone, Optional BtnInsert, Optional BtnInsertClone, Optional BtnEdit, Optional BtnDelete, Optional BtnMoveUp, Optional BtnMoveDown, Optional BtnSortUp, Optional BtnSortDown, Optional BtnSearch, Optional TxtSearch)
+    Set m_List = aList: m_IsHashed = m_List.IsHashed: Set mListBox = ListBox
     If Not IsMissing(BtnAdd) Then Set mBtnAdd = BtnAdd
     If Not IsMissing(BtnAddClone) Then Set mBtnAddCln = BtnAddClone
     If Not IsMissing(BtnInsert) Then Set mBtnIns = BtnInsert
@@ -204,7 +204,7 @@ Private Sub mBtnSrtDwn_Click()
 End Sub
 
 Private Sub mBtnSearch_Click()
-    Dim s As String: s = mTxtSearch.text
+    Dim s As String: s = mTxtSearch.Text
     If Len(s) = 0 Then Exit Sub
     Dim found As CCollection: Set found = m_List.Find(s)
     If found Is Nothing Then Exit Sub
