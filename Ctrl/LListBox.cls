@@ -387,11 +387,11 @@ End Sub
 'https://www.activevb.de/tipps/vb6tipps/tipp0052.html
 Private Sub mListBox_MouseMove(Button As Integer, Shift As Integer, X As Single, Y As Single)
     If Not m_HighlightEntries Then Exit Sub
-    Dim SX As Single: SX = List1.Parent.ScaleX(X, List1.Parent.ScaleMode, vbPixels)
-    Dim SY As Single: SY = List1.Parent.ScaleY(Y, List1.Parent.ScaleMode, vbPixels)
+    Dim SX As Single: SX = mListBox.Parent.ScaleX(X, mListBox.Parent.ScaleMode, vbPixels)
+    Dim SY As Single: SY = mListBox.Parent.ScaleY(Y, mListBox.Parent.ScaleMode, vbPixels)
     Dim XY As Long:   XY = CLng(SX) + &H10000 * CLng(SY)
-    Dim li As Long:   li = SendMessage(List1.hWnd, LB_ITEMFROMPOINT, 0, ByVal XY)
-    If li < List1.ListCount Then List1.ListIndex = li
+    Dim li As Long:   li = SendMessage(mListBox.hWnd, LB_ITEMFROMPOINT, 0, ByVal XY)
+    If li < mListBox.ListCount Then mListBox.ListIndex = li
 End Sub
 
 Private Sub mListBox_MouseUp(Button As Integer, Shift As Integer, X As Single, Y As Single)

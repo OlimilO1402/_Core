@@ -234,7 +234,7 @@ Public Property Set Value(aValue)
 End Property
 
 Public Function UDTPtrToStr() As String
-    UDTPtrToStr = MPtr.UDTPtrToString(m_Var.udtptr)
+    UDTPtrToStr = MPtr.UDTPtr_ToStr(m_Var.udtptr)
 End Function
 
 ' ############################## '    Arithmetic and Boolean Operations    ' ############################## '

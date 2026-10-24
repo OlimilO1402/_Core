@@ -25,8 +25,9 @@ Private Sub Class_Initialize()
     Set m_KeyValues = MNew.List(EDataType.vbObject)
 End Sub
 
-Friend Sub New_(IniFile As ConfigIniDocument, ByVal SectionName As String)
+Friend Sub New_(IniFile As ConfigIniDocument, ByVal SectionName As String, Optional ByVal IsHashed As Boolean = False)
     Set m_IniFile = IniFile: m_Name = SectionName
+    If IsHashed Then Set m_KeyValues = MNew.List(EDataType.vbObject, , IsHashed)
 End Sub
 'Copy to MNew:
 'Public Function ConfigIniSection(IniFile As ConfigIniDocument, SectionName As String) As ConfigIniSection
@@ -159,11 +160,11 @@ End Sub
 
 Private Sub LoadRoot()
 Try: On Error GoTo Catch
-    Dim PFN As PathFileName: Set PFN = m_IniFile.PFN
+    Dim pfn As PathFileName: Set pfn = m_IniFile.pfn
     Dim line As String
     Dim sKeyName As String, sValue As String, bEqualsign As Boolean, bLineIsSectionHeader As Boolean
     Do
-        line = Trim(PFN.ReadLine)
+        line = Trim(pfn.ReadLine)
         If Len(line) Then
             sKeyName = vbNullString: sValue = vbNullString: bEqualsign = False: bLineIsSectionHeader = False
             If Not Line_TryParse(line, sKeyName, bEqualsign, sValue, bLineIsSectionHeader) Then
@@ -182,12 +183,12 @@ Try: On Error GoTo Catch
                 m_KeyValues.Add nkey
             End If
         End If
-    Loop Until PFN.IsEOF
+    Loop Until pfn.IsEOF
     GoTo Finally
 Catch:
     ErrHandler "LoadAsRoot"
 Finally:
-    PFN.CloseFile
+    pfn.CloseFile
 End Sub
 
 Private Function Line_TryParse(line As String, keyname_out As String, hasEqualSign_out As Boolean, Value_out As String, isSectionHeader_out As Boolean) As Boolean

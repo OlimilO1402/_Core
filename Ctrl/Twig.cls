@@ -288,12 +288,13 @@ Public Property Get TwigByPath(ByVal aPath As String) As Twig
                     Set t = Twigs.Item(i)
                     If p = t.Name & "\" Then
                         'aPath = Mid(aPath, pos + 1)
-                        If t.Twigs.Count = 0 Then
-                            Set TwigByPath = t
-                        Else
-                            Set TwigByPath = t.Twig(aPath)
-                            Exit Property
-                        End If
+                        Set TwigByPath = t
+                        'If t.Twigs.Count = 0 Then
+                        '    Set TwigByPath = t
+                        'Else
+                        '    Set TwigByPath = t.Twig(aPath)
+                        '    Exit Property
+                        'End If
                     End If
                 Next
             End If
@@ -310,7 +311,7 @@ Public Property Get Path() As String
     If Not Me.Tree Is Nothing Then Path = Me.Tree.Path & Path
 End Property
 
-Public Sub ToListbox(aLB As ListBox, ind As IndentStack, aPath As String)
+Public Sub ToListBox(aLB As ListBox, ind As IndentStack, aPath As String)
     Dim ve As String: ve = IIf(Me.IsOpen, "v-", ">-")
     Me.ViewIndex = aLB.ListCount '- 1
     aLB.AddItem ind.Peek & ve & Me.Name
@@ -321,7 +322,7 @@ Public Sub ToListbox(aLB As ListBox, ind As IndentStack, aPath As String)
             Dim tw As Twig
             For i = 0 To Twigs.Count - 1
                 Set tw = Twigs.Item(i)
-                tw.ToListbox aLB, ind, aPath & Me.Name & "\"
+                tw.ToListBox aLB, ind, aPath & Me.Name & "\"
             Next
             Dim lf As Leaf
             For i = 0 To Leafs.Count - 1
