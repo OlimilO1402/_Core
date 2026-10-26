@@ -153,21 +153,20 @@ Public Sub SetPenPos(X As Long, Y As Long)
   Call MoveTo(X, Y)
 End Sub
 
-Public Property Get PenPos() As TPoint
+Friend Property Get PenPos() As TPoint
   Call RequiredState(csHandleValid)
   Call Windows.GetCurrentPositionEx(mHandle, mPenPos)
   'X = mPenPos.X
   'Y = mPenPos.Y
   PenPos = mPenPos
 End Property
-Public Property Let PenPos(aPt As TPoint)
+Friend Property Let PenPos(aPt As TPoint)
   mPenPos.X = aPt.X
   mPenPos.Y = aPt.Y
   Call MoveTo(mPenPos.X, mPenPos.Y)
 End Property
 
-
-Public Property Get ClipRect() As Rect
+Friend Property Get ClipRect() As Rect
 'ByRef Left As Long, ByRef Top As Long, ByRef Right As Long, ByRef Bottom As Long)
   RequiredState (csHandleValid)
   Call GetClipBox(mHandle, ClipRect)
@@ -290,7 +289,7 @@ Public Sub CopyRectA(DstL As Long, DstT As Long, DstW As Long, DstH As Long, Src
          SrcCanvas.Handle, SrcL, SrcT, SrcW, SrcH, mCopyMode)
   Call Changed
 End Sub
-Public Sub CopyRect(Dest As Rect, ByRef Canvas As TCanvas, Source As Rect)
+Friend Sub CopyRect(Dest As Rect, ByRef Canvas As TCanvas, Source As Rect)
   Call Changing
   Call RequiredState(csHandleValid Or csFontValid Or csBrushValid)
   Call Canvas.RequiredState(csHandleValid Or csBrushValid)
@@ -316,7 +315,7 @@ Public Sub DrawFocusRectA(Left As Long, Top As Long, Right As Long, Bottom As Lo
   Call DrawFocusRectP(mHandle, VarPtr(Left))
   Call Changed
 End Sub
-Public Sub DrawFocusRect(Rec As Rect)
+Friend Sub DrawFocusRect(Rec As Rect)
   Call Changing
   Call RequiredState(csHandleValid Or csBrushValid)
   Call DrawFocusRectP(mHandle, VarPtr(Rec.Left))
@@ -330,7 +329,7 @@ Public Sub Ellipse(X1 As Long, Y1 As Long, X2 As Long, Y2 As Long)
   Call Changed
 End Sub
 
-Public Sub EllipseR(Rec As Rect)
+Friend Sub EllipseR(Rec As Rect)
   Call Ellipse(Rec.Left, Rec.Top, Rec.Right, Rec.Bottom)
 End Sub
 
@@ -344,7 +343,7 @@ Dim Rec As Rect
   Call Changed
 End Sub
 
-Public Sub FloodFill(X As Long, Y As Long, Color As TColor, FillStyle As TFillStyle)
+Friend Sub FloodFill(X As Long, Y As Long, Color As TColor, FillStyle As TFillStyle)
   Call Changing
   Call RequiredState(csHandleValid Or csBrushValid)
   Call ExtFloodFill(mHandle, X, Y, Color, FillStyle)
@@ -482,7 +481,7 @@ Public Sub RectangleXY(X1 As Long, Y1 As Long, X2 As Long, Y2 As Long)
   Call Changed
 End Sub
 
-Public Sub Rectangle(Rec As Rect)
+Friend Sub Rectangle(Rec As Rect)
   Call RectangleXY(Rec.Left, Rec.Top, Rec.Right, Rec.Bottom)
 End Sub
 

@@ -55,10 +55,8 @@ Private mSTPX As Long, mSTPY As Long
 Public mTCHandle      As Long 'Handle des TabControls
 Public mIndex         As Long 'der eigene Index und der des Tabs - beginnt bei 0
 
-Private Declare Function SendMessage Lib "user32.dll" Alias "SendMessageA" ( _
-    ByVal hwnd As Long, ByVal wMsg As Long, ByVal wParam As Long, lParam As Any) As Long
-Private Declare Function SetParent Lib "user32.dll" ( _
-    ByVal hWndChild As Long, ByVal hWndNewParent As Long) As Long
+Private Declare Function SendMessage Lib "user32.dll" Alias "SendMessageA" (ByVal hwnd As Long, ByVal wMsg As Long, ByVal wParam As Long, lParam As Any) As Long
+Private Declare Function SetParent Lib "user32.dll" (ByVal hWndChild As Long, ByVal hWndNewParent As Long) As Long
 
 Private Sub Class_Initialize()
     Set mControls = New ControlCollection
