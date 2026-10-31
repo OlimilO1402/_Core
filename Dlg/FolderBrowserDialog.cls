@@ -329,16 +329,16 @@ Try: On Error GoTo Catch
         Dim Buffer As String: Buffer = String$(1024, vbNullChar)
         Call SHGetPathFromIDListW(IDList, ByVal StrPtr(Buffer))
         mSelectedPath = Left$(Buffer, lstrlenW(ByVal StrPtr(Buffer)))
-        ShowDialog = vbOK
+        ShowDialog = VbMsgBoxResult.vbOK
         'Free the IDList Memory !
         Call CoTaskMemFree(IDList)
     Else
-        ShowDialog = vbCancel
+        ShowDialog = VbMsgBoxResult.vbCancel
     End If
     Exit Function
 Catch:
     If Err.Number > 0 Then MsgBox Err.Description
-    ShowDialog = vbAbort
+    ShowDialog = VbMsgBoxResult.vbAbort
 End Function
 
 Private Function FncPtr(ByVal p As LongPtr) As LongPtr

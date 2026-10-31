@@ -367,15 +367,15 @@ Public Property Let FontName(ByVal Value As String)
 End Property
 
 #If VBA7 Then
-Public Property Get Font() As newFont
-    Set Font = New newFont
+Public Property Get Font() As NewFont
+    Set Font = New NewFont
 #Else
 Public Property Get Font() As StdFont
     Set Font = New StdFont
 #End If
     With Font
         .Bold = mFont.lfWidth
-        .CharSet = mFont.lfCharSet
+        .Charset = mFont.lfCharSet
         .Italic = mFont.lfItalic
         '.Name = StrConv(mFont.lfFaceName, vbUnicode)
         .Name = Me.FontName
@@ -387,13 +387,13 @@ Public Property Get Font() As StdFont
 End Property
 
 #If VBA7 Then
-Public Property Set Font(aFont As newFont)
+Public Property Set Font(aFont As NewFont)
 #Else
 Public Property Set Font(aFont As StdFont)
 #End If
     With mFont
         .lfWidth = aFont.Bold
-        .lfCharSet = aFont.CharSet
+        .lfCharSet = aFont.Charset
         .lfItalic = aFont.Italic
         'Dim StdName As String: StdName = "Ms Sans Serif"
         '.lfFaceName = StrConv(FntVal.Name, vbFromUnicode) & vbNullChar
@@ -573,7 +573,7 @@ Try: On Error GoTo Finally
     End If
 Finally:
     CoTaskMemFree ByVal CF.lpLogFont
-    If Err Then ShowDialog = vbAbort
+    If Err Then ShowDialog = VbMsgBoxResult.vbAbort
 End Function
 
 Private Sub CheckMessError()

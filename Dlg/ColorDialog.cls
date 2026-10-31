@@ -69,7 +69,7 @@ Private Type ChooseColorW     '      x86 '     x64
     hInstance      As LongPtr '        4 '       8
     rgbResult      As Long    '        4 '       4 + 4pads
     lpCustColors   As LongPtr '        4 '       8
-    Flags          As Long    '        4 '       4 + 4pads
+    flags          As Long    '        4 '       4 + 4pads
     lCustData      As LongPtr '        4 '       8
     lpfnHook       As LongPtr '        4 '       8
     lpTemplateName As LongPtr 'String  4 '       8
@@ -209,7 +209,7 @@ Try: On Error GoTo Catch
     If IsMissing(Frm) Then
         ahWndOwner = GetActiveWindow
     Else
-        ahWndOwner = Frm.hWnd
+        ahWndOwner = Frm.hwnd
     End If
     Dim ChCl As ChooseColorW
     With ChCl
@@ -223,42 +223,42 @@ Try: On Error GoTo Catch
 '#End If
         .rgbResult = m_Color 'RGB(0, 255, 0) 'Farbe voreinstellen
         .lpCustColors = VarPtr(m_CustomColors(0)) 'Benutzerdefinierte Farben zuweisen
-        .Flags = m_Flags
+        .flags = m_Flags
         .lCustData = 0&
         .lpfnHook = 0&
         .lpTemplateName = StrPtr(m_TemplateName) '"" '0&
     End With
-    ShowDialog = IIf(ChooseColorW(ChCl) <> 0, vbOK, vbCancel)
-    If ShowDialog = vbOK Then
+    ShowDialog = IIf(ChooseColorW(ChCl) <> 0, VbMsgBoxResult.vbOK, VbMsgBoxResult.vbCancel)
+    If ShowDialog = VbMsgBoxResult.vbOK Then
         m_Color = ChCl.rgbResult
-    ElseIf ShowDialog = vbCancel Then
+    ElseIf ShowDialog = VbMsgBoxResult.vbCancel Then
         m_CustomColors() = CancelColors()
         CheckMessError
     End If
     Exit Function
 Catch:
-    ShowDialog = vbAbort
+    ShowDialog = VbMsgBoxResult.vbAbort
 End Function
 
 Private Sub CheckMessError()
     Dim hr As Long: hr = CommDlgExtendedError
     If hr = 0 Then Exit Sub
-    Dim S As String
+    Dim s As String
     Select Case hr
-    Case CDERR_STRUCTSIZE:      S = "STRUCTSIZE"
-    Case CDERR_INITIALIZATION:  S = "INITIALIZATION"
-    Case CDERR_NOTEMPLATE:      S = "NOTEMPLATE"
-    Case CDERR_NOHINSTANCE:     S = "NOHINSTANCE"
-    Case CDERR_LOADSTRFAILURE:  S = "LOADSTRFAILURE"
-    Case CDERR_FINDRESFAILURE:  S = "FINDRESFAILURE"
-    Case CDERR_LOADRESFAILURE:  S = "LOADRESFAILURE"
-    Case CDERR_LOCKRESFAILURE:  S = "LOCKRESFAILURE"
-    Case CDERR_MEMALLOCFAILURE: S = "MEMALLOCFAILURE"
-    Case CDERR_MEMLOCKFAILURE:  S = "MEMLOCKFAILURE"
-    Case CDERR_NOHOOK:          S = "NOHOOK"
-    Case CDERR_DIALOGFAILURE:   S = "DIALOGFAILURE"
+    Case CDERR_STRUCTSIZE:      s = "STRUCTSIZE"
+    Case CDERR_INITIALIZATION:  s = "INITIALIZATION"
+    Case CDERR_NOTEMPLATE:      s = "NOTEMPLATE"
+    Case CDERR_NOHINSTANCE:     s = "NOHINSTANCE"
+    Case CDERR_LOADSTRFAILURE:  s = "LOADSTRFAILURE"
+    Case CDERR_FINDRESFAILURE:  s = "FINDRESFAILURE"
+    Case CDERR_LOADRESFAILURE:  s = "LOADRESFAILURE"
+    Case CDERR_LOCKRESFAILURE:  s = "LOCKRESFAILURE"
+    Case CDERR_MEMALLOCFAILURE: s = "MEMALLOCFAILURE"
+    Case CDERR_MEMLOCKFAILURE:  s = "MEMLOCKFAILURE"
+    Case CDERR_NOHOOK:          s = "NOHOOK"
+    Case CDERR_DIALOGFAILURE:   s = "DIALOGFAILURE"
     End Select
-    If Len(S) Then
-        MsgBox S
+    If Len(s) Then
+        MsgBox s
     End If
 End Sub

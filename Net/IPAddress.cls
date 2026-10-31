@@ -380,7 +380,7 @@ Friend Function ToStr(Optional ByVal short As Boolean = False) As String
             sa(i) = I8_ToStr(short): i = i + 1
         End If
     End If
-    s = Join(sa, sep) & IIf(m_b4atEnd, ":" & Join(sa4, "."), "")
+    Dim s As String: s = Join(sa, sep) & IIf(m_b4atEnd, ":" & Join(sa4, "."), "")
     If Not IsEmpty(m_ZoneID) Then ToStr = ToStr & "%" & m_ZoneID
     If m_IsInURI Then s = "[" & s & "]"
     Dim portsep As String: portsep = ":"

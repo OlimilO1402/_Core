@@ -53,10 +53,12 @@ Private Const INTERNET_FLAG_NO_AUTO_REDIRECT         As Long = &H200000
 Private Const INTERNET_FLAG_KEEP_CONNECTION          As Long = &H400000
 Private Const INTERNET_FLAG_SECURE                   As Long = &H800000
 Private Const INTERNET_FLAG_NO_CACHE_WRITE           As Long = &H4000000
+Private Const INTERNET_FLAG_DONT_CACHE               As Long = &H4000000
 Private Const INTERNET_FLAG_PASSIVE                  As Long = &H8000000
 Private Const INTERNET_FLAG_EXISTING_CONNECT         As Long = &H20000000
 Private Const INTERNET_FLAG_RAW_DATA                 As Long = &H40000000
 Private Const INTERNET_FLAG_RELOAD                   As Long = &H80000000
+
 
 'https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetreadfile
 Private Declare Function InternetReadFile Lib "wininet" (ByVal hFile As LongPtr, ByVal lpBuffer As LongPtr, ByVal dwNumberOfBytesToRead As Long, ByRef out_NumberOfBytesRead As Long) As Long 'BOOL
@@ -80,6 +82,7 @@ Private Declare Function InternetReadFileExW Lib "wininet" (ByRef hFile As LongP
 'https://learn.microsoft.com/en-us/windows/win32/api/wininet/nf-wininet-internetclosehandle
 Private Declare Function InternetCloseHandle Lib "wininet" (ByVal hInternet As LongPtr) As Long 'BOOL
 
+Private m_hFile  As LongPtr
 Private m_hInet  As LongPtr
 Private m_hURL   As LongPtr
 Private m_sURL   As String
@@ -125,8 +128,8 @@ Private Function pRead(ByVal len_in As Long, Buffer_inout As String) As Long
 End Function
 
 Private Sub Class_Terminate()
-    If InternetCloseHandle(m_hFile) = 0 Then MsgBox "URL-File-handle could not be closed"
-    If InternetCloseHandle(m_hInet) = 0 Then MsgBox "Internet-handle could not be closed"
+    If m_hFile Then If InternetCloseHandle(m_hFile) = 0 Then MsgBox "URL-File-handle could not be closed"
+    If m_hInet Then If InternetCloseHandle(m_hInet) = 0 Then MsgBox "Internet-handle could not be closed"
 End Sub
 
 

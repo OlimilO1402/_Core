@@ -23,12 +23,12 @@ Attribute VB_Exposed = False
 ' * VBA6 (VBA before 2007)
 ' * VBA7-x86
 ' * VBA7-X64
-'For this class to compile you also need:
-'* MShell.bas  from the same repo                     in folder \Modules\
-'* MString.bas from the repo Sys_Strings              in folder \Modules\
-'* MPtr.bas    from the repo Ptr_Pointers             in folder \Modules\
-'* MErr.bas    from the repo Err_CorrectErrorHandling in folder \Modules\
-'
+'For this vb-project to compile you also need:
+'* MShell.bas  ..\_Core\IO\
+'* MString.bas ..\_Core\Syst\
+'* MPtr.bas    ..\_Core\Syst\
+'* MErr.bas    ..\_Core\Syst\
+'* MMath.bas   ..\_Core\Math\ used by MString.bas
 'a PathFileName consists of the following parts:
 'Drive     |      Only path      |   Only filename  |  extension
 '  C:\     |  Windows\System32\  |      user32      |    .dll
@@ -756,8 +756,8 @@ Public Function Exists() As Boolean
     'checks whether file or path exists, works on both(!)
     'Überprüft ob die Datei oder der Pfad existiert
     On Error Resume Next
-    Dim f As String: f = Me.FileName
-    If Len(f) Then
+    Dim F As String: F = Me.FileName
+    If Len(F) Then
     'If Me.IsFile Then
         Exists = Not CBool(GetAttr(m_PFN) And (vbDirectory Or vbVolume))
     Else
@@ -847,7 +847,7 @@ Try: On Error GoTo Catch
     Set CopyTo = newPFN
     Exit Function
 Catch:
-    If Err.Number = 70 Or Err.Number = 53 Then
+    If Err.number = 70 Or Err.number = 53 Then
         'File access denied? give it another try one or more, MsgBox retry
         Set CopyTo = CopyRetryLoop(newPFN, True)
     Else
@@ -1161,7 +1161,7 @@ Try: On Error GoTo Catch
     OpenFile = m_FNr
     Exit Function
 Catch:
-    MsgBox "Error: " & CStr(Err.Number) & " in PFNStream::OOpen: " & Err.Description
+    MsgBox "Error: " & CStr(Err.number) & " in PFNStream::OOpen: " & Err.Description
 End Function
 
 Public Function ReadAllText() As String
@@ -1610,14 +1610,14 @@ End Sub
 Private Function Get_FileNameOnly(PFN_in As String) As String
     'gibt den Dateinamen ohne Drive, ohne Path und ohne Extension zurück
 'Try: On Error GoTo Catch
-    Dim f As String: f = Get_FileName(PFN_in)
+    Dim F As String: F = Get_FileName(PFN_in)
     Dim e As String: e = Get_Extension(PFN_in)
-    If Len(f) Then
+    If Len(F) Then
         If Len(e) Then
-            f = Left(f, Len(f) - Len(e))
+            F = Left(F, Len(F) - Len(e))
         End If
     End If
-    Get_FileNameOnly = f
+    Get_FileNameOnly = F
 'Catch:
 '    If Err Then MessError Me, "FileNameOnly"
 End Function
@@ -1659,15 +1659,15 @@ Private Function Get_DirPart(ByVal n As Long, _
 'nicht.
     Dim op As String: op = GetValidPath(Me.PathOnly)
     Dim i  As Long
-    Dim P1 As Long, P2 As Long
+    Dim p1 As Long, p2 As Long
     For i = 0 To n - 1
-        P1 = P2 + 1
-        P2 = InStr(P1, op, Chr$(C_DirSepChar))
+        p1 = p2 + 1
+        p2 = InStr(p1, op, Chr$(C_DirSepChar))
     Next
-    If P2 > P1 Then
-        sDir = Mid$(op, P1, P2 - P1)
-        pos1 = P1
-        pos2 = P2
+    If p2 > p1 Then
+        sDir = Mid$(op, p1, p2 - p1)
+        pos1 = p1
+        pos2 = p2
         Get_DirPart = True
     End If
 End Function
@@ -1706,20 +1706,20 @@ Private Function GetValidPath(ByVal aPath As String) As String
 End Function
 Private Function IsValidFileName(aFileName As String) As Boolean
     Dim i As Long
-    Dim X As String: X = "\/:*?""<>|"
+    Dim x As String: x = "\/:*?""<>|"
     If Len(aFileName) Then
-        For i = 1 To Len(X)
-            IsValidFileName = (InStr(1, aFileName, Mid$(X, i, 1)) <> 0)
+        For i = 1 To Len(x)
+            IsValidFileName = (InStr(1, aFileName, Mid$(x, i, 1)) <> 0)
             If Not IsValidFileName Then Exit Function
         Next
     End If
 End Function
 Private Function GetValidFileName(aFileName As String) As String
     Dim i As Long
-    Dim c As String, X As String: X = "\/:" & C_InvalidChars '*?""<>|"
+    Dim c As String, x As String: x = "\/:" & C_InvalidChars '*?""<>|"
     If Len(aFileName) Then
         'GetValidFileName = aFileName
-        GetValidFileName = RemoveChars(aFileName, X)
+        GetValidFileName = RemoveChars(aFileName, x)
         'For i = 1 To Len(x)
         '    c = Mid$(x, i, 1)
         '    GetValidFileName = Replace$(GetValidFileName, c, vbNullString)
@@ -1773,22 +1773,22 @@ Try: On Error GoTo Catch
     If p <> 0 Then aStrPath = Left$(aStrPath, p - 1)
     'und alle Zeichen entfernen die nicht hinein dürfen
     Dim i As Long
-    Dim c As String, X As String: X = C_InvalidChars '"*?""<>|"
+    Dim c As String, x As String: x = C_InvalidChars '"*?""<>|"
     Select Case C_DirSepChar
-    Case 92: X = X & "/"
-    Case 47: X = X & "\"
+    Case 92: x = x & "/"
+    Case 47: x = x & "\"
     End Select
-    aStrPath = RemoveChars(aStrPath, X)
+    aStrPath = RemoveChars(aStrPath, x)
     aStrPath = RecursiveReplaceSL(aStrPath, "\\", "\", 2) 'muss bei 2 starten, weil am Anfang ein doppelter "\\" vorkommen darf
 '    'und alle doppelten Backslashes entfernen,
 '    'die nicht am Anfang sind, denn ansonsten ist es ein Serverlaufwerk
     'braucht man das wirklich? nein vielleicht gibt es da Fehler irgendwo
     c = Chr$(C_DirSepChar)
-    X = c & c
+    x = c & c
     Dim posDblBackSlash As Long
-    posDblBackSlash = InStr(1, aStrPath, X)
+    posDblBackSlash = InStr(1, aStrPath, x)
     If posDblBackSlash > 1 Then
-        aStrPath = Replace(aStrPath, X, c)
+        aStrPath = Replace(aStrPath, x, c)
     End If
     'und doppelpunkte ":" entfernen ausser in der Laufwerksangabe
     Dim sd As String: sd = Get_Drive(aStrPath)

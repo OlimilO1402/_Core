@@ -536,20 +536,20 @@ Try: On Error GoTo Catch
     If hr Then
         'man muﬂ am String erkennen, ob nur eine oder mehrere Dateien ausgew‰hlt wurden
         FileNames_Parse Buffer
-        ShowDialog = vbOK
+        ShowDialog = VbMsgBoxResult.vbOK
     Else
         'If mFlags And OFN_ALLOWMULTISELECT Then
         '    FileNames_Parse Buffer
         'End If
-        ShowDialog = vbCancel
+        ShowDialog = VbMsgBoxResult.vbCancel
         'oder zuviele Dateien
     End If
     Exit Function
 Catch:
     If Err.Number = 32755 Then
-        ShowDialog = vbCancel
+        ShowDialog = VbMsgBoxResult.vbCancel
     Else
-        ShowDialog = vbAbort
+        ShowDialog = VbMsgBoxResult.vbAbort
         MsgBox CStr(Err.Number) + " " + Err.Description
     End If
 End Function

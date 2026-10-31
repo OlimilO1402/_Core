@@ -486,7 +486,7 @@ Try: On Error GoTo Catch
     RtlMoveMemory ByVal pCF, aCHOOSEFONT, LenB(aCHOOSEFONT)
     If ChooseFontW(ByVal pCF) = 0 Then
         'return false
-        ShowDialog = vbCancel ' False
+        ShowDialog = VbMsgBoxResult.vbCancel ' False
         CheckMessAllErrors
         Exit Function
     End If
@@ -500,11 +500,11 @@ Try: On Error GoTo Catch
         GlobalUnlock pCF
         CoTaskMemFree ByVal pCF
     'End If
-    ShowDialog = vbOK 'return true
+    ShowDialog = VbMsgBoxResult.vbOK 'return true
     GoTo Finally
 Catch:
-    ShowDialog = vbCancel
-    'ShowDialog = vbAbort
+    ShowDialog = VbMsgBoxResult.vbCancel
+    'ShowDialog = VbMsgBoxResult.vbAbort
     CheckMessAllErrors
 Finally:
     If IntPtr_LF <> 0 Then  ' IntPtr.Zero)

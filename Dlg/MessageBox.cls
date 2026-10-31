@@ -175,7 +175,7 @@ Private m_Result        As MsgBoxResult
 Private Sub Class_Initialize()
     With m_MsgBoxParams
         .cbSize = LenB(m_MsgBoxParams)
-        .dwStyle = vbOKOnly
+        .dwStyle = VbMsgBoxStyle.vbOKOnly
         '.hwndOwner = ActiveWindow
         '.hInstance = App.hInstance
         m_Title = App.EXEName
@@ -241,7 +241,7 @@ Private Function FncPtr(pFnc As LongPtr) As LongPtr
 End Function
 
 Public Function Show(Optional aPrompt, Optional BtnsAndStyle, Optional aTitle, Optional aHelpFile, Optional aContext) As MsgBoxResult
-    'Optional BtnsAndStyle As MsgBoxStyle = vbOKOnly
+    'Optional BtnsAndStyle As MsgBoxStyle = VbMsgBoxStyle.vbOKOnly
     If Not IsMissing(aPrompt) Then m_Text = CStr(aPrompt)
     If Not IsMissing(aTitle) Then m_Title = CStr(aTitle)
     With m_MsgBoxParams
@@ -280,4 +280,4 @@ Public Function Result_ToStr(Optional aMsgBoxResult) As String
     Result_ToStr = s
 End Function
 
-'Function MyMsgbox(Prompt, Optional Buttons As VbMsgBoxStyle = vbOKOnly, Optional Title As Variant, Optional HelpFile As Variant, Optional Context As Variant) As VbMsgBoxResult
+'Function MyMsgbox(Prompt, Optional Buttons As VbMsgBoxStyle = VbMsgBoxStyle.vbOKOnly, Optional Title As Variant, Optional HelpFile As Variant, Optional Context As Variant) As VbMsgBoxResult

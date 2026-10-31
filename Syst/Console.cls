@@ -836,9 +836,10 @@ Public Property Get hWnd() As LongPtr
     If m_hWnd = 0 Then m_hWnd = GetConsoleWindow
     hWnd = m_hWnd
 End Property
+
 Public Sub SetFocus()
     Dim aHWND As LongPtr: aHWND = Intern_SetFocus(Me.hWnd)
-    Dim bOK As Boolean: bOK = SetForegroundWindow(Me.hWnd)
+    Dim bOK   As Boolean:   bOK = SetForegroundWindow(Me.hWnd)
 End Sub
 
 Public Property Get IsErrorRedirected() As Boolean

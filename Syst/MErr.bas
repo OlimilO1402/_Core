@@ -78,6 +78,22 @@ Public Function WinApiError_ToStr(ByVal MessageID As Long) As String
     If L Then WinApiError_ToStr = Left$(s, L)
 End Function
 
+Public Property Get LastError() As String
+    If Len(ErrLog) = 0 Then Exit Property
+    If InStr(ErrLog, vbCrLf) = 0 Then
+        LastError = ErrLog
+    Else
+        Dim pos As Long: pos = InStrRev(ErrLog, vbCrLf)
+        If pos Then
+            If pos = Len(ErrLog) - 1 Then pos = InStrRev(ErrLog, vbCrLf, pos)
+            If pos = 0 Then
+                LastError = ErrLog
+            Else
+                LastError = Right(ErrLog, Len(ErrLog) - pos - 1)
+            End If
+        End If
+    End If
+End Property
 ''copy this same function to every class, form or module
 ''the name of the class or form will be added automatically
 ''in standard-modules the function "TypeName(Me)" will not work, so simply replace it with the name of the Module

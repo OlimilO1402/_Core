@@ -282,17 +282,17 @@ Try: On Error GoTo Catch
     End With
     Dim hr As Long: hr = PageSetupDlgW(m_PSD)
     If hr Then
-        ShowDialog = vbOK
+        ShowDialog = VbMsgBoxResult.vbOK
         GetNames m_PSD.hDevNames
     Else
-        ShowDialog = vbCancel
+        ShowDialog = VbMsgBoxResult.vbCancel
     End If
     Exit Function
 Catch:
     If Err.Number = 32755 Then
-        ShowDialog = vbCancel
+        ShowDialog = VbMsgBoxResult.vbCancel
     Else
-        ShowDialog = vbAbort
+        ShowDialog = VbMsgBoxResult.vbAbort
         MsgBox CStr(Err.Number) + " " + Err.Description
     End If
 End Function

@@ -181,7 +181,7 @@ Public Sub Reset()
     mFlags = mFlags Or OFN_HIDEREADONLY
     mFlags = mFlags Or OFN_PATHMUSTEXIST
     'mFlags = mFlags Or OPTION_ADDEXTENSION
-    
+    ReDim mExts(0)
     mAddExtension = True
     FileNames_Clear
     mFilterIndex = 1           'nFilterIndex
@@ -319,9 +319,10 @@ Private Sub FileNames_Parse(FNs As String)
     
     'Schauen ob evt. nur eine Datei ausgew‰hlt wurde
     Call TrimVBNullchar(FNs)
-    If Len(FNs) = 0 Then Exit Sub
-    If InStr(FNs, vbNullChar) <> 0 Then
-        aa = FNs & vbNullChar
+    FN = FNs
+    If Len(FN) = 0 Then Exit Sub
+    If InStr(FN, vbNullChar) <> 0 Then
+        aa = FN & vbNullChar
         Dim pos As Long: pos = 1
         
         Do
@@ -353,7 +354,7 @@ Private Sub FileNames_Parse(FNs As String)
         'Call mFileNames.Add(FNs)
         If mFilterIndex > 0 Then mFilterIndex = mFilterIndex - 1
         Dim ext As String: ext = mExts(mFilterIndex)
-        If mAddExtension Then
+        If mAddExtension And Len(ext) Then
             FN = EnsureExtension(FNs, ext)
         End If
         mFileName = FN
@@ -582,21 +583,21 @@ Try: On Error GoTo Catch
         mFilterIndex = OFN.nFilterIndex
         'man muﬂ am String erkennen, ob nur eine oder mehrere Dateien ausgew‰hlt wurden
         FileNames_Parse Buffer 'OFN.lpstrFile)
-        ShowDialog = vbOK
+        ShowDialog = VbMsgBoxResult.vbOK
     Else
         'If mFlags And OFN_ALLOWMULTISELECT Then
         '    FileNames_Parse Buffer
         'End If
-        ShowDialog = vbCancel
+        ShowDialog = VbMsgBoxResult.vbCancel
         'oder zuviele Dateien
     End If
     Exit Function
 Catch:
-    If Err.number = 32755 Then
-        ShowDialog = vbCancel
+    If Err.Number = 32755 Then
+        ShowDialog = VbMsgBoxResult.vbCancel
     Else
-        ShowDialog = vbAbort
-        MsgBox CStr(Err.number) + " " + Err.Description
+        ShowDialog = VbMsgBoxResult.vbAbort
+        MsgBox CStr(Err.Number) & " " & Err.Description
     End If
 End Function
 

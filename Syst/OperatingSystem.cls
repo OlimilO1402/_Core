@@ -75,15 +75,15 @@ Public Function ToStr() As String 'cString
     s = "Microsoft "
     Select Case m_Platform
     Case PlatformID.WinNT
-        Select Case m_Version.major
+        Select Case m_Version.Major
         Case 10:
-           Select Case m_Version.minor
+           Select Case m_Version.Minor
            Case 0:
               s = s & "Windows 10 "
            Case Else
            End Select
         Case 6:
-           Select Case m_Version.minor
+           Select Case m_Version.Minor
            Case 0:
               s = s & "Windows Vista "
             'wie geht die Unterscheidung zwischen
@@ -93,7 +93,7 @@ Public Function ToStr() As String 'cString
            End Select
             
         Case 5
-            Select Case m_Version.minor
+            Select Case m_Version.Minor
             Case 2:               s = s & "Windows Server 2003 "
                 If GetSystemMetrics(SM_SERVERR2) > 0 Then
                                         s = s & "R2 "
@@ -114,7 +114,7 @@ Public Function ToStr() As String 'cString
         Case 4:                 s = s & "Windows NT "
         End Select
     Case PlatformID.Win32Windows
-        Select Case m_Version.minor
+        Select Case m_Version.Minor
         Case 0:                 s = s & "Windows 95 "
         Case 10:                s = s & "Windows 98 "
         Case 90:                s = s & "Windows ME "
@@ -182,7 +182,7 @@ End Function
 
 Public Function APIFunctionExists(ByVal DllName As String, ByVal FncName As String) As Boolean
 
-    Dim hMod As Long: hMod = GetModuleHandleW(StrPtr(DllName))
+    Dim hMod As LongPtr: hMod = GetModuleHandleW(StrPtr(DllName))
     APIFunctionExists = (GetProcAddress(hMod, FncName) <> 0)
 
 End Function

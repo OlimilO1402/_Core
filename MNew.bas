@@ -230,8 +230,8 @@ Public Function ComIntfcFunction(aComIntfc As ComInterface, ByVal aName As Strin
     Set ComIntfcFunction = New ComIntfcFunction: ComIntfcFunction.New_ aComIntfc, aName, aIndex, ReturnType
 End Function
 
-Public Function ConfigIniDocument(PFN As PathFileName) As ConfigIniDocument
-    Set ConfigIniDocument = New ConfigIniDocument: ConfigIniDocument.New_ PFN
+Public Function ConfigIniDocument(pfn As PathFileName) As ConfigIniDocument
+    Set ConfigIniDocument = New ConfigIniDocument: ConfigIniDocument.New_ pfn
 End Function
 Public Function ConfigIniKeyValue(IniFile As ConfigIniDocument, _
                                   Section As ConfigIniSection, _
@@ -311,14 +311,14 @@ Public Function DocumentP(aPFN As String) As Document
     Set DocumentP = New Document: DocumentP.New_ aPFN
 End Function
 ' ############################## '    DocumentPStore    ' ############################## '
-Public Function DocumentPStore(aPFN As PathFileName, PossFileProps As list) As DocumentPStore 'PossFileProps As List(Of PropKey))
+Public Function DocumentPStore(aPFN As PathFileName, PossFileProps As List) As DocumentPStore 'PossFileProps As List(Of PropKey))
     Set DocumentPStore = New DocumentPStore: DocumentPStore.New_ aPFN, PossFileProps
 End Function
 ' ############################## '    DocumentTsv    ' ############################## '
 'Public Function DocumentTsv(aPFN As String, Optional ByVal aPropertyLists As List = Nothing) As DocumentTsv
 '    Set DocumentTsv = New DocumentTsv: DocumentTsv.New_ aPFN, aPropertyLists
 'End Function
-Public Function DocumentTsv(aPFN As PathFileName, Optional ByVal aPropertyLists As list = Nothing) As DocumentTsv
+Public Function DocumentTsv(aPFN As PathFileName, Optional ByVal aPropertyLists As List = Nothing) As DocumentTsv
     Set DocumentTsv = New DocumentTsv: DocumentTsv.New_ aPFN, aPropertyLists
 End Function
 
@@ -491,7 +491,7 @@ Public Function GitHubUserD(Dictionary As Dictionary) As GitHubUser
     Dim gu As GitHubUser: Set gu = New GitHubUser: If gu.Read(Dictionary) Then Set GitHubUserD = gu
 End Function
 
-Public Function GraphicView(aCanvas As PictureBox, aPoint3DList As list) As GraphicView
+Public Function GraphicView(aCanvas As PictureBox, aPoint3DList As List) As GraphicView
     Set GraphicView = New GraphicView: GraphicView.New_ aCanvas, aPoint3DList
 End Function
 
@@ -531,7 +531,7 @@ Public Function HeapList(aSnapShot As Snapshot) As HeapList
 End Function
 
 'HeapSorter
-Public Function HeapSorter(aCmp As list) As HeapSorter ', aSwp As Object) As HeapSorter ' As IComparable, ISwappable
+Public Function HeapSorter(aCmp As List) As HeapSorter ', aSwp As Object) As HeapSorter ' As IComparable, ISwappable
     Set HeapSorter = New HeapSorter: HeapSorter.New_ aCmp ', aSwp
 End Function
 
@@ -539,133 +539,307 @@ Public Function Holz(ByVal Klasse As EHolzKlasse, ByVal f_mk_Nmm2 As Double, ByV
     Set Holz = New Holz: Holz.New_ Klasse, f_mk_Nmm2, f_t0k_Nmm2, EModul0mean_kNmm2, Rohdichterhok_kgm3
 End Function
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Public Function XTimer(Listener As IListenXTimer, ByVal Interval_ms As Single) As XTimer
-    Set XTimer = New XTimer: XTimer.New_ Listener, Interval_ms
+Public Function IBAN(IBANInfos As IBANInfos, siban As String) As IBAN
+    Set IBAN = New IBAN: IBAN.New_ IBANInfos, siban
 End Function
+
+Public Function IBANCreator(IBANInfos As IBANInfos, aIBANInfo As IBANInfo, List As Collection) As IBANCreator 'sArr() As String) As IBANCreator
+    Set IBANCreator = New IBANCreator: IBANCreator.New_ IBANInfos, aIBANInfo, List 'sArr
+End Function
+
+Public Function IBANInfo(Name As String, LC As String, bbinf As BBANInfo) As IBANInfo
+    Set IBANInfo = New IBANInfo: IBANInfo.New_ Name, LC, bbinf
+End Function
+
+Public Function IBANInfos(aPFN As String) As IBANInfos
+    Set IBANInfos = New IBANInfos: IBANInfos.New_ aPFN
+End Function
+
+Public Function IDLInterface(aName As String, aUUID As String, Inherits As String) As IDLInterface
+    Set IDLInterface = New IDLInterface: IDLInterface.New_ aName, aUUID, Inherits
+End Function
+
+Public Function Image(aPic As StdPicture) As Image
+    Set Image = New Image: Image.FromStdPicture aPic
+End Function
+
+Public Function IndentStack(aTabSize As Long) As IndentStack
+    Set IndentStack = New IndentStack: IndentStack.New_ aTabSize
+End Function
+
+Public Function InternetURL(ByVal sURL As String, Optional bufferSize As Long = 2048) As InternetURL
+    Set InternetURL = New InternetURL: InternetURL.New_ sURL, bufferSize
+End Function
+
+Public Function IPAddress(ByVal i1 As Integer, ByVal i2 As Integer, ByVal i3 As Integer, ByVal i4 As Integer, Optional i5, Optional i6, Optional i7, Optional i8, Optional Port) As IPAddress
+    If IsMissing(i5) Then
+        Set IPAddress = IPAddressV4(CByte(i1), CByte(i2), CByte(i3), CByte(i4), Port)
+    Else
+        Set IPAddress = IPAddressV6(i1, i2, i3, i4, i5, i6, i7, i8, Port)
+    End If
+End Function
+Public Function IPAddressV(StrLngBytesNewAddress) As IPAddress
+    Set IPAddressV = New IPAddress: IPAddressV.New_ StrLngBytesNewAddress
+End Function
+Public Function IPAddressV4(ByVal b1 As Byte, ByVal b2 As Byte, ByVal b3 As Byte, ByVal b4 As Byte, Optional Port) As IPAddress
+    Set IPAddressV4 = New IPAddress: IPAddressV4.NewV4 b1, b2, b3, b4, Port
+End Function
+Public Function IPAddressV6(ByVal i1 As Integer, ByVal i2 As Integer, ByVal i3 As Integer, ByVal i4 As Integer, ByVal i5 As Integer, ByVal i6 As Integer, ByVal i7 As Integer, ByVal i8 As Integer, Optional Port) As IPAddress
+    Set IPAddressV6 = New IPAddress: IPAddressV6.NewV6 i1, i2, i3, i4, i5, i6, i7, i8, Port
+End Function
+Public Function IPAddressV4Rnd() As IPAddress
+    Randomize
+    Set IPAddressV4Rnd = New IPAddress: IPAddressV4Rnd.NewV4 RndUInt8, RndUInt8, RndUInt8, RndUInt8
+End Function
+Public Function IPAddressV6Rnd() As IPAddress
+    Randomize
+    Set IPAddressV6Rnd = New IPAddress: IPAddressV6Rnd.NewV6 RndUInt16, RndUInt16, RndUInt16, RndUInt16, RndUInt16, RndUInt16, RndUInt16, RndUInt16
+End Function
+
+Public Function IRange(ByVal MinValue As Double, ByVal MaxValue As Double, ByVal RangeType As ERangeType) As IRange
+    Select Case RangeType
+    Case ERangeType.ExMinExMax: Set IRange = MNew.RangeExMinExMax(MinValue, MaxValue)
+    Case ERangeType.ExMinInMax: Set IRange = MNew.RangeExMinInMax(MinValue, MaxValue)
+    Case ERangeType.InMinExMax: Set IRange = MNew.RangeInMinExMax(MinValue, MaxValue)
+    Case ERangeType.InMinInMax: Set IRange = MNew.RangeInMinInMax(MinValue, MaxValue)
+    End Select
+End Function
+
+'Function IsInIDE() As Boolean
+'Try: On Error GoTo Catch
+'    Debug.Print 1 / 0
+'    IsInIDE = False: Exit Function
+'Catch: IsInIDE = True
+'End Function
+Function IsInIDE() As Boolean
+    IsInIDE = App.LogMode = 0 'LogModeConstants.vbLogAuto
+End Function
+
+Public Function LANAdapter(LanNumber As Long, MACAddress As MACAddress) As LANAdapter
+    Set LANAdapter = New LANAdapter: LANAdapter.New_ LanNumber, MACAddress
+End Function
+
+'Public Function ListOfLeaf(bUseHashes As Boolean) As ListOfLeaf
+'    Set ListOfLeaf = New ListOfLeaf
+'    ListOfLeaf.New_ bUseHashes
+'End Function
+Public Function Leaf(ByVal aName As String, ByVal aValue) As Leaf
+    Set Leaf = New Leaf: Leaf.New_ aName, aValue
+End Function
+
+' ############################## '    List    ' ############################## '
+Public Function List(Of_T As EDataType, _
+                     Optional ArrColStrTypList, _
+                     Optional ByVal IsHashed As Boolean = False, _
+                     Optional ByVal Capacity As Long = 32, _
+                     Optional ByVal GrowRate As Single = 2, _
+                     Optional ByVal GrowSize As Long = 0) As List
+    Set List = New List: List.New_ Of_T, ArrColStrTypList, IsHashed, Capacity, GrowRate, GrowSize
+End Function
+
+'not inside of DocumentTsv because FileProperty is unknown in vb-project PReadPropKeyH
+Public Function ListOfFileProperty(doc As DocumentTsv) As List '(Of FileProperty)
+    Dim lifp As List: Set lifp = MNew.List(EDataType.vbObject)
+    Dim i As Long, j As Long, le As List
+    Dim pkhe As PropKeyHEntry, fp As FileProperty
+    Dim pl As List: Set pl = doc.PropertyLists
+    For i = 0 To pl.Count - 1
+        Set le = pl.item(i)
+        For j = 0 To le.Count - 1
+            Set pkhe = le.item(j)
+            Set fp = MNew.FilePropertyPkhe(pkhe)
+            lifp.Add fp 'pk.ToPossFileProperty
+        Next
+    Next
+    Set ListOfFileProperty = lifp
+End Function
+
+Public Function LListBox(aListBox As ListBox) As LListBox
+    Set LListBox = New LListBox: LListBox.New_ aListBox
+End Function
+
+Public Function LoadFromResource(nID As Long) As IPictureDisp
+    LoadFromResource = LoadResPicture(nID, vbResBitmap)
+End Function
+
+Function LogModeConstants_ToStr(e As LogModeConstants) As String
+    Dim s As String
+    Select Case e
+    Case LogModeConstants.vbLogAuto:      s = "vbLogAuto"      ' 0
+    Case LogModeConstants.vbLogOff:       s = "vbLogOff"       ' 1
+    Case LogModeConstants.vbLogToFile:    s = "vbLogToFile"    ' 2
+    Case LogModeConstants.vbLogToNT:      s = "vbLogToNT"      ' 3
+    Case LogModeConstants.vbLogOverwrite: s = "vbLogOverwrite" '16 &H10
+    Case LogModeConstants.vbLogThreadID:  s = "vbLogThreadID"  '32 &H20
+    Case Else: s = CStr(e)
+    End Select
+    LogModeConstants_ToStr = s
+End Function
+
+Public Function LuDecomposition(Value As Matrix) As LuDecomposition
+    Set LuDecomposition = New LuDecomposition:  LuDecomposition.New_ Value
+End Function
+
+Public Function MACAddress(ByVal b1 As Byte, ByVal b2 As Byte, ByVal b3 As Byte, ByVal b4 As Byte, ByVal b5 As Byte, ByVal b6 As Byte, Optional sep As String = "-") As MACAddress
+    Set MACAddress = New MACAddress: MACAddress.New_ b1, b2, b3, b4, b5, b6, sep
+End Function
+
+Public Function MACAddressA(bytes05() As Byte, Optional sep As String = "-") As MACAddress
+    Set MACAddressA = New MACAddress: MACAddressA.New_ bytes05(0), bytes05(1), bytes05(2), bytes05(3), bytes05(4), bytes05(5), sep
+End Function
+
+Public Function MACAddressS(s As String) As MACAddress
+    Set MACAddressS = New MACAddress: MACAddressS.NewS s
+End Function
+
+Public Function MatBereich(Optional Value, Optional Bereich_von, Optional Bereich_bis, Optional ByVal Auswahl As EBereichAuswahl = EBereichAuswahl.Mittelwert) As MatBereich
+    Set MatBereich = New MatBereich: MatBereich.New_ Value, Bereich_von, Bereich_bis, Auswahl
+End Function
+
+Public Function MatBereichB(Optional Bereich_von, Optional Bereich_bis, Optional ByVal Auswahl As EBereichAuswahl = EBereichAuswahl.Mittelwert) As MatBereich
+    Set MatBereichB = New MatBereich: MatBereich.NewB Bereich_von, Bereich_bis, Auswahl
+End Function
+
+Public Function MaterialMC(ByVal EModul As Double, ByVal GModul As Double, ByVal KModul As Double, ByVal Nue As Double, ByVal Dichte_rho As Double, Optional ByVal Wichte_gam As Double = 0, Optional ByVal Name As String = "", Optional ByVal norm As String = "") As MaterialMC
+    Set MaterialMC = New MaterialMC: MaterialMC.New_ EModul, GModul, KModul, Nue, Dichte_rho, Wichte_gam, Name, norm
+End Function
+
+Function MathFunction(ByVal addrof As LongPtr) As MathFunction
+    Set MathFunction = New MathFunction
+    Dim pVTable As LongPtr
+    GetMem4 ByVal ObjPtr(MathFunction), pVTable
+    GetMem4 addrof, ByVal (pVTable + 28)
+End Function
+
+Public Function MathFunctionD(aDF As TDelegateFunction, ByVal pFncAddr As LongPtr) As MathFunction 'ICallDoubleReturnDouble
+    Set MathFunctionD = New_DelegateFunction(aDF, pFncAddr)
+End Function
+
+Public Function MathFunctionView(Canvas As PictureBox) As MathFunctionView
+    Set MathFunctionView = New MathFunctionView: MathFunctionView.New_ Canvas
+End Function
+
+Public Function Matrix(ByVal Rows As Long, ByVal Columns As Long, Optional ByVal Value) As Matrix
+    Set Matrix = New Matrix: Matrix.New_ Rows, Columns, Value
+End Function
+
+Public Function MemGlobal(ByVal flags As EMemGlobalFlags, ByVal SizeBytes As Long, Optional ByVal pCopyFrom As LongPtr = 0) As MemGlobal
+    Set MemGlobal = New MemGlobal: MemGlobal.New_ flags, SizeBytes, pCopyFrom
+End Function
+
+Public Function MemHeap(ByVal flags As EMemGlobalFlags, ByVal SizeBytes As Long, Optional ByVal pCopyFrom As LongPtr = 0) As MemHeap
+    Set MemHeap = New MemHeap ': MemHeap.New_ Flags, SizeBytes, pCopyFrom
+End Function
+
+Public Function MemLocal(ByVal flags As EMemGlobalFlags, ByVal SizeBytes As Long, Optional ByVal pCopyFrom As LongPtr = 0) As MemLocal
+    Set MemLocal = New MemLocal ': MemLocal.New_ Flags, SizeBytes, pCopyFrom
+End Function
+
+Public Function MessageDialog(ByVal OwnerHwnd As Long, ByVal Content As String, Optional ByVal Title As String = vbNullString) As MessageDialog
+    Set MessageDialog = New MessageDialog: MessageDialog.New_ OwnerHwnd, Content, Title
+End Function
+
+'Public Function ModalDialog(aDialog As Form, BtnOK As CommandButton, BtnCancel As CommandButton, Optional ByVal IsReadOnly As Boolean = False) As ModalDialog
+'    Set ModalDialog = New ModalDialog: ModalDialog.New_ aDialog, BtnOK, BtnCancel, IsReadOnly
+'End Function
+'
+'Public Function ModalDialog(Dialog As Form, BtnOK As CommandButton, BtnCancel As CommandButton) As ModalDialog
+'    Set ModalDialog = New ModalDialog: ModalDialog.New_ Dialog, BtnOK, BtnCancel
+'End Function
+'Public Function ModalDialog(Dialog As Form, BtnOK As CommandButton, BtnCancel As CommandButton) As ModalDialog
+'    Set ModalDialog = New ModalDialog: ModalDialog.New_ Dialog, BtnOK, BtnCancel
+'End Function
+'Public Function ModalDialog(Dialog As Form, BtnOK As CommandButton, BtnCancel As CommandButton, Optional ByVal IsReadOnly As Boolean = False) As ModalDialog
+'    Set ModalDialog = New ModalDialog: ModalDialog.New_ Dialog, BtnOK, BtnCancel, IsReadOnly
+'End Function
+'Public Function ModalDialog(Dialog As Form, BtnOK As CommandButton, BtnCancel As CommandButton) As ModalDialog
+'    Set ModalDialog = New ModalDialog: ModalDialog.New_ Dialog, BtnOK, BtnCancel
+'End Function
 
 Public Function ModalDialog(Dialog As Form, BtnOK As CommandButton, BtnCancel As CommandButton, Optional ByVal IsReadOnly As Boolean = False) As ModalDialog
     Set ModalDialog = New ModalDialog: ModalDialog.New_ Dialog, BtnOK, BtnCancel, IsReadOnly
+End Function
+
+Public Function ModuleEntry(aSnapShot As Snapshot) As ModuleEntry
+    Set ModuleEntry = New ModuleEntry: ModuleEntry.New_ aSnapShot
+End Function
+
+Public Function Monitor(ByVal HMONITOR As LongPtr, ByVal HDC As LongPtr, ByVal lpClipRECT As LongPtr) As Monitor
+    Set Monitor = New Monitor: Monitor.New_ HMONITOR, HDC, lpClipRECT
+End Function
+Public Function MonitorP(ByVal X As Long, ByVal Y As Long, Optional ByVal aFlag As EMonitorDefault = EMonitorDefault.ToNearest) As Monitor
+    Set MonitorP = New Monitor: MonitorP.NewP X, Y, aFlag
+End Function
+Public Function MonitorR(ByVal X As Long, ByVal Y As Long, ByVal Width As Long, ByVal Height As Long, Optional ByVal aFlag As EMonitorDefault = EMonitorDefault.ToNearest) As Monitor
+    Set MonitorR = New Monitor: MonitorR.NewR X, Y, Width, Height, aFlag
+End Function
+Public Function MonitorW(ByVal hwnd As LongPtr, Optional ByVal aFlag As EMonitorDefault = EMonitorDefault.ToNearest) As Monitor
+    Set MonitorW = New Monitor: MonitorW.NewW hwnd, aFlag
 End Function
 
 Public Function MSCrypt(ByVal alg As ECryptHashAlgo) As MSCrypt
     Set MSCrypt = New MSCrypt: MSCrypt.New_ alg
 End Function
 
-Public Function IPAddress(ByVal i1 As Integer, ByVal i2 As Integer, ByVal i3 As Integer, ByVal i4 As Integer, Optional i5, Optional i6, Optional i7, Optional i8, Optional Port) As IPAddress
-    'Set IPAddress = New IPAddress: IPAddress.New_ i1, i2, i3, i4, i5, i6, i7, i8
-    If IsMissing(i5) Then
-        Set IPAddress = IPAddressV4(CByte(i1), CByte(i2), CByte(i3), CByte(i4), Port)
-    Else
-        Set IPAddress = IPAddressV6(i1, i2, i3, i4, i5, i6, i7, i8, Port)
-    End If
+Public Function MyThread(ith As IThreading, ByVal Index As Long, ByVal sIP As String) As MyThread
+    Set MyThread = New MyThread: MyThread.New_ ith, Index, sIP
 End Function
 
-Public Function IPAddressV(StrLngBytesNewAddress) As IPAddress
-    Set IPAddressV = New IPAddress: IPAddressV.New_ StrLngBytesNewAddress
-End Function
+'Public Function MyThread(ith As IThreading, ByVal sIP As String) As MyThread
+'    Set MyThread = New MyThread: MyThread.New_ ith, sIP
+'End Function
 
-Public Function IPAddressV4(ByVal b1 As Byte, ByVal b2 As Byte, ByVal b3 As Byte, ByVal b4 As Byte, Optional Port) As IPAddress
-    Set IPAddressV4 = New IPAddress: IPAddressV4.NewV4 b1, b2, b3, b4, Port
-End Function
 
-Public Function IPAddressV4Rnd() As IPAddress
-    Randomize
-    Set IPAddressV4Rnd = New IPAddress: IPAddressV4Rnd.NewV4 RndUInt8, RndUInt8, RndUInt8, RndUInt8
-End Function
 
-Public Function IPAddressV6(ByVal i1 As Integer, ByVal i2 As Integer, ByVal i3 As Integer, ByVal i4 As Integer, ByVal i5 As Integer, ByVal i6 As Integer, ByVal i7 As Integer, ByVal i8 As Integer, Optional Port) As IPAddress
-    Set IPAddressV6 = New IPAddress: IPAddressV6.NewV6 i1, i2, i3, i4, i5, i6, i7, i8, Port
-End Function
 
-Public Function IPAddressV6Rnd() As IPAddress
-    Randomize
-    Set IPAddressV6Rnd = New IPAddress: IPAddressV6Rnd.NewV6 RndUInt16, RndUInt16, RndUInt16, RndUInt16, RndUInt16, RndUInt16, RndUInt16, RndUInt16
-End Function
-Public Function IPAddress(ByVal i1 As Integer, ByVal i2 As Integer, ByVal i3 As Integer, ByVal i4 As Integer, Optional i5, Optional i6, Optional i7, Optional i8, Optional Port) As IPAddress
-    'Set IPAddress = New IPAddress: IPAddress.New_ i1, i2, i3, i4, i5, i6, i7, i8
-    If IsMissing(i5) Then
-        Set IPAddress = IPAddressV4(CByte(i1), CByte(i2), CByte(i3), CByte(i4), Port)
-    Else
-        Set IPAddress = IPAddressV6(i1, i2, i3, i4, i5, i6, i7, i8, Port)
-    End If
-End Function
 
-Public Function IPAddressV(StrLngBytesNewAddress) As IPAddress
-    Set IPAddressV = New IPAddress: IPAddressV.New_ StrLngBytesNewAddress
-End Function
 
-Public Function IPAddressV4(ByVal b1 As Byte, ByVal b2 As Byte, ByVal b3 As Byte, ByVal b4 As Byte, Optional Port) As IPAddress
-    Set IPAddressV4 = New IPAddress: IPAddressV4.NewV4 b1, b2, b3, b4, Port
-End Function
 
-Public Function IPAddressV4Rnd() As IPAddress
-    Randomize
-    Set IPAddressV4Rnd = New IPAddress: IPAddressV4Rnd.NewV4 RndUInt8, RndUInt8, RndUInt8, RndUInt8
-End Function
 
-Public Function IPAddressV6(ByVal i1 As Integer, ByVal i2 As Integer, ByVal i3 As Integer, ByVal i4 As Integer, ByVal i5 As Integer, ByVal i6 As Integer, ByVal i7 As Integer, ByVal i8 As Integer, Optional Port) As IPAddress
-    Set IPAddressV6 = New IPAddress: IPAddressV6.NewV6 i1, i2, i3, i4, i5, i6, i7, i8, Port
-End Function
 
-Public Function IPAddressV6Rnd() As IPAddress
-    Randomize
-    Set IPAddressV6Rnd = New IPAddress: IPAddressV6Rnd.NewV6 RndUInt16, RndUInt16, RndUInt16, RndUInt16, RndUInt16, RndUInt16, RndUInt16, RndUInt16
-End Function
 
-Public Function MACADDress(ByVal b1 As Byte, ByVal b2 As Byte, ByVal b3 As Byte, ByVal b4 As Byte, ByVal b5 As Byte, ByVal b6 As Byte, Optional sep As String = "-") As MACADDress
-    Set MACADDress = New MACADDress: MACADDress.New_ b1, b2, b3, b4, b5, b6, sep
-End Function
 
-Public Function MACAddressA(bytes05() As Byte, Optional sep As String = "-") As MACADDress
-    Set MACAddressA = New MACADDress: MACAddressA.New_ bytes05(0), bytes05(1), bytes05(2), bytes05(3), bytes05(4), bytes05(5), sep
-End Function
 
-Public Function MACAddressS(s As String) As MACADDress
-    Set MACAddressS = New MACADDress: MACAddressS.NewS s
-End Function
 
-Public Function LANAdapter(LanNumber As Long, MACADDress As MACADDress) As LANAdapter
-    Set LANAdapter = New LANAdapter: LANAdapter.New_ LanNumber, MACADDress
-End Function
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 Public Function SScreen(DstPB As PictureBox, SrcRect As WndRect) As SScreen
     Set SScreen = New SScreen: SScreen.New_ DstPB, SrcRect
@@ -683,16 +857,6 @@ End Function
 '    With WinAPIRect: .Left = L: .Top = T: .Right = R: .Bottom = B: End With
 'End Function
 
-Public Function WndRect(r As WinAPIRect) As WndRect
-    Set WndRect = New WndRect: WndRect.New_ r
-End Function
-Public Function WndRectHWnd(ByVal hwnd As LongPtr) As WndRect
-    Set WndRectHWnd = New WndRect: WndRectHWnd.NewFromHWnd hwnd
-End Function
-Public Function WndRectFromMousePoint(P As WinAPIPoint) As WndRect
-    Set WndRectFromMousePoint = New WndRect: WndRectFromMousePoint.NewFromMousePoint P
-End Function
-
 Public Function WinAPIPoint(ByVal X As Long, ByVal Y As Long) As WinAPIPoint
     With WinAPIPoint: .X = X: .Y = Y: End With
 End Function
@@ -705,23 +869,10 @@ Public Function StdPicBmp(StdPic As StdPicture) As StdPicBmp
     Set StdPicBmp = New StdPicBmp: StdPicBmp.New_ StdPic
 End Function
 
-Public Function list(Of_T As EDataType, _
-                     Optional ArrColStrTypList, _
-                     Optional ByVal IsHashed As Boolean = False, _
-                     Optional ByVal Capacity As Long = 32, _
-                     Optional ByVal GrowRate As Single = 2, _
-                     Optional ByVal GrowSize As Long = 0) As list
-    Set list = New list: list.New_ Of_T, ArrColStrTypList, IsHashed, Capacity, GrowRate, GrowSize
-End Function
-
 Public Function PathFileName(ByVal aPathFileName As String, _
                      Optional ByVal aFileName As String, _
                      Optional ByVal aExt As String) As PathFileName
     Set PathFileName = New PathFileName: PathFileName.New_ aPathFileName, aFileName, aExt
-End Function
-
-Public Function ModalDialog(Dialog As Form, BtnOK As CommandButton, BtnCancel As CommandButton, Optional ByVal IsReadOnly As Boolean = False) As ModalDialog
-    Set ModalDialog = New ModalDialog: ModalDialog.New_ Dialog, BtnOK, BtnCancel, IsReadOnly
 End Function
 
 'Bsp: "DIN EN 10365", "HE-B 300", 300, 300, 11, 19, 27
@@ -772,10 +923,6 @@ Public Function PersonDefault(City As City) As Person
     Set PersonDefault = MNew.Person(DateSerial(1980, 1, 1), City, 1, "Max Mustermann")
 End Function
 
-Public Function ModalDialog(aDialog As Form, BtnOK As CommandButton, BtnCancel As CommandButton, Optional ByVal IsReadOnly As Boolean = False) As ModalDialog
-    Set ModalDialog = New ModalDialog: ModalDialog.New_ aDialog, BtnOK, BtnCancel, IsReadOnly
-End Function
-
 'Public Function DBcrud(Col As Collection, ListBox As ListBox, _
 '                       BtnAdd As CommandButton, Optional BtnAddClone, Optional BtnInsert, Optional BtnInsertClone, Optional BtnEdit, _
 '                       Optional BtnDelete, Optional BtnMoveUp, Optional BtnMoveDown, Optional BtnSortUp, Optional BtnSortDown, Optional BtnSearch) As DBcrud
@@ -785,29 +932,6 @@ Public Function Point3D(ByVal TagName As String, ByVal X As Double, ByVal Y As D
     Set Point3D = New Point3D: Point3D.New_ TagName, X, Y, z
 End Function
 
-Public Function ModalDialog(Dialog As Form, BtnOK As CommandButton, BtnCancel As CommandButton) As ModalDialog
-    Set ModalDialog = New ModalDialog: ModalDialog.New_ Dialog, BtnOK, BtnCancel
-End Function
-
-Public Function list(Of_T As EDataType, _
-                     Optional ArrColStrTypList, _
-                     Optional ByVal IsHashed As Boolean = False, _
-                     Optional ByVal Capacity As Long = 32, _
-                     Optional ByVal GrowRate As Single = 2, _
-                     Optional ByVal GrowSize As Long = 0) As list
-    Set list = New list: list.New_ Of_T, ArrColStrTypList, IsHashed, Capacity, GrowRate, GrowSize
-End Function
-
-Public Function MathFunction(aDF As TDelegateFunction, ByVal pFncAddr As LongPtr) As MathFunction 'ICallDoubleReturnDouble
-    Set MathFunction = New_DelegateFunction(aDF, pFncAddr)
-End Function
-
-Public Function MathFunctionView(Canvas As PictureBox) As MathFunctionView
-    Set MathFunctionView = New MathFunctionView: MathFunctionView.New_ Canvas
-End Function
-
-
-
 
 Public Function UUID() As GUID
     Set UUID = New GUID: UUID.Parse UUID.UUID
@@ -815,22 +939,6 @@ End Function
 
 Public Function sscale(ScalableControl) As sscale
     Set sscale = New sscale: sscale.New_ ScalableControl
-End Function
-Public Function list(Of_T As EDataType, _
-                     Optional ArrColStrTypList, _
-                     Optional ByVal IsHashed As Boolean = False, _
-                     Optional ByVal Capacity As Long = 32, _
-                     Optional ByVal GrowRate As Single = 2, _
-                     Optional ByVal GrowSize As Long = 0) As list
-    Set list = New list: list.New_ Of_T, ArrColStrTypList, IsHashed, Capacity, GrowRate, GrowSize
-End Function
-
-Public Function IndentStack(aTabSize As Long) As IndentStack
-    Set IndentStack = New IndentStack: IndentStack.New_ aTabSize
-End Function
-
-Public Function Leaf(aName As String, aValue) As Leaf
-    Set Leaf = New Leaf: Leaf.New_ aName, aValue
 End Function
 
 Public Function Twig(aName As String) As Twig
@@ -865,8 +973,8 @@ End Function
 Public Function VBProjProps(cid As ConfigIniDocument) As VBProjProps
     Set VBProjProps = New VBProjProps: VBProjProps.New_ cid
 End Function
-Public Function VBCodeFile(PFN As PathFileName, ByVal Name As String) As VBCodeFile
-    Set VBCodeFile = New VBCodeFile: VBCodeFile.New_ PFN, Name
+Public Function VBCodeFile(pfn As PathFileName, ByVal Name As String) As VBCodeFile
+    Set VBCodeFile = New VBCodeFile: VBCodeFile.New_ pfn, Name
 End Function
 
 Public Function Version(ByVal aMajor As Long, ByVal aMinor As Long, Optional ByVal aBuild As Long = -1, Optional ByVal aRevision As Long = -1) As Version
@@ -884,9 +992,6 @@ End Function
 
 Public Function Nullable(ByVal vt As EVbVarType) As Nullable
     Set Nullable = New Nullable: Nullable.New_ vt
-End Function
-Public Function ModalDialog(Dialog As Form, BtnOK As CommandButton, BtnCancel As CommandButton) As ModalDialog
-    Set ModalDialog = New ModalDialog: ModalDialog.New_ Dialog, BtnOK, BtnCancel
 End Function
 
 
@@ -933,28 +1038,11 @@ End Function
 Public Function VBTypeVar(ByVal Name As String, ByVal DataType As VbVarType, Optional ByVal TypeName As String = "") As VBTypeVar
     Set VBTypeVar = New VBTypeVar: VBTypeVar.New_ Name, DataType, TypeName
 End Function
-Public Function ModalDialog(Dialog As Form, BtnOK As CommandButton, BtnCancel As CommandButton) As ModalDialog
-    Set ModalDialog = New ModalDialog: ModalDialog.New_ Dialog, BtnOK, BtnCancel
-End Function
-
-Public Function MaterialMC(ByVal EModul As Double, ByVal GModul As Double, ByVal KModul As Double, ByVal Nue As Double, ByVal Dichte_rho As Double, Optional ByVal Wichte_gam As Double = 0, Optional ByVal Name As String = "", Optional ByVal norm As String = "") As MaterialMC
-    Set MaterialMC = New MaterialMC: MaterialMC.New_ EModul, GModul, KModul, Nue, Dichte_rho, Wichte_gam, Name, norm
-End Function
 
 Public Function Stahl(ByVal BaustahlArt As EBaustahlArt, ByVal fykMax As Double, ByVal GueteGruppeJRJ0 As String, ByVal Stahlgruppe As Integer, ByVal Zaehler As Integer, ByVal t_min As Double, ByVal t_max As Double, ByVal fyk As Double, ByVal fuk_min As Double, ByVal fuk_max As Double) As Stahl ', Optional ByVal LegierungsElemente As String = "")
     Set Stahl = New Stahl: Stahl.New_ BaustahlArt, fykMax, GueteGruppeJRJ0, Stahlgruppe, Zaehler, t_min, t_max, fyk, fuk_min, fuk_max ', LegierungsElemente
 End Function
 
-Public Function MatBereich(Optional Value, Optional Bereich_von, Optional Bereich_bis, Optional ByVal Auswahl As EBereichAuswahl = EBereichAuswahl.Mittelwert) As MatBereich
-    Set MatBereich = New MatBereich: MatBereich.New_ Value, Bereich_von, Bereich_bis, Auswahl
-End Function
-
-Public Function MatBereichB(Optional Bereich_von, Optional Bereich_bis, Optional ByVal Auswahl As EBereichAuswahl = EBereichAuswahl.Mittelwert) As MatBereich
-    Set MatBereichB = New MatBereich: MatBereich.NewB Bereich_von, Bereich_bis, Auswahl
-End Function
-Public Function InternetURL(ByVal sURL As String) As InternetURL
-    Set InternetURL = New InternetURL: InternetURL.New_ sURL
-End Function
 Public Function PathFileName(ByVal aPathFileName As String, _
                      Optional ByVal aFileName As String, _
                      Optional ByVal aExt As String) As PathFileName
@@ -998,49 +1086,10 @@ Public Function WndInputText(ByVal Name As String, ByVal Text As String, ByVal h
     Set WndInputText = New WndInputText: WndInputText.New_ Name, Text, hWndSender, hWndReceiver
 End Function
 
-
-
-
-
-
-
-
-Public Function IBANInfo(Name As String, LC As String, bbinf As BBANInfo) As IBANInfo
-    Set IBANInfo = New IBANInfo: IBANInfo.New_ Name, LC, bbinf
-End Function
-
-Public Function IBANInfos(aPFN As String) As IBANInfos
-    Set IBANInfos = New IBANInfos: IBANInfos.New_ aPFN
-End Function
-
-
-
-Public Function IBAN(IBANInfos As IBANInfos, siban As String) As IBAN
-    Set IBAN = New IBAN: IBAN.New_ IBANInfos, siban
-End Function
-
-Public Function IBANCreator(IBANInfos As IBANInfos, aIBANInfo As IBANInfo, list As Collection) As IBANCreator 'sArr() As String) As IBANCreator
-    Set IBANCreator = New IBANCreator: IBANCreator.New_ IBANInfos, aIBANInfo, list 'sArr
-End Function
-
-
-
-
-
-
 Public Function PathFileName(ByVal aPathOrPFN As String, _
                     Optional ByVal aFileName As String, _
                     Optional ByVal aExt As String) As PathFileName
     Set PathFileName = New PathFileName: PathFileName.New_ aPathOrPFN, aFileName, aExt
-End Function
-
-Public Function list(Of_T As EDataType, _
-                     Optional ArrColStrTypList, _
-                     Optional ByVal IsHashed As Boolean = False, _
-                     Optional ByVal Capacity As Long = 32, _
-                     Optional ByVal GrowRate As Single = 2, _
-                     Optional ByVal GrowSize As Long = 0) As list
-    Set list = New list: list.New_ Of_T, ArrColStrTypList, IsHashed, Capacity, GrowRate, GrowSize
 End Function
 
 Public Function NamedIBAN(ByVal aName As String, aIBAN As IBAN) As NamedIBAN
@@ -1094,23 +1143,8 @@ Public Function Thread(ByVal aPriority As EThreadPriority, ByVal aAffinityMask A
     Set Thread = New Thread: Thread.New_ aPriority, aAffinityMask
 End Function
 
-Public Function XTimer(Listener As IListenXTimer, ByVal Interval_ms As Single) As XTimer
-    Set XTimer = New XTimer: XTimer.New_ Listener, Interval_ms
-End Function
-
-Public Function XTimerL(Listener As IListenXTimer, ByVal Interval_ms As Single) As XTimerL
-    Set XTimerL = New XTimerL: XTimerL.New_ Listener, Interval_ms
-End Function
-
 Public Function Thread(ByVal aPriority As EThreadPriority, ByVal aAffinityMask As Long) As Thread
     Set Thread = New Thread: Thread.New_ aPriority, aAffinityMask
-End Function
-
-Function MathFunction(ByVal addrof As Long) As MathFunction
-    Set MathFunction = New MathFunction
-    Dim pVTable As Long
-    GetMem4 ByVal ObjPtr(MathFunction), pVTable
-    GetMem4 addrof, ByVal (pVTable + 28)
 End Function
 
 Public Function Pipe(Optional ByVal Name As String, Optional bIsLocal As Boolean = False, _
@@ -1136,50 +1170,9 @@ End Function
 Public Function RangeInMinInMax(ByVal MinValue As Double, ByVal MaxValue As Double) As RangeInMinInMax
     Set RangeInMinInMax = New RangeInMinInMax: RangeInMinInMax.New_ MinValue, MaxValue
 End Function
-
-Public Function IRange(ByVal MinValue As Double, ByVal MaxValue As Double, ByVal RangeType As ERangeType) As IRange
-    Select Case RangeType
-    Case ERangeType.ExMinExMax: Set IRange = MNew.RangeExMinExMax(MinValue, MaxValue)
-    Case ERangeType.ExMinInMax: Set IRange = MNew.RangeExMinInMax(MinValue, MaxValue)
-    Case ERangeType.InMinExMax: Set IRange = MNew.RangeInMinExMax(MinValue, MaxValue)
-    Case ERangeType.InMinInMax: Set IRange = MNew.RangeInMinInMax(MinValue, MaxValue)
-    End Select
-End Function
-
-
-
-Public Function IPAddress(ByVal i1 As Integer, ByVal i2 As Integer, ByVal i3 As Integer, ByVal i4 As Integer, Optional i5, Optional i6, Optional i7, Optional i8) As IPAddress
-    Set IPAddress = New IPAddresses: IPAddress.New_ i1, i2, i3, i4, i5, i6, i7, i8
-End Function
-
-Public Function IPAddressV(StrLngBytesNewAddress) As IPAddress
-    Set IPAddressV = New IPAddress: IPAddressV.New_ StrLngBytesNewAddress
-End Function
-
-Public Function IPAddressV4(ByVal b1 As Byte, ByVal b2 As Byte, ByVal b3 As Byte, ByVal b4 As Byte, Optional Port As Integer) As IPAddress
-    Set IPAddressV4 = New IPAddress: IPAddressV4.NewV4 b1, b2, b3, b4, Port
-End Function
-
-Public Function IPAddressV6(ByVal i1 As Integer, ByVal i2 As Integer, ByVal i3 As Integer, ByVal i4 As Integer, ByVal i5 As Integer, ByVal i6 As Integer, ByVal i7 As Integer, ByVal i8 As Integer) As IPAddress
-    Set IPAddressV6 = New IPAddress: IPAddressV6.NewV6 i1, i2, i3, i4, i5, i6, i7, i8
-End Function
-
     
 Public Function Splitter(bMDI As Boolean, MyOwner As Object, MyContainer As Object, Name As String, LeftTop As Control, RghtBot As Control) As Splitter
     Set Splitter = New Splitter: Splitter.New_ bMDI, MyOwner, MyContainer, Name, LeftTop, RghtBot
-End Function
-
-Public Function InternetURL(sURL As String) As InternetURL
-    Set InternetURL = New InternetURL: InternetURL.New_ sURL
-End Function
-
-Public Function list(Of_T As EDataType, _
-                     Optional ArrColStrTypList, _
-                     Optional ByVal IsHashed As Boolean = False, _
-                     Optional ByVal Capacity As Long = 32, _
-                     Optional ByVal GrowRate As Single = 2, _
-                     Optional ByVal GrowSize As Long = 0) As list
-    Set list = New list: list.New_ Of_T, ArrColStrTypList, IsHashed, Capacity, GrowRate, GrowSize
 End Function
 
 Public Function PathFileName(ByVal aPathFileName As String, _
@@ -1199,16 +1192,6 @@ Public Function VersionA() As Version
 End Function
 Public Function VersionD(Optional DateValue) As Version
     Set VersionD = New Version: VersionD.NewD DateValue
-End Function
-
-
-Public Function list(Of_T As EDataType, _
-                     Optional ArrColStrTypList, _
-                     Optional ByVal IsHashed As Boolean = False, _
-                     Optional ByVal Capacity As Long = 32, _
-                     Optional ByVal GrowRate As Single = 2, _
-                     Optional ByVal GrowSize As Long = 0) As list
-    Set list = New list: list.New_ Of_T, ArrColStrTypList, IsHashed, Capacity, GrowRate, GrowSize
 End Function
 
 Public Function PathFileName(ByVal aPathFileName As String, _
@@ -1264,22 +1247,6 @@ Public Function nTupel(Of_Type As VbVarType, ByVal nCount As Long, ParamArray pa
 End Function
 
 
-Public Function MemGlobal(ByVal flags As EMemGlobalFlags, ByVal SizeBytes As Long, Optional ByVal pCopyFrom As LongPtr = 0) As MemGlobal
-    Set MemGlobal = New MemGlobal: MemGlobal.New_ flags, SizeBytes, pCopyFrom
-End Function
-
-Public Function MemLocal(ByVal flags As EMemGlobalFlags, ByVal SizeBytes As Long, Optional ByVal pCopyFrom As LongPtr = 0) As MemLocal
-    Set MemLocal = New MemLocal ': MemLocal.New_ Flags, SizeBytes, pCopyFrom
-End Function
-
-Public Function MemHeap(ByVal flags As EMemGlobalFlags, ByVal SizeBytes As Long, Optional ByVal pCopyFrom As LongPtr = 0) As MemHeap
-    Set MemHeap = New MemHeap ': MemHeap.New_ Flags, SizeBytes, pCopyFrom
-End Function
-
-Public Function ScrollableTextBox(Owner As Form, aTB As TextBox, ByVal Panel As PictureBox, ByVal MinValue As Double, ByVal MaxValue As Double, ByVal CountSteps As Long, StrFormat As String, Optional Btn As CommandButton, Optional ScrollComboBox As ComboBox = Nothing, Optional ByVal InverseScroll As Boolean = False) As ScrollableTextBox
-    Set ScrollableTextBox = New ScrollableTextBox: ScrollableTextBox.New_ Owner, aTB, Panel, MinValue, MaxValue, CountSteps, StrFormat, Btn, ScrollComboBox, InverseScroll
-End Function
-
 
 
 Public Function UTM32(ByVal Northing As Double, ByVal Easting As Double, ByVal UTMZone As String) As UTM32
@@ -1309,23 +1276,6 @@ Public Function VBExprOrLiteral(ByVal Value, Optional ByVal vtid As Long = 0, Op
     Set VBExprOrLiteral = New VBExprOrLiteral: VBExprOrLiteral.New_ Value, vtid, IsExpression
 End Function
 
-
-Public Function Monitor(ByVal HMONITOR As LongPtr, ByVal HDC As LongPtr, ByVal lpClipRECT As LongPtr) As Monitor
-    Set Monitor = New Monitor: Monitor.New_ HMONITOR, HDC, lpClipRECT
-End Function
-
-Public Function MonitorP(ByVal X As Long, ByVal Y As Long, Optional ByVal aFlag As EMonitorDefault = EMonitorDefault.ToNearest) As Monitor
-    Set MonitorP = New Monitor: MonitorP.NewP X, Y, aFlag
-End Function
-
-Public Function MonitorR(ByVal X As Long, ByVal Y As Long, ByVal Width As Long, ByVal Height As Long, Optional ByVal aFlag As EMonitorDefault = EMonitorDefault.ToNearest) As Monitor
-    Set MonitorR = New Monitor: MonitorR.NewR X, Y, Width, Height, aFlag
-End Function
-
-Public Function MonitorW(ByVal hwnd As LongPtr, Optional ByVal aFlag As EMonitorDefault = EMonitorDefault.ToNearest) As Monitor
-    Set MonitorW = New Monitor: MonitorW.NewW hwnd, aFlag
-End Function
-
 '
 'Public Function DisplayDevices(ByVal DevName As String) As DisplayDevices
 '    Set DisplayDevices = New DisplayDevices: DisplayDevices.New_ DevName
@@ -1335,23 +1285,6 @@ End Function
 '    Set DeviceMode = New DeviceMode: DeviceMode.New_ DeviceName
 'End Function
 
-
-
-Public Function Monitor(ByVal HMONITOR As LongPtr, ByVal HDC As LongPtr, ByVal lpClipRECT As LongPtr) As Monitor
-    Set Monitor = New Monitor: Monitor.New_ HMONITOR, HDC, lpClipRECT
-End Function
-
-Public Function MonitorP(ByVal X As Long, ByVal Y As Long, Optional ByVal aFlag As EMonitorDefault = EMonitorDefault.ToNearest) As Monitor
-    Set MonitorP = New Monitor: MonitorP.NewP X, Y, aFlag
-End Function
-
-Public Function MonitorR(ByVal X As Long, ByVal Y As Long, ByVal Width As Long, ByVal Height As Long, Optional ByVal aFlag As EMonitorDefault = EMonitorDefault.ToNearest) As Monitor
-    Set MonitorR = New Monitor: MonitorR.NewR X, Y, Width, Height, aFlag
-End Function
-
-Public Function MonitorW(ByVal hwnd As LongPtr, Optional ByVal aFlag As EMonitorDefault = EMonitorDefault.ToNearest) As Monitor
-    Set MonitorW = New Monitor: MonitorW.NewW hwnd, aFlag
-End Function
 
 '
 'Public Function DisplayDevices(ByVal DevName As String) As DisplayDevices
@@ -1366,10 +1299,6 @@ Public Function Window(ByVal Name As String, Optional ByVal Caption As String, O
     Set Window = New Window: Window.New_ Name, Caption, Style, StyleEx
 End Function
 
-
-Public Function LListBox(aListBox As ListBox) As LListBox
-    Set LListBox = New LListBox: LListBox.New_ aListBox
-End Function
 
 Public Function ResourceFile(aPFN As String) As ResourceFile
     Set ResourceFile = New ResourceFile: ResourceFile.New_ aPFN
@@ -1422,15 +1351,6 @@ Public Function Splitter(BolMDI As Boolean, Owner As Object, Container As Object
     Set Splitter = New Splitter: Splitter.New_ BolMDI, Owner, Container, Name, LeftTop, RghtBot
 End Function
 
-Public Function list(Of_T As EDataType, _
-                     Optional ArrColStrTypList, _
-                     Optional ByVal IsHashed As Boolean = False, _
-                     Optional ByVal Capacity As Long = 32, _
-                     Optional ByVal GrowRate As Single = 2, _
-                     Optional ByVal GrowSize As Long = 0) As list
-    Set list = New list: list.New_ Of_T, ArrColStrTypList, IsHashed, Capacity, GrowRate, GrowSize
-End Function
-
 Public Function VBAProj(vbap As VBProject) As VBAProj
     Set VBAProj = New VBAProj: VBAProj.New_ vbap
 End Function
@@ -1455,14 +1375,6 @@ Public Function VBAClass(VBComp As VBComponent, Content As String) As VBAClass
     Set VBAClass = New VBAClass: VBAClass.New_ VBComp, Content
 End Function
 
-Public Function IDLInterface(aName As String, aUUID As String, Inherits As String) As IDLInterface
-    Set IDLInterface = New IDLInterface: IDLInterface.New_ aName, aUUID, Inherits
-End Function
-
-Public Function MessageDialog(ByVal OwnerHwnd As Long, ByVal Content As String, Optional ByVal Title As String = vbNullString) As MessageDialog
-    Set MessageDialog = New MessageDialog: MessageDialog.New_ OwnerHwnd, Content, Title
-End Function
-
 
 Public Function Splitter(BolMDI As Boolean, Owner As Object, Container As Object, Name As String, LeftTop As Control, RghtBot As Control) As Splitter
     Set Splitter = New Splitter: Splitter.New_ BolMDI, Owner, Container, Name, LeftTop, RghtBot
@@ -1483,15 +1395,6 @@ Public Function VVariantVt(vt As EVbVarType, aValue) As VVariant
     Set VVariantVt = New VVariant: VVariantVt.NewVt vt, aValue
 End Function
 
-Public Function list(Of_T As EDataType, _
-                     Optional ArrColStrTypList, _
-                     Optional ByVal IsHashed As Boolean = False, _
-                     Optional ByVal Capacity As Long = 32, _
-                     Optional ByVal GrowRate As Single = 2, _
-                     Optional ByVal GrowSize As Long = 0) As list
-    Set list = New list: list.New_ Of_T, ArrColStrTypList, IsHashed, Capacity, GrowRate, GrowSize
-End Function
-
 Public Function PathFileName(ByVal aPathOrPFN As String, _
                     Optional ByVal aFileName As String, _
                     Optional ByVal aExt As String) As PathFileName
@@ -1502,12 +1405,12 @@ Public Function PFNDirectory(aRoot As PFNDirectory, Name As String) As PFNDirect
     Set PFNDirectory = New PFNDirectory: PFNDirectory.New_ aRoot, Name
 End Function
 
-Public Function PFNDirectoryP(PFN As PathFileName) As PFNDirectory
-    If Not PFN.IsPath Then Exit Function
-    Dim root As PFNDirectory: Set root = MNew.PFNDrive(PFN.Drive)
+Public Function PFNDirectoryP(pfn As PathFileName) As PFNDirectory
+    If Not pfn.IsPath Then Exit Function
+    Dim root As PFNDirectory: Set root = MNew.PFNDrive(pfn.Drive)
     Dim i As Long
-    For i = 0 To PFN.PathCount - 1
-        Set root = MNew.PFNDirectory(root, PFN.PathI(i))
+    For i = 0 To pfn.PathCount - 1
+        Set root = MNew.PFNDirectory(root, pfn.PathI(i))
     Next
     Set PFNDirectoryP = root
 End Function
@@ -1526,32 +1429,6 @@ End Function
 '    Set PFNStreamW = New PFNStreamW: PFNStreamW.New_ PFN
 'End Function
 
-'Function IsInIDE() As Boolean
-'Try: On Error GoTo Catch
-'    Debug.Print 1 / 0
-'    IsInIDE = False: Exit Function
-'Catch: IsInIDE = True
-'End Function
-
-Function IsInIDE() As Boolean
-    IsInIDE = App.LogMode = 0 'LogModeConstants.vbLogAuto
-End Function
-
-Function LogModeConstants_ToStr(e As LogModeConstants) As String
-    Dim s As String
-    Select Case e
-    Case LogModeConstants.vbLogAuto:      s = "vbLogAuto"      ' 0
-    Case LogModeConstants.vbLogOff:       s = "vbLogOff"       ' 1
-    Case LogModeConstants.vbLogToFile:    s = "vbLogToFile"    ' 2
-    Case LogModeConstants.vbLogToNT:      s = "vbLogToNT"      ' 3
-    Case LogModeConstants.vbLogOverwrite: s = "vbLogOverwrite" '16 &H10
-    Case LogModeConstants.vbLogThreadID:  s = "vbLogThreadID"  '32 &H20
-    Case Else: s = CStr(e)
-    End Select
-    LogModeConstants_ToStr = s
-End Function
-
-
 Public Function Pdf(ByVal aPdfPFN As PathFileName) As Pdf
     Set Pdf = New Pdf: Pdf.New_ aPdfPFN
 End Function
@@ -1564,44 +1441,10 @@ Public Function PDFToolKit(PFN_PdfTK_exe As PathFileName) As PDFToolKit
     Set PDFToolKit = New PDFToolKit: PDFToolKit.New_ PFN_PdfTK_exe
 End Function
 
-Public Function MyThread(ith As IThreading, ByVal sIP As String) As MyThread
-    Set MyThread = New MyThread: MyThread.New_ ith, sIP
-End Function
-
-
-Public Function MyThread(ith As IThreading, ByVal Index As Long, ByVal sIP As String) As MyThread
-    Set MyThread = New MyThread: MyThread.New_ ith, Index, sIP
-End Function
-
-
-Public Function IndentStack(aTabSize As Long) As IndentStack
-    Set IndentStack = New IndentStack
-    IndentStack.New_ aTabSize
-End Function
-
-Public Function Leaf(aName As String, aValue) As Leaf
-    Set Leaf = New Leaf
-    Leaf.New_ aName, aValue
-End Function
-
 Public Function Twig(aName As String) As Twig
     Set Twig = New Twig
     Twig.New_ aName
 End Function
-
-'Public Function ListOfLeaf(bUseHashes As Boolean) As ListOfLeaf
-'    Set ListOfLeaf = New ListOfLeaf
-'    ListOfLeaf.New_ bUseHashes
-'End Function
-Public Function list(Of_T As EDataType, _
-                     Optional ArrColStrTypList, _
-                     Optional ByVal IsHashed As Boolean = False, _
-                     Optional ByVal Capacity As Long = 32, _
-                     Optional ByVal GrowRate As Single = 2, _
-                     Optional ByVal GrowSize As Long = 0) As list
-    Set list = New list: list.New_ Of_T, ArrColStrTypList, IsHashed, Capacity, GrowRate, GrowSize
-End Function
-
 
 Public Function Splitter(BolMDI As Boolean, MyOwner As Object, MyContainer As Object, Name As String, LeftTop As Control, LeftBot As Control) As Splitter
     Set Splitter = New Splitter
@@ -1619,6 +1462,10 @@ End Function
 
 Public Function UserInfo() As UserInfo
     Set UserInfo = New UserInfo
+End Function
+
+Public Function ScrollableTextBox(Owner As Form, aTB As TextBox, ByVal Panel As PictureBox, ByVal MinValue As Double, ByVal MaxValue As Double, ByVal CountSteps As Long, StrFormat As String, Optional Btn As CommandButton, Optional ScrollComboBox As ComboBox = Nothing, Optional ByVal InverseScroll As Boolean = False) As ScrollableTextBox
+    Set ScrollableTextBox = New ScrollableTextBox: ScrollableTextBox.New_ Owner, aTB, Panel, MinValue, MaxValue, CountSteps, StrFormat, Btn, ScrollComboBox, InverseScroll
 End Function
 
 
@@ -1670,34 +1517,6 @@ Public Function PathFileName(ByVal aPathFileName As String, _
     Set PathFileName = New PathFileName: PathFileName.New_ aPathFileName, aFileName, aExt
 End Function
 
-' ############################## '    List    ' ############################## '
-Public Function list(Of_T As EDataType, _
-                     Optional ArrColStrTypList, _
-                     Optional ByVal IsHashed As Boolean = False, _
-                     Optional ByVal Capacity As Long = 32, _
-                     Optional ByVal GrowRate As Single = 2, _
-                     Optional ByVal GrowSize As Long = 0) As list
-    Set list = New list: list.New_ Of_T, ArrColStrTypList, IsHashed, Capacity, GrowRate, GrowSize
-End Function
-
-
-
-'not inside of DocumentTsv because FileProperty is unknown in vb-project PReadPropKeyH
-Public Function ListOfFileProperty(doc As DocumentTsv) As list '(Of FileProperty)
-    Dim lifp As list: Set lifp = MNew.list(EDataType.vbObject)
-    Dim i As Long, j As Long, le As list
-    Dim pkhe As PropKeyHEntry, fp As FileProperty
-    Dim pl As list: Set pl = doc.PropertyLists
-    For i = 0 To pl.Count - 1
-        Set le = pl.item(i)
-        For j = 0 To le.Count - 1
-            Set pkhe = le.item(j)
-            Set fp = MNew.FilePropertyPkhe(pkhe)
-            lifp.Add fp 'pk.ToPossFileProperty
-        Next
-    Next
-    Set ListOfFileProperty = lifp
-End Function
 
 'Public Function ToPropKey() As PropKey
 '    Dim PID As Long: PID = CLng(PIDValue)
@@ -1733,50 +1552,12 @@ Public Function PropKeyPkhe(aPkhe As PropKeyHEntry) As PropKey
     Set PropKeyPkhe = MNew.PropKey(aPkhe.FmtGuid, CLng(aPkhe.PIDValue), aPkhe.Name)
 End Function
 
-' ############################## '    List    ' ############################## '
-Public Function list(Of_T As EDataType, _
-                     Optional ArrColStrTypList, _
-                     Optional ByVal IsHashed As Boolean = False, _
-                     Optional ByVal Capacity As Long = 32, _
-                     Optional ByVal GrowRate As Single = 2, _
-                     Optional ByVal GrowSize As Long = 0) As list
-    Set list = New list: list.New_ Of_T, ArrColStrTypList, IsHashed, Capacity, GrowRate, GrowSize
-End Function
-
-
-'not inside of DocumentTsv because FileProperty is unknown in vb-project PReadPropKeyH
-Public Function ListOfFileProperty(doc As DocumentTsv) As list '(Of FileProperty)
-    Dim lifp As list: Set lifp = MNew.list(EDataType.vbObject)
-    Dim i As Long, j As Long, le As list
-    Dim pkhe As PropKeyHEntry, fp As FileProperty
-    Dim pl As list: Set pl = doc.PropertyLists
-    For i = 0 To pl.Count - 1
-        Set le = pl.item(i)
-        For j = 0 To le.Count - 1
-            Set pkhe = le.item(j)
-            Set fp = MNew.FilePropertyPkhe(pkhe)
-            lifp.Add fp 'pk.ToPossFileProperty
-        Next
-    Next
-    Set ListOfFileProperty = lifp
-End Function
 
 Public Function PathFileName(ByVal aPathFileName As String, _
                     Optional ByVal aFileName As String, _
                     Optional ByVal aExt As String) As PathFileName
     Set PathFileName = New PathFileName: PathFileName.New_ aPathFileName, aFileName, aExt
 End Function
-
-Public Function list(Of_T As EDataType, _
-                     Optional ArrColStrTypList, _
-                     Optional ByVal IsHashed As Boolean = False, _
-                     Optional ByVal Capacity As Long = 32, _
-                     Optional ByVal GrowRate As Single = 2, _
-                     Optional ByVal GrowSize As Long = 0) As list
-    Set list = New list: list.New_ Of_T, ArrColStrTypList, IsHashed, Capacity, GrowRate, GrowSize
-End Function
-
-
 
 Public Function UUID() As GUID
     Set UUID = New GUID: UUID.Parse UUID.UUID
@@ -1848,7 +1629,7 @@ Public Function PathFileName(ByVal aPathFileName As String, _
 End Function
 
 'QuickSorter
-Public Function QuickSorter(aCmp As list) As QuickSorter ' , aSwp As Object) As QuickSorter ' As IComparable, ISwappable
+Public Function QuickSorter(aCmp As List) As QuickSorter ' , aSwp As Object) As QuickSorter ' As IComparable, ISwappable
     Set QuickSorter = New QuickSorter: QuickSorter.New_ aCmp ', aSwp
 End Function
 
@@ -1893,16 +1674,6 @@ Public Function TBButton(aName As String, aOwner As Form, aPanel As PictureBox, 
     Set TBButton = New TBButton: TBButton.New_ aName, aOwner, aPanel, aBtn, aPic
 End Function
 
-Public Function Image(aPic As StdPicture) As Image
-    Set Image = New Image: Image.FromStdPicture aPic
-End Function
-
-Public Function LoadFromResource(nID As Long) As IPictureDisp
-    LoadFromResource = LoadResPicture(nID, vbResBitmap)
-End Function
-
-
-
 
 Public Function PEDocument(aPFN As String) As PEDocument
     Set PEDocument = New PEDocument: PEDocument.New_ aPFN
@@ -1926,15 +1697,6 @@ Public Function WaveSoundF(aFileName As String) As WaveSound
     Set WaveSoundF = New WaveSound: WaveSoundF.NewF aFileName
 End Function
 
-
-Public Function LuDecomposition(Value As Matrix) As LuDecomposition
-    Set LuDecomposition = New LuDecomposition:  LuDecomposition.New_ Value
-End Function
-
-Public Function Matrix(ByVal Rows As Long, ByVal Columns As Long, Optional ByVal Value) As Matrix
-    Set Matrix = New Matrix: Matrix.New_ Rows, Columns, Value
-End Function
-
 Public Function QrDecomposition(Value As Matrix) As QrDecomposition
     Set QrDecomposition = New QrDecomposition: QrDecomposition.New_ Value
 End Function
@@ -1951,10 +1713,6 @@ End Function
 
 Public Function ProcessEntry(aSnapShot As Snapshot) As ProcessEntry
     Set ProcessEntry = New ProcessEntry: ProcessEntry.New_ aSnapShot
-End Function
-
-Public Function ModuleEntry(aSnapShot As Snapshot) As ModuleEntry
-    Set ModuleEntry = New ModuleEntry: ModuleEntry.New_ aSnapShot
 End Function
 
 Public Function ThreadEntry(aSnapShot As Snapshot) As ThreadEntry
@@ -2021,12 +1779,12 @@ Public Function stringBuilder(Optional ByVal Value As String, Optional ByVal sta
   Set stringBuilder = New stringBuilder: stringBuilder.New_ Value, startIndex, Length, Capacity, maxCapacity
 End Function
 
-Public Function StreamReader(ByVal aStream As Stream, Optional ByVal Encoding, Optional ByVal detectEncodingFromByteOrderMarks As Boolean, Optional ByVal buffersize As Long) As StreamReader
-  Set StreamReader = New StreamReader: StreamReader.New_ aStream, Encoding, detectEncodingFromByteOrderMarks, buffersize
+Public Function StreamReader(ByVal aStream As Stream, Optional ByVal Encoding, Optional ByVal detectEncodingFromByteOrderMarks As Boolean, Optional ByVal bufferSize As Long) As StreamReader
+  Set StreamReader = New StreamReader: StreamReader.New_ aStream, Encoding, detectEncodingFromByteOrderMarks, bufferSize
 End Function
 
-Public Function StreamReaderP(ByVal aPath As String, Optional ByVal Encoding, Optional ByVal detectEncodingFromByteOrderMarks As Boolean, Optional ByVal buffersize As Long) As StreamReader
-  Set StreamReaderP = New StreamReader: StreamReaderP.NewP aPath, Encoding, detectEncodingFromByteOrderMarks, buffersize
+Public Function StreamReaderP(ByVal aPath As String, Optional ByVal Encoding, Optional ByVal detectEncodingFromByteOrderMarks As Boolean, Optional ByVal bufferSize As Long) As StreamReader
+  Set StreamReaderP = New StreamReader: StreamReaderP.NewP aPath, Encoding, detectEncodingFromByteOrderMarks, bufferSize
 End Function
 
 Public Function TaggedImageFile(aFileName As String) As TaggedImageFile
@@ -2080,5 +1838,24 @@ End Function
 Public Function OperatorLinear(ByVal aStartValue As Double, ByVal aIncrement As Double) As OperatorLinear
     Set OperatorLinear = New OperatorLinear
     OperatorLinear.New_ aStartValue, aIncrement
+End Function
+
+
+Public Function WndRect(r As WinAPIRect) As WndRect
+    Set WndRect = New WndRect: WndRect.New_ r
+End Function
+Public Function WndRectHWnd(ByVal hwnd As LongPtr) As WndRect
+    Set WndRectHWnd = New WndRect: WndRectHWnd.NewFromHWnd hwnd
+End Function
+Public Function WndRectFromMousePoint(P As WinAPIPoint) As WndRect
+    Set WndRectFromMousePoint = New WndRect: WndRectFromMousePoint.NewFromMousePoint P
+End Function
+
+Public Function XTimer(Listener As IListenXTimer, ByVal Interval_ms As Single) As XTimer
+    Set XTimer = New XTimer: XTimer.New_ Listener, Interval_ms
+End Function
+
+Public Function XTimerL(Listener As IListenXTimer, ByVal Interval_ms As Single) As XTimerL
+    Set XTimerL = New XTimerL: XTimerL.New_ Listener, Interval_ms
 End Function
 

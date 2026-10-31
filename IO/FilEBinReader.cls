@@ -136,12 +136,32 @@ End Sub
 
 
 '##############################'   Locale ErrHandler   '##############################'
-Private Function ErrHandler(ByVal FncName As String, _
+'Private Function ErrHandler(ByVal FncName As String, _
+'                            Optional ByVal AddInfo As String, _
+'                            Optional ByVal bLoud As Boolean = True, _
+'                            Optional ByVal bErrLog As Boolean = False, _
+'                            Optional ByVal vbDecor As VbMsgBoxStyle = vbOKOnly Or vbCritical _
+'                            ) As VbMsgBoxResult
+'    ErrHandler = MError.ErrHandler(Me, FncName, AddInfo, bLoud, bErrLog, vbDecor)
+'End Function
+
+Private Function ErrHandler(ByVal FuncName As String, _
                             Optional ByVal AddInfo As String, _
-                            Optional ByVal bLoud As Boolean = True, _
-                            Optional ByVal bErrLog As Boolean = False, _
-                            Optional ByVal vbDecor As VbMsgBoxStyle = vbOKOnly Or vbCritical _
-                            ) As VbMsgBoxResult
-    ErrHandler = MError.ErrHandler(Me, FncName, AddInfo, bLoud, bErrLog, vbDecor)
+                            Optional WinApiError, _
+                            Optional bLoud As Boolean = False, _
+                            Optional bErrLog As Boolean = True, _
+                            Optional vbDecor As VbMsgBoxStyle = vbOKCancel, _
+                            Optional bRetry As Boolean) As VbMsgBoxResult
+    
+    If bRetry Then
+        
+        ErrHandler = MErr.MessErrorRetry(TypeName(Me), FuncName, AddInfo, WinApiError, bErrLog)
+        
+    Else
+        
+        ErrHandler = MErr.MessError(TypeName(Me), FuncName, AddInfo, WinApiError, bLoud, bErrLog, vbDecor)
+        
+    End If
+    
 End Function
 

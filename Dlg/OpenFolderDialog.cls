@@ -123,9 +123,9 @@ End Property
 Public Function ShowDialog(Optional ByVal hwndOwner As Long) As VbMsgBoxResult
     If Invoke_(m_pIPickFolderDialog, Show_, hwndOwner) = S_OK Then
         'bolRet = True
-        ShowDialog = vbOK
+        ShowDialog = VbMsgBoxResult.vbOK
     Else
-        ShowDialog = vbCancel
+        ShowDialog = VbMsgBoxResult.vbCancel
     End If
 End Function
 

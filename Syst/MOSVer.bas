@@ -31,6 +31,15 @@ End Type
     'NOT_BUILD_WINDOWS_DEPRECATE DWORD GetVersion();
     Public Declare Function GetVersion Lib "kernel32" () As Long
     Public Declare Function GetVersionExW Lib "kernel32" (ByVal lpVersionInformation As LongPtr) As Long
+    Private Declare Function VerSetConditionMask Lib "kernel32" (ByVal ConditionMask As Currency, ByVal TypeMask As Long, ByVal Condition As Byte) As Currency
+    
+'BOOL VerifyVersionInfoW(
+'  [in] LPOSVERSIONINFOEXW lpVersionInformation,
+'  [in] DWORD              dwTypeMask,
+'  [in] DWORDLONG          dwlConditionMask
+');
+Private Declare Function VerifyVersionInfoW Lib "kernel32" (ByRef OSVERSIONINFOEX As OSVERSIONINFOEX, ByVal dwTypeMask As Long, ByVal dwlConditionMask As Long) As Long
+
 '#Else
 '    Private Const MAX_STR As Long = 127
 '    'https://learn.microsoft.com/en-us/windows/win32/api/sysinfoapi/nf-sysinfoapi-getversionexa
@@ -110,6 +119,7 @@ Public Type OSVERSIONINFOEX
     wReserved           As Byte                         '   1
 End Type                                           ' Sum: 284
 
+'dwTypeMask:
 Private Const VER_BUILDNUMBER      As Long = &H4&   'dwBuildNumber
 Private Const VER_MAJORVERSION     As Long = &H2&   'dwMajorVersion
 Private Const VER_MINORVERSION     As Long = &H1&   'dwMinorVersion
@@ -183,7 +193,7 @@ Try: On Error GoTo Catch
 '#End If
         
         If RetVal = 1 Then
-            
+        
 '#If DefDebugCalc Then
 '            MsgBox "OsV1.dwPlatformId = " & CStr(OsV1.dwPlatformId)
 '#End If
@@ -191,7 +201,7 @@ Try: On Error GoTo Catch
             If OsV1.dwPlatformId < 2 Then
                 Set m_OS = MNew.OperatingSystem(OsV1.dwPlatformId, MNew.Version(OsV1.dwMajorVersion, OsV1.dwMinorVersion, OsV1.dwBuildNumber))
             Else
-                
+            
 '#If DefDebugCalc Then
 '                MsgBox "OsV1.dwMajorVersion = " & CStr(OsV1.dwMajorVersion)
 '                MsgBox "OsV1.dwMinorVersion = " & CStr(OsV1.dwMinorVersion)
@@ -203,7 +213,7 @@ Try: On Error GoTo Catch
 '                    MsgBox "OsVX.dwOSVersionInfoSize = Len(OsVX) = " & CStr(Len(OsVX))
 '#End If
                     
-                    OsVX.dwOSVersionInfoSize = Len(OsVX)
+                    OsVX.dwOSVersionInfoSize = LenB(OsVX)
                     
                     RetVal = GetVersionExW(VarPtr(OsVX))
                     
@@ -218,7 +228,7 @@ Try: On Error GoTo Catch
 '                        MsgBox "OsVX.dwMinorVersion = " & CStr(OsVX.dwMinorVersion)
 '#End If
                         
-                        Set m_OS = MNew.OperatingSystem(OsVX.dwPlatformId, MNew.Version(OsVX.dwMajorVersion, OsVX.dwMinorVersion, OsVX.dwBuildNumber, 131072))
+                        Set m_OS = MNew.OperatingSystem(OsVX.dwPlatformId, MNew.Version(OsVX.dwMajorVersion, OsVX.dwMinorVersion, OsVX.dwBuildNumber))
                         
 '#If DefDebugCalc Then
 '                        MsgBox "OsVX.szCSDVersion = " & CStr(OsVX.szCSDVersion)
@@ -297,7 +307,7 @@ End Property
 
 
 Public Function IsWindowsVersionOrGreater(ByVal wMajorVersion As Integer, ByVal wMinorVersion As Integer, ByVal wServicePackMajor As Integer) As Boolean
-    Dim osvi As OSVERSIONINFOEXW
+    Dim osvi As OSVERSIONINFOEX 'W
     With osvi
         .dwOSVersionInfoSize = LenB(osvi)
         .dwMajorVersion = wMajorVersion
@@ -306,15 +316,9 @@ Public Function IsWindowsVersionOrGreater(ByVal wMajorVersion As Integer, ByVal 
     End With
     
     Dim dwlConditionMask As Currency
-    dwlConditionMask = VerSetConditionMask( _
-        VerSetConditionMask( _
-        VerSetConditionMask( _
-            0, VER_MAJORVERSION, VER_GREATER_EQUAL), _
-               VER_MINORVERSION, VER_GREATER_EQUAL), _
-               VER_SERVICEPACKMAJOR, VER_GREATER_EQUAL)
+    dwlConditionMask = VerSetConditionMask(VerSetConditionMask(VerSetConditionMask(0, VER_MAJORVERSION, VER_GREATER_EQUAL), VER_MINORVERSION, VER_GREATER_EQUAL), VER_SERVICEPACKMAJOR, VER_GREATER_EQUAL)
     
-    IsWindowsVersionOrGreater = _
-        VerifyVersionInfoW(ByVal VarPtr(osvi), VER_MAJORVERSION Or VER_MINORVERSION Or VER_SERVICEPACKMAJOR, dwlConditionMask) <> 0
+    IsWindowsVersionOrGreater = VerifyVersionInfoW(osvi, VER_MAJORVERSION Or VER_MINORVERSION Or VER_SERVICEPACKMAJOR, dwlConditionMask) <> 0
     'CSDVersion = osvi.szCSDVersion
     'Debug.Print "szCSDVersion: " & CStr(osvi.szCSDVersion)
     'Debug.Print "Produkttyp: " & osvi.wProductType
@@ -380,17 +384,15 @@ Public Function IsWindows10OrGreater() As Boolean
 End Function
 
 Public Function IsWindowsServer() As Boolean
-    Dim osvi As OSVERSIONINFOEXW
+    Dim osvi As OSVERSIONINFOEX 'W
     With osvi
         .dwOSVersionInfoSize = LenB(osvi)
         .wProductType = VER_NT_WORKSTATION
     End With
     
-    Dim dwlConditionMask As Currency
-        dwlConditionMask = VerSetConditionMask(0, VER_PRODUCT_TYPE, VER_EQUAL)
+    Dim dwlConditionMask As Currency: dwlConditionMask = VerSetConditionMask(0, VER_PRODUCT_TYPE, VER_EQUAL)
 
-    IsWindowsServer = _
-        VerifyVersionInfoW(ByVal VarPtr(osvi), VER_PRODUCT_TYPE, dwlConditionMask) <> 0
+    IsWindowsServer = VerifyVersionInfoW(osvi, VER_PRODUCT_TYPE, dwlConditionMask) <> 0
 End Function
 
 

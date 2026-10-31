@@ -917,7 +917,7 @@ Try: On Error GoTo Catch
         hr = PrintDlg(VarPtr(m_PrintDialog))
         mFlags = m_PrintDialog.flags
         ShowDialog = IIf(hr, vbOK, vbCancel)
-        If ShowDialog = vbOK Then
+        If ShowDialog = VbMsgBoxResult.vbOK Then
             ' Dev_Mode wieder aus dem Speicherblock in die Struktur kopieren und
             ' Speicherblock zerstören
             pMemMode = GlobalLock(m_PrintDialog.hDevMode) ' Speicherblock sperren
