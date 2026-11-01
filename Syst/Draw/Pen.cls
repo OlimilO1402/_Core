@@ -105,8 +105,8 @@ End Sub
 '    Set Pen = New Pen: Pen.New_ PenStyle, WidthX, WidthY, Color
 'End Function
 
-Public Function NewC(other As Pen)
-    RtlMoveMemory m_LogObj, other.Ptr, LenB(m_LogObj)
+Public Function NewC(Other As Pen)
+    RtlMoveMemory m_LogObj, Other.Ptr, LenB(m_LogObj)
 End Function
 
 Public Sub Dispose():    If m_Handle Then DeleteObject m_Handle: m_Handle = 0
@@ -140,10 +140,55 @@ Public Property Get Color() As Long:                    Color = m_LogObj.lopnCol
 Friend Property Let Color(ByVal Value As Long):         m_LogObj.lopnColor = Value:    End Property
 
 
+' v ' ############################## ' v '    all Enums    ' v ' ############################## ' v '
+' v ' ############################## ' v '    EPenStyle    ' v ' ############################## ' v '
+Public Function EPenStyle_ToStr(ByVal e As EPenStyle) As String
+    Dim s As String
+    Select Case e
+    Case EPenStyle.psSolid:       s = "Solid      " & vbTab & "______"
+    Case EPenStyle.psDash:        s = "Dash       " & vbTab & "------"
+    Case EPenStyle.psDot:         s = "Dot        " & vbTab & "......"
+    Case EPenStyle.psDashDot:     s = "DashDot    " & vbTab & "-.-.-."
+    Case EPenStyle.psDashDotDot:  s = "DashDotDot " & vbTab & "-..-.."
+    Case EPenStyle.psNull:        s = "Null       " & vbTab & "      "
+    Case EPenStyle.psInsideFrame: s = "InsideFrame" & vbTab & "_"
+    End With
+    EPenStyle_ToStr = s
+End Function
+
+Public Function EPenStyle_Parse(ByVal s As String) As EPenStyle
+    s = Trim(Split(s, vbTab)(0))
+    Dim e As EPenStyle
+    Select Case s
+    Case "Solid":       e = EPenStyle.psSolid
+    Case "Dash":        e = EPenStyle.psDash
+    Case "Dot":         e = EPenStyle.psDot
+    Case "DashDot":     e = EPenStyle.psDashDot
+    Case "DashDotDot":  e = EPenStyle.psDashDotDot
+    Case "Null":        e = EPenStyle.psNull
+    Case "InsideFrame": e = EPenStyle.psInsideFrame
+    End Select
+    EPenStyle_Parse = e
+End Function
+
+Public Function EPenStyle_ToCBLB(ByVal CBLB As ComboBox) As EPenStyle
+    CBLB.Clear: Dim i As Long: For i = 0 To 7: .AddItem EPenStyle_ToStr(i): Next
+End Function
 
 
 
 
+'class <GDI32.LOG...>:
+'Private Sub Class_Initialize(): Me.New_: End Sub
+'Private Sub Class_Terminate(): Me.Dispose: End Sub
+'Friend Sub New_()
+'Public Sub NewC(Other As <GDI32.LOG...>, optional byval deep as Boolean = False): End Sub
+'Public Sub Dispose(): If m_Handle Then DeleteObject m_Handle: m_Handle = 0: End Sub
+'Public Function Clone() As <GDI32.LOG...>: Set Clone = new <GDI32.LOG...>: Clone.NewC Me: End Function
+'Public Sub SetParams(Optional Param1, Optional Param2, ...): End Sub
+'Public Sub Create(): m_Handle = Create<GDI32.LOG...>: Create = m_Handle: End Sub
+'Public Property Get Ptr() As LongPtr: Ptr = VarPtr(m_<GDI32.LOG...>): End Property
+'Public Property Get Handle() As LongPtr: Handle = m_Handle: End Property
 
 
 
