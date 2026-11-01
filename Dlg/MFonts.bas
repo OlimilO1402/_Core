@@ -1,6 +1,6 @@
 Attribute VB_Name = "MFonts"
 Option Explicit
-
+'needs class Font
 'https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-enumfontfamiliesexw
 Private Declare Function EnumFontFamiliesExW Lib "gdi32" (ByVal hDC As LongPtr, ByRef lpLogFont As Any, ByVal lpEnumFontProc As Any, ByVal lParam As Collection, Optional ByVal dw As Long = 0) As Long
 Private Declare Function lstrlenW Lib "kernel32.dll" (ByRef lpString As Byte) As Long
@@ -12,7 +12,7 @@ Private m_FontsAll   As Collection
 Private m_FontsFixed As Collection
 Private m_FontsVaria As Collection
 
-Public Sub Init()
+Public Sub init()
     Set m_FontsAll = New Collection
     Set m_FontsFixed = New Collection
     Set m_FontsVaria = New Collection
@@ -33,23 +33,23 @@ End Sub
 
 'int CALLBACK EnumFontFamExProc( const LOGFONT *lpelfe, const TEXTMETRIC *lpntme, DWORD FontType, lParam lParam);
 Public Function EnumFontFamExProc(ByVal lpElfe As LongPtr, ByVal lpntme As LongPtr, ByVal FontType As Long, ByVal Col As Collection) As Long
-    Dim newFont As Font: Set newFont = MNew.FontPtr(lpElfe)
-    Dim nam As String: nam = newFont.Name
+    Dim NewFont As Font: Set NewFont = MNew.FontPtr(lpElfe)
+    Dim nam As String: nam = NewFont.Name
     If m_LastFont Is Nothing Then
-        Col.Add newFont, nam
+        Col.Add NewFont, nam
     Else
         If Not m_LastFont.Name = nam Then
-            Col.Add newFont, nam
+            Col.Add NewFont, nam
         End If
     End If
-    Set m_LastFont = newFont
+    Set m_LastFont = NewFont
     EnumFontFamExProc = 1
 End Function
 
 Public Property Get FontsAll() As Collection
-    If m_FontsAll Is Nothing Then MFonts.Init
+    If m_FontsAll Is Nothing Then MFonts.init
     'Set m_FontsAll = New Collection
-    If m_FontsAll.Count = 0 Then MFonts.Init
+    If m_FontsAll.Count = 0 Then MFonts.init
     Set FontsAll = m_FontsAll
 End Property
 
