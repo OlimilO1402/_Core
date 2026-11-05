@@ -33,15 +33,36 @@ Private Declare Function CloseHandle Lib "kernel32" (ByVal hObject As LongPtr) A
 
 Private m_PFN    As PathFileName
 Private m_Handle As LongPtr
-
-Friend Sub New_(aPFN As PathFileName)
-    Set m_PFN = aPFN
-    m_Handle = CreateFileW(StrPtr(m_PFN.Value), GENERIC_READ Or GENERIC_WRITE, FILE_SHARE_READ Or FILE_SHARE_WRITE, ByVal 0&, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, 0&)
-End Sub
+Private m_CreationTime   As Date
+Private m_LastAccessTime As Date
+Private m_LastWriteTime  As Date
 
 Private Sub Class_Initialize()
     CClose
 End Sub
+
+Private Sub Class_Terminate()
+    CClose
+End Sub
+
+Friend Sub New_(aPFN As PathFileName)
+    Set m_PFN = aPFN
+    m_Handle = CreateFileW(StrPtr(m_PFN.Value), GENERIC_READ Or GENERIC_WRITE, FILE_SHARE_READ Or FILE_SHARE_WRITE, ByVal 0&, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, 0&)
+    m_CreationTime = GetCreationTime
+    m_LastWriteTime = GetLastWriteTime
+    m_LastAccessTime = GetLastAccessTime
+End Sub
+
+Public Sub NewC(other As PFNDateTime)
+    Me.New_ m_PFN
+    m_CreationTime = other.CreationTime
+    m_LastAccessTime = other.LastAccessTime
+    m_LastWriteTime = other.LastWriteTime
+End Sub
+
+Public Function Clone() As PFNDateTime
+    Set Clone = New PFNDateTime: Clone.NewC Me
+End Function
 
 Public Sub CClose()
     If m_Handle <= 0 Then Exit Sub
@@ -65,25 +86,27 @@ Public Property Get PathFileName() As PathFileName
     Set PathFileName = m_PFN
 End Property
 
-Public Property Get CreationTime() As Date
-    If m_Handle <= 0 Then Exit Property
+Private Function GetCreationTime() As Date
+    If m_Handle <= 0 Then Exit Function
     Dim ct As FILETIME, lat As FILETIME, lwt As FILETIME
     If GetFileTime(m_Handle, ct, lat, lwt) = 0 Then
         MsgBox "Could not get FileTime from file: " & m_PFN.Value
-        Exit Property
+        Exit Function
     End If
-    CreationTime = MTime.SystemTime_ToDate(MTime.SystemTime_ToTzSpecificLocalTime(MTime.FileTime_ToSystemTime(ct)))
-    'ct = MTime.FileTime_ToLocalFileTime(ct)
-    'CreationTime = MTime.FileTime_ToDate(ct)
+    GetCreationTime = MTime.SystemTime_ToDate(MTime.SystemTime_ToTzSpecificLocalTime(MTime.FileTime_ToSystemTime(ct)))
+End Function
+Public Property Get CreationTime() As Date
+    CreationTime = m_CreationTime
 End Property
 Public Property Let CreationTime(ByVal aDateTime As Date)
+    m_CreationTime = aDateTime
     If m_Handle <= 0 Then Exit Property
     Dim ct As FILETIME, lat As FILETIME, lwt As FILETIME
     If GetFileTime(m_Handle, ct, lat, lwt) = 0 Then
         MsgBox "Could not get FileTime from file: " & m_PFN.Value
         Exit Property
     End If
-    ct = MTime.Date_ToFileTime(aDateTime)
+    ct = MTime.Date_ToFileTime(m_CreationTime)
     ct = MTime.LocalFileTime_ToFileTime(ct)
     If SetFileTime(m_Handle, ct, lat, lwt) = 0 Then
         MsgBox "Could not write FileTime to file: " & m_PFN.Value
@@ -91,25 +114,27 @@ Public Property Let CreationTime(ByVal aDateTime As Date)
     End If
 End Property
 
-Public Property Get LastAccessTime() As Date
-    If m_Handle <= 0 Then Exit Property
+Private Function GetLastAccessTime() As Date
+    If m_Handle <= 0 Then Exit Function
     Dim ct As FILETIME, lat As FILETIME, lwt As FILETIME
     If GetFileTime(m_Handle, ct, lat, lwt) = 0 Then
         MsgBox "Could not get FileTime from file: " & m_PFN.Value
-        Exit Property
+        Exit Function
     End If
-    LastAccessTime = MTime.SystemTime_ToDate(MTime.SystemTime_ToTzSpecificLocalTime(MTime.FileTime_ToSystemTime(lat)))
-    'lat = MTime.FileTime_ToLocalFileTime(lat)
-    'LastAccessTime = MTime.FileTime_ToDate(lat)
+    GetLastAccessTime = MTime.SystemTime_ToDate(MTime.SystemTime_ToTzSpecificLocalTime(MTime.FileTime_ToSystemTime(lat)))
+End Function
+Public Property Get LastAccessTime() As Date
+    LastAccessTime = m_LastAccessTime
 End Property
 Public Property Let LastAccessTime(ByVal aDateTime As Date)
+    m_LastAccessTime = aDateTime
     If m_Handle <= 0 Then Exit Property
     Dim ct As FILETIME, lat As FILETIME, lwt As FILETIME
     If GetFileTime(m_Handle, ct, lat, lwt) = 0 Then
         MsgBox "Could not get FileTime from file: " & vbCrLf & m_PFN.Value
         Exit Property
     End If
-    lat = MTime.Date_ToFileTime(aDateTime)
+    lat = MTime.Date_ToFileTime(m_LastAccessTime)
     lat = MTime.LocalFileTime_ToFileTime(lat)
     If SetFileTime(m_Handle, ct, lat, lwt) = 0 Then
         MsgBox "Could not write FileTime to file: " & vbCrLf & m_PFN.Value
@@ -117,29 +142,30 @@ Public Property Let LastAccessTime(ByVal aDateTime As Date)
     End If
 End Property
 
-Public Property Get LastWriteTime() As Date
-    If m_Handle <= 0 Then Exit Property
+Private Function GetLastWriteTime() As Date
+    If m_Handle <= 0 Then Exit Function
     Dim ct As FILETIME, lat As FILETIME, lwt As FILETIME
     If GetFileTime(m_Handle, ct, lat, lwt) = 0 Then
         MsgBox "Could not get FileTime from file: " & vbCrLf & m_PFN.Value
-        Exit Property
+        Exit Function
     End If
-    LastWriteTime = MTime.SystemTime_ToDate(MTime.SystemTime_ToTzSpecificLocalTime(MTime.FileTime_ToSystemTime(lwt)))
-    'lwt = MTime.FileTime_ToLocalFileTime(lwt)
-    'LastWriteTime = MTime.FileTime_ToDate(lwt)
+    GetLastWriteTime = MTime.SystemTime_ToDate(MTime.SystemTime_ToTzSpecificLocalTime(MTime.FileTime_ToSystemTime(lwt)))
+End Function
+Public Property Get LastWriteTime() As Date
+    LastWriteTime = m_LastWriteTime
 End Property
 Public Property Let LastWriteTime(ByVal aDateTime As Date)
+    m_LastWriteTime = aDateTime
     If m_Handle <= 0 Then Exit Property
     Dim ct As FILETIME, lat As FILETIME, lwt As FILETIME
     If GetFileTime(m_Handle, ct, lat, lwt) = 0 Then
         MsgBox "Could not get FileTime from file: " & vbCrLf & m_PFN.Value
         Exit Property
     End If
-    lwt = MTime.Date_ToFileTime(aDateTime)
+    lwt = MTime.Date_ToFileTime(m_LastWriteTime)
     lwt = MTime.LocalFileTime_ToFileTime(lwt)
     If SetFileTime(m_Handle, ct, lat, lwt) = 0 Then
         MsgBox "Could not write FileTime to file: " & vbCrLf & m_PFN.Value
         Exit Property
     End If
 End Property
-

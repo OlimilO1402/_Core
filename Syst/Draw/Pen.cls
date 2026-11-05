@@ -81,7 +81,7 @@ End Type
 'https://github.com/microsoft/Windows-classic-samples
 
 'https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-createpen
-Private Declare Function CreatePen Lib "gdi32" (ByVal iStyle As Long, ByVal cWidth As Long, ByVal crColor As Long) As Long
+'Private Declare Function CreatePen Lib "gdi32" (ByVal iStyle As Long, ByVal cWidth As Long, ByVal crColor As Long) As Long
 'https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-createpenindirect
 Private Declare Function CreatePenIndirect Lib "gdi32" (ByRef lpLogPen As LOGPEN) As Long
 Private Declare Function DeleteObject Lib "gdi32" (ByVal hObject As LongPtr) As Long
@@ -94,10 +94,12 @@ Private Sub Class_Terminate():  Me.Dispose:             End Sub
 
 Friend Sub New_(Optional PenStyle As EPenStyle = EPenStyle.psSolid, Optional WidthX As Long = 1, Optional WidthY As Long = 1, Optional Color As Long = vbBlack)
     With m_LogObj: .lopnStyle = PenStyle: .lopnWidthX = WidthX: .lopnWidthY = WidthY: .lopnColor = Color: End With
+    Me.Create
 End Sub
 
 Friend Sub NewPtr(ByVal lpLogObj As LongPtr)
     RtlMoveMemory ByVal Me.Ptr, ByVal lpLogObj, LenB(m_LogObj)
+    Me.Create
 End Sub
 
 'Copy to MNew
@@ -105,8 +107,9 @@ End Sub
 '    Set Pen = New Pen: Pen.New_ PenStyle, WidthX, WidthY, Color
 'End Function
 
-Public Function NewC(Other As Pen)
-    RtlMoveMemory m_LogObj, Other.Ptr, LenB(m_LogObj)
+Public Function NewC(other As Pen)
+    'RtlMoveMemory m_LogObj, other.Ptr, LenB(m_LogObj)
+    Me.NewPtr other.Ptr
 End Function
 
 Public Sub Dispose():    If m_Handle Then DeleteObject m_Handle: m_Handle = 0
@@ -114,8 +117,8 @@ End Sub
 
 Public Function Clone(Optional ByVal deep As Boolean = False) As Pen: Set Clone = New Pen: Clone.NewC Me: End Function
 
-Public Sub SetParams(Optional PenStyle, Optional WidthX, Optional WidthY, Optional Color)
-    If Not IsMissing(PenStyle) Then Me.PenStyle = CLng(PenStyle)
+Public Sub SetParams(Optional Style, Optional WidthX, Optional WidthY, Optional Color)
+    If Not IsMissing(Style) Then Me.Style = CLng(Style)
     If Not IsMissing(WidthX) Then Me.WidthX = CLng(WidthX)
     If Not IsMissing(WidthY) Then Me.WidthY = CLng(WidthY)
     If Not IsMissing(Color) Then Me.Color = CLng(Color)
@@ -127,8 +130,8 @@ Public Property Get Ptr() As LongPtr:                   Ptr = VarPtr(m_LogObj): 
 
 Public Property Get Handle() As LongPtr:                Handle = m_Handle:             End Property
 
-Public Property Get PenStyle() As EPenStyle:            PenStyle = m_LogObj.lopnStyle: End Property
-Friend Property Let PenStyle(ByVal Value As EPenStyle): m_LogObj.lopnStyle = Value:    End Property
+Public Property Get Style() As EPenStyle:               Style = m_LogObj.lopnStyle: End Property
+Friend Property Let Style(ByVal Value As EPenStyle):    m_LogObj.lopnStyle = Value:    End Property
 
 Public Property Get WidthX() As Long:                   WidthX = m_LogObj.lopnWidthX:  End Property
 Friend Property Let WidthX(ByVal Value As Long):        m_LogObj.lopnWidthX = Value:   End Property
@@ -152,7 +155,7 @@ Public Function EPenStyle_ToStr(ByVal e As EPenStyle) As String
     Case EPenStyle.psDashDotDot:  s = "DashDotDot " & vbTab & "-..-.."
     Case EPenStyle.psNull:        s = "Null       " & vbTab & "      "
     Case EPenStyle.psInsideFrame: s = "InsideFrame" & vbTab & "_"
-    End With
+    End Select
     EPenStyle_ToStr = s
 End Function
 
@@ -171,9 +174,9 @@ Public Function EPenStyle_Parse(ByVal s As String) As EPenStyle
     EPenStyle_Parse = e
 End Function
 
-Public Function EPenStyle_ToCBLB(ByVal CBLB As ComboBox) As EPenStyle
-    CBLB.Clear: Dim i As Long: For i = 0 To 7: .AddItem EPenStyle_ToStr(i): Next
-End Function
+Public Sub EPenStyle_ToCBLB(ByVal CBLB As ComboBox)
+    CBLB.Clear: Dim i As Long: For i = 0 To 7: CBLB.AddItem EPenStyle_ToStr(i): Next
+End Sub
 
 
 
