@@ -205,8 +205,8 @@ Public Function City(ByVal Name As String, ByVal PostalCode As String) As City
     Set City = New City: City.New_ Name, PostalCode
 End Function
 
-Public Function CMatOp(ByVal P As Long, s As String, Optional ByVal nk As Byte) As CMatOp
-    Set CMatOp = New CMatOp: CMatOp.New_ P, s, nk
+Public Function CMatOp(ByVal P As Long, S As String, Optional ByVal nk As Byte) As CMatOp
+    Set CMatOp = New CMatOp: CMatOp.New_ P, S, nk
 End Function
 Public Function CMatOpByVal(ByVal pDbl As Long, Optional ByVal mRows As Byte = 1, Optional ByVal nCols As Byte = 1) As CMatOp
     Set CMatOpByVal = New CMatOp: CMatOpByVal.NewByVal pDbl, mRows, nCols
@@ -219,10 +219,13 @@ Public Function CoderVB(Optional ByVal WriteClsHeader As Boolean = False) As Cod
     Set CoderVB = New CoderVB: CoderVB.New_ WriteClsHeader
 End Function
 
+
+'_Core\Ctrl\ColorSelector.cls
 Public Function ColorSelector(aTimer As Timer, aButton As CommandButton, aColorView As PictureBox, aLabel As Label) As ColorSelector
     Set ColorSelector = New ColorSelector: ColorSelector.New_ aTimer, aButton, aColorView, aLabel
 End Function
 
+'_Core\COM\ComInterface.cls
 Public Function ComInterface(aIID As GUID, Optional aName As String) As ComInterface
     Set ComInterface = New ComInterface: ComInterface.New_ aIID, aName
 End Function
@@ -316,14 +319,14 @@ Public Function DocumentP(aPFN As String) As Document
     Set DocumentP = New Document: DocumentP.New_ aPFN
 End Function
 ' ############################## '    DocumentPStore    ' ############################## '
-Public Function DocumentPStore(aPFN As PathFileName, PossFileProps As list) As DocumentPStore 'PossFileProps As List(Of PropKey))
+Public Function DocumentPStore(aPFN As PathFileName, PossFileProps As List) As DocumentPStore 'PossFileProps As List(Of PropKey))
     Set DocumentPStore = New DocumentPStore: DocumentPStore.New_ aPFN, PossFileProps
 End Function
 ' ############################## '    DocumentTsv    ' ############################## '
 'Public Function DocumentTsv(aPFN As String, Optional ByVal aPropertyLists As List = Nothing) As DocumentTsv
 '    Set DocumentTsv = New DocumentTsv: DocumentTsv.New_ aPFN, aPropertyLists
 'End Function
-Public Function DocumentTsv(aPFN As PathFileName, Optional ByVal aPropertyLists As list = Nothing) As DocumentTsv
+Public Function DocumentTsv(aPFN As PathFileName, Optional ByVal aPropertyLists As List = Nothing) As DocumentTsv
     Set DocumentTsv = New DocumentTsv: DocumentTsv.New_ aPFN, aPropertyLists
 End Function
 
@@ -408,16 +411,16 @@ Public Function FocusRect(ByVal aHDC As LongPtr) As FocusRect
 End Function
 
 Public Function FormatRange(ByVal vt As VbVarType, ByVal Min As Double, ByVal Max As Double) As String
-    Dim s As String
+    Dim S As String
     Select Case vt
     Case VbVarType.vbDate
         Dim datMin As Date: datMin = Min
         Dim datMax As Date: datMax = Max
-        s = datMin & " | " & datMax
+        S = datMin & " | " & datMax
     Case Else
-        s = Min & " | " & Max
+        S = Min & " | " & Max
     End Select
-    FormatRange = s
+    FormatRange = S
 End Function
 'ist Shared muﬂ deshalb in ein Modul
 'von Bitmap:
@@ -472,8 +475,8 @@ End Function
 Public Function GeoPos(Latitude As AngleDec, Longitude As AngleDec, Optional ByVal Height As Double, Optional ByVal Name As String) As GeoPos
     Set GeoPos = New GeoPos: GeoPos.New_ Latitude, Longitude, Height, Name
 End Function
-Public Function GeoPosS(s As String) As GeoPos
-    Set GeoPosS = New GeoPos: GeoPosS.Parse s
+Public Function GeoPosS(S As String) As GeoPos
+    Set GeoPosS = New GeoPos: GeoPosS.Parse S
 End Function
 
 Public Function GetDefaultYear() As Integer
@@ -496,7 +499,7 @@ Public Function GitHubUserD(Dictionary As Dictionary) As GitHubUser
     Dim gu As GitHubUser: Set gu = New GitHubUser: If gu.Read(Dictionary) Then Set GitHubUserD = gu
 End Function
 
-Public Function GraphicView(aCanvas As PictureBox, aPoint3DList As list) As GraphicView
+Public Function GraphicView(aCanvas As PictureBox, aPoint3DList As List) As GraphicView
     Set GraphicView = New GraphicView: GraphicView.New_ aCanvas, aPoint3DList
 End Function
 
@@ -523,9 +526,9 @@ End Function
 Public Function GuidPK(ByVal sGuid As String, ByVal PID As Long) As GUID
     Set GuidPK = New GUID: GuidPK.NewPK sGuid, PID
 End Function
-Public Function GuidS(s As String) As GUID
+Public Function GuidS(S As String) As GUID
     Set GuidS = New GUID
-    If Not GuidS.Parse(s) Then Set GuidS = Nothing
+    If Not GuidS.Parse(S) Then Set GuidS = Nothing
 End Function
 
 Public Function HeapEntry(aSnapShot As Snapshot, ByVal Index As Long) As HeapEntry
@@ -536,7 +539,7 @@ Public Function HeapList(aSnapShot As Snapshot) As HeapList
 End Function
 
 'HeapSorter
-Public Function HeapSorter(aCmp As list) As HeapSorter ', aSwp As Object) As HeapSorter ' As IComparable, ISwappable
+Public Function HeapSorter(aCmp As List) As HeapSorter ', aSwp As Object) As HeapSorter ' As IComparable, ISwappable
     Set HeapSorter = New HeapSorter: HeapSorter.New_ aCmp ', aSwp
 End Function
 
@@ -552,8 +555,8 @@ Public Function IBAN(IBANInfos As IBANInfos, siban As String) As IBAN
     Set IBAN = New IBAN: IBAN.New_ IBANInfos, siban
 End Function
 
-Public Function IBANCreator(IBANInfos As IBANInfos, aIBANInfo As IBANInfo, list As Collection) As IBANCreator 'sArr() As String) As IBANCreator
-    Set IBANCreator = New IBANCreator: IBANCreator.New_ IBANInfos, aIBANInfo, list 'sArr
+Public Function IBANCreator(IBANInfos As IBANInfos, aIBANInfo As IBANInfo, List As Collection) As IBANCreator 'sArr() As String) As IBANCreator
+    Set IBANCreator = New IBANCreator: IBANCreator.New_ IBANInfos, aIBANInfo, List 'sArr
 End Function
 
 Public Function IBANInfo(Name As String, LC As String, bbinf As BBANInfo) As IBANInfo
@@ -637,25 +640,25 @@ Public Function Leaf(ByVal aName As String, ByVal aValue) As Leaf
 End Function
 
 ' ############################## '    List    ' ############################## '
-Public Function list(Of_T As EDataType, _
+Public Function List(Of_T As EDataType, _
                      Optional ArrColStrTypList, _
                      Optional ByVal IsHashed As Boolean = False, _
                      Optional ByVal Capacity As Long = 32, _
                      Optional ByVal GrowRate As Single = 2, _
-                     Optional ByVal GrowSize As Long = 0) As list
-    Set list = New list: list.New_ Of_T, ArrColStrTypList, IsHashed, Capacity, GrowRate, GrowSize
+                     Optional ByVal GrowSize As Long = 0) As List
+    Set List = New List: List.New_ Of_T, ArrColStrTypList, IsHashed, Capacity, GrowRate, GrowSize
 End Function
 
 'not inside of DocumentTsv because FileProperty is unknown in vb-project PReadPropKeyH
-Public Function ListOfFileProperty(doc As DocumentTsv) As list '(Of FileProperty)
-    Dim lifp As list: Set lifp = MNew.list(EDataType.vbObject)
-    Dim i As Long, j As Long, le As list
+Public Function ListOfFileProperty(doc As DocumentTsv) As List '(Of FileProperty)
+    Dim lifp As List: Set lifp = MNew.List(EDataType.vbObject)
+    Dim i As Long, j As Long, le As List
     Dim pkhe As PropKeyHEntry, fp As FileProperty
-    Dim pl As list: Set pl = doc.PropertyLists
+    Dim pl As List: Set pl = doc.PropertyLists
     For i = 0 To pl.Count - 1
-        Set le = pl.item(i)
+        Set le = pl.Item(i)
         For j = 0 To le.Count - 1
-            Set pkhe = le.item(j)
+            Set pkhe = le.Item(j)
             Set fp = MNew.FilePropertyPkhe(pkhe)
             lifp.Add fp 'pk.ToPossFileProperty
         Next
@@ -672,17 +675,17 @@ Public Function LoadFromResource(nID As Long) As IPictureDisp
 End Function
 
 Function LogModeConstants_ToStr(e As LogModeConstants) As String
-    Dim s As String
+    Dim S As String
     Select Case e
-    Case LogModeConstants.vbLogAuto:      s = "vbLogAuto"      ' 0
-    Case LogModeConstants.vbLogOff:       s = "vbLogOff"       ' 1
-    Case LogModeConstants.vbLogToFile:    s = "vbLogToFile"    ' 2
-    Case LogModeConstants.vbLogToNT:      s = "vbLogToNT"      ' 3
-    Case LogModeConstants.vbLogOverwrite: s = "vbLogOverwrite" '16 &H10
-    Case LogModeConstants.vbLogThreadID:  s = "vbLogThreadID"  '32 &H20
-    Case Else: s = CStr(e)
+    Case LogModeConstants.vbLogAuto:      S = "vbLogAuto"      ' 0
+    Case LogModeConstants.vbLogOff:       S = "vbLogOff"       ' 1
+    Case LogModeConstants.vbLogToFile:    S = "vbLogToFile"    ' 2
+    Case LogModeConstants.vbLogToNT:      S = "vbLogToNT"      ' 3
+    Case LogModeConstants.vbLogOverwrite: S = "vbLogOverwrite" '16 &H10
+    Case LogModeConstants.vbLogThreadID:  S = "vbLogThreadID"  '32 &H20
+    Case Else: S = CStr(e)
     End Select
-    LogModeConstants_ToStr = s
+    LogModeConstants_ToStr = S
 End Function
 
 Public Function LuDecomposition(Value As Matrix) As LuDecomposition
@@ -697,8 +700,8 @@ Public Function MACAddressA(bytes05() As Byte, Optional sep As String = "-") As 
     Set MACAddressA = New MACADDress: MACAddressA.New_ bytes05(0), bytes05(1), bytes05(2), bytes05(3), bytes05(4), bytes05(5), sep
 End Function
 
-Public Function MACAddressS(s As String) As MACADDress
-    Set MACAddressS = New MACADDress: MACAddressS.NewS s
+Public Function MACAddressS(S As String) As MACADDress
+    Set MACAddressS = New MACADDress: MACAddressS.NewS S
 End Function
 
 Public Function MatBereich(Optional Value, Optional Bereich_von, Optional Bereich_bis, Optional ByVal Auswahl As EBereichAuswahl = EBereichAuswahl.Mittelwert) As MatBereich
@@ -776,11 +779,11 @@ End Function
 Public Function Monitor(ByVal HMONITOR As LongPtr, ByVal hDC As LongPtr, ByVal lpClipRECT As LongPtr) As Monitor
     Set Monitor = New Monitor: Monitor.New_ HMONITOR, hDC, lpClipRECT
 End Function
-Public Function MonitorP(ByVal X As Long, ByVal Y As Long, Optional ByVal aFlag As EMonitorDefault = EMonitorDefault.ToNearest) As Monitor
-    Set MonitorP = New Monitor: MonitorP.NewP X, Y, aFlag
+Public Function MonitorP(ByVal x As Long, ByVal y As Long, Optional ByVal aFlag As EMonitorDefault = EMonitorDefault.ToNearest) As Monitor
+    Set MonitorP = New Monitor: MonitorP.NewP x, y, aFlag
 End Function
-Public Function MonitorR(ByVal X As Long, ByVal Y As Long, ByVal Width As Long, ByVal Height As Long, Optional ByVal aFlag As EMonitorDefault = EMonitorDefault.ToNearest) As Monitor
-    Set MonitorR = New Monitor: MonitorR.NewR X, Y, Width, Height, aFlag
+Public Function MonitorR(ByVal x As Long, ByVal y As Long, ByVal Width As Long, ByVal Height As Long, Optional ByVal aFlag As EMonitorDefault = EMonitorDefault.ToNearest) As Monitor
+    Set MonitorR = New Monitor: MonitorR.NewR x, y, Width, Height, aFlag
 End Function
 Public Function MonitorW(ByVal hwnd As LongPtr, Optional ByVal aFlag As EMonitorDefault = EMonitorDefault.ToNearest) As Monitor
     Set MonitorW = New Monitor: MonitorW.NewW hwnd, aFlag
@@ -994,12 +997,12 @@ Public Function Pipe(Optional ByVal Name As String, Optional bIsLocal As Boolean
     Set Pipe = New Pipe: Pipe.New_ Name, bIsLocal, PipeAccess, PipeType, nInstances
 End Function
 
-Public Function Point3D(ByVal TagName As String, ByVal X As Double, ByVal Y As Double, ByVal z As Double) As Point3D
-    Set Point3D = New Point3D: Point3D.New_ TagName, X, Y, z
+Public Function Point3D(ByVal TagName As String, ByVal x As Double, ByVal y As Double, ByVal z As Double) As Point3D
+    Set Point3D = New Point3D: Point3D.New_ TagName, x, y, z
 End Function
 
-Public Function PossFileProp(aName As String, aGUID As String, aPID As Long, aType As String) As PossFileProp
-    Set PossFileProp = New PossFileProp: PossFileProp.New_ aName, aGUID, aPID, aType
+Public Function PossFileProp(aName As String, aGuid As String, aPID As Long, aType As String) As PossFileProp
+    Set PossFileProp = New PossFileProp: PossFileProp.New_ aName, aGuid, aPID, aType
 End Function
 
 Public Function ProcessEntry(aSnapShot As Snapshot) As ProcessEntry
@@ -1084,7 +1087,7 @@ Public Function QrDecomposition(Value As Matrix) As QrDecomposition
     Set QrDecomposition = New QrDecomposition: QrDecomposition.New_ Value
 End Function
 'QuickSorter
-Public Function QuickSorter(aCmp As list) As QuickSorter ' , aSwp As Object) As QuickSorter ' As IComparable, ISwappable
+Public Function QuickSorter(aCmp As List) As QuickSorter ' , aSwp As Object) As QuickSorter ' As IComparable, ISwappable
     Set QuickSorter = New QuickSorter: QuickSorter.New_ aCmp ', aSwp
 End Function
 
@@ -1154,8 +1157,8 @@ Public Function Splitter(ByVal bMDI As Boolean, Owner As Object, Container As Ob
     Set Splitter = New Splitter: Splitter.New_ bMDI, Owner, Container, Name, LeftTop, RghtBot
 End Function
 
-Public Function SScale(ScalableControl) As SScale
-    Set SScale = New SScale: SScale.New_ ScalableControl
+Public Function sscale(ScalableControl) As sscale
+    Set sscale = New sscale: sscale.New_ ScalableControl
 End Function
 
 Public Function SScreen(DstPB As PictureBox, SrcRect As WndRect) As SScreen
@@ -1210,23 +1213,23 @@ Public Function StreamStr(ByVal aValue As String) As StreamStr
 End Function
 
 'Oliver Meyers  StringBuilder www.MBO-Ing.com
-Public Function StringBuilder(Optional ByVal Value As String, Optional ByVal startIndex As Long, Optional ByVal Length As Long, Optional ByVal Capacity As Long, Optional ByVal maxCapacity As Long) As StringBuilder
-    Set StringBuilder = New StringBuilder: StringBuilder.New_ Value, startIndex, Length, Capacity, maxCapacity
+Public Function StringBuilder(Optional ByVal Value As String, Optional ByVal startIndex As Long, Optional ByVal Length As Long, Optional ByVal Capacity As Long, Optional ByVal MaxCapacity As Long) As StringBuilder
+    Set StringBuilder = New StringBuilder: StringBuilder.New_ Value, startIndex, Length, Capacity, MaxCapacity
 End Function
 
 'Jost Schwiders  StringBuilder www.VBTec.de 'originally it is called Concat
-Public Function StringBuilderJS(Optional ByVal Value As String, Optional ByVal startIndex As Long, Optional ByVal Length As Long, Optional ByVal Capacity As Long, Optional ByVal maxCapacity As Long) As StringBuilderJS
-    Set StringBuilderJS = New StringBuilderJS: StringBuilderJS.New_ Value, startIndex, Length, Capacity, maxCapacity
+Public Function StringBuilderJS(Optional ByVal Value As String, Optional ByVal startIndex As Long, Optional ByVal Length As Long, Optional ByVal Capacity As Long, Optional ByVal MaxCapacity As Long) As StringBuilderJS
+    Set StringBuilderJS = New StringBuilderJS: StringBuilderJS.New_ Value, startIndex, Length, Capacity, MaxCapacity
 End Function
 
 'Steve McMahons StringBuilder www.VBAccelerator.com
-Public Function StringBuilderSM(Optional ByVal Value As String, Optional ByVal startIndex As Long, Optional ByVal Length As Long, Optional ByVal Capacity As Long, Optional ByVal maxCapacity As Long) As StringBuilderSM
+Public Function StringBuilderSM(Optional ByVal Value As String, Optional ByVal startIndex As Long, Optional ByVal Length As Long, Optional ByVal Capacity As Long, Optional ByVal MaxCapacity As Long) As StringBuilderSM
     Set StringBuilderSM = New StringBuilderSM: StringBuilderSM.ChunkSize = Capacity
 End Function
 
 'only a class around VB's original String concatenation with the "&"-operator
-Public Function StringBuilderVB(Optional ByVal Value As String, Optional ByVal startIndex As Long, Optional ByVal Length As Long, Optional ByVal Capacity As Long, Optional ByVal maxCapacity As Long) As StringBuilderVB
-    Set StringBuilderVB = New StringBuilderVB: StringBuilderVB.New_ Value, startIndex, Length, Capacity, maxCapacity
+Public Function StringBuilderVB(Optional ByVal Value As String, Optional ByVal startIndex As Long, Optional ByVal Length As Long, Optional ByVal Capacity As Long, Optional ByVal MaxCapacity As Long) As StringBuilderVB
+    Set StringBuilderVB = New StringBuilderVB: StringBuilderVB.New_ Value, startIndex, Length, Capacity, MaxCapacity
 End Function
 
 '##############################'    TabControl   '##############################'
@@ -1458,16 +1461,16 @@ Public Function WaveView(aPBView As PictureBox) As WaveView
     Set WaveView = New WaveView: WaveView.New_ aPBView
 End Function
 
-Public Function WinAPIPoint(ByVal X As Long, ByVal Y As Long) As WinAPIPoint
-    With WinAPIPoint: .X = X: .Y = Y: End With
+Public Function WinAPIPoint(ByVal x As Long, ByVal y As Long) As WinAPIPoint
+    With WinAPIPoint: .x = x: .y = y: End With
 End Function
 
 Public Function WinAPIRect(ByVal Left As Long, ByVal Top As Long, ByVal Right As Long, ByVal Bottom As Long) As WinAPIRect
     With WinAPIRect: .Left = Left: .Top = Top: .Right = Right: .Bottom = Bottom: End With
 End Function
 
-Public Function WinAPIRectXYWH(ByVal X As Long, ByVal Y As Long, ByVal Width As Long, ByVal Height As Long) As WinAPIRect
-    With WinAPIRect: .Left = X: .Top = Y: .Right = X + Width: .Bottom = Y + Height: End With
+Public Function WinAPIRectXYWH(ByVal x As Long, ByVal y As Long, ByVal Width As Long, ByVal Height As Long) As WinAPIRect
+    With WinAPIRect: .Left = x: .Top = y: .Right = x + Width: .Bottom = y + Height: End With
 End Function
 
 Public Function WinAPISize(ByVal W As Long, ByVal H As Long) As WinAPISize
@@ -1518,8 +1521,8 @@ Public Function WndPicker(aTimer As Timer, aButton As CommandButton, ByVal bDraw
     Set WndPicker = New WndPicker: WndPicker.New_ aTimer, aButton, bDrawFocusRect
 End Function
 
-Public Function WndRect(R As WinAPIRect) As WndRect
-    Set WndRect = New WndRect: WndRect.New_ R
+Public Function WndRect(r As WinAPIRect) As WndRect
+    Set WndRect = New WndRect: WndRect.New_ r
 End Function
 
 Public Function WndRectFromMousePoint(P As WinAPIPoint) As WndRect
