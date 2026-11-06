@@ -12,6 +12,82 @@ Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
+
+Public Enum PowerInformationLevel
+    SystemPowerPolicyAc = 0
+    SystemPowerPolicyDc
+    VerifySystemPolicyAc
+    VerifySystemPolicyDc
+    SystemPowerCapabilities
+    SystemBatteryState
+    SystemPowerStateHandler
+    ProcessorStateHandler
+    SystemPowerPolicyCurrent
+    AdministratorPowerPolicy
+    SystemReserveHiberFile
+    ProcessorInformation
+    SystemPowerInformation
+    ProcessorStateHandler2
+    LastWakeTime
+    LastSleepTime
+    SystemExecutionState
+    SystemPowerStateNotifyHandler
+    ProcessorPowerPolicyAc
+    ProcessorPowerPolicyDc
+    VerifyProcessorPowerPolicyAc
+    VerifyProcessorPowerPolicyDc
+    ProcessorPowerPolicyCurrent
+    SystemPowerStateLogging
+    SystemPowerLoggingEntry
+    SetPowerSettingValue
+    NotifyUserPowerSetting
+    PowerInformationLevelUnused0
+    PowerInformationLevelUnused1
+    SystemVideoState
+    TraceApplicationPowerMessage
+    TraceApplicationPowerMessageEnd
+    ProcessorPerfStates
+    ProcessorIdleStates
+    ProcessorCap
+    SystemWakeSource
+    SystemHiberFileInformation
+    TraceServicePowerMessage
+    ProcessorLoad
+    PowerShutdownNotification
+    MonitorCapabilities
+    SessionPowerInit
+    SessionDisplayState
+    PowerRequestCreate
+    PowerRequestAction
+    GetPowerRequestList
+    ProcessorInformationEx
+    NotifyUserModeLegacyPowerEvent
+    GroupPark
+    ProcessorIdleDomains
+    WakeTimerList
+    SystemHiberFileSize
+    PowerInformationLevelMaximum
+End Enum
+
+Private Type SystemBatteryState
+    IsACOnLine         As Byte ' [MarshalAs(UnmanagedType.I1)]
+    IsBatteryPresent   As Byte ' [MarshalAs(UnmanagedType.I1)]
+    IsCharging         As Byte ' [MarshalAs(UnmanagedType.I1)]
+    IsDischarging      As Byte ' [MarshalAs(UnmanagedType.I1)]
+    Spare1             As Byte
+    spare2             As Byte
+    spare3             As Byte
+    Spare4             As Byte
+    MaxCapacity        As Long ' public uint
+    RemainingCapacity  As Long ' public uint
+    Rate               As Long ' public uint
+    EstimatedTime      As Long ' public uint
+    DefaultAlert1      As Long ' public uint
+    DefaultAlert2      As Long ' public uint
+End Type
+
+Private Declare Function CallNtPowerInformation Lib "powrprof" (ByVal informationLevel As PowerInformationLevel, ByVal pinputBuffer As Long, ByVal inputBufferSize As Long, ByRef outputBuffer As SystemBatteryState, ByVal outputBufferSize As Long) As Long
+
 '// Microsoft.WindowsAPICodePack.ApplicationServices.BatteryState
 Private m_SystemBatteryState As SystemBatteryState
 
@@ -45,35 +121,79 @@ Private Sub Class_Initialize()
 '        SuggestedBatteryWarningCharge = (int)systemBatteryState.DefaultAlert2;
 
 End Sub
+
 Public Sub Recall(Optional ByVal loud As Boolean = False)
-    m_SystemBatteryState = MPower.GetSystemBatteryState
-    If Not CBool(m_SystemBatteryState.boolBatteryPresent) Then
+    m_SystemBatteryState = GetSystemBatteryState
+    If Not CBool(m_SystemBatteryState.IsBatteryPresent) Then
         'Err.Description = "InvalidOperationException(LocalizedMessages.PowerManagerBatteryNotPresent)"
         'Err.Raise 0
         If loud Then MsgBox "InvalidOperationException( LocalizedMessages.PowerManagerBatteryNotPresent )"
     End If
 End Sub
-Public Property Get ACOnline() As Boolean
-    ACOnline = m_SystemBatteryState.boolAcOnLine
+
+'internal static class Power
+'{
+'internal static PowerManagementNativeMethods.SystemBatteryState GetSystemBatteryState()
+'{
+'    if (PowerManagementNativeMethods.CallNtPowerInformation(PowerManagementNativeMethods.PowerInformationLevel.SystemBatteryState, IntPtr.Zero, 0u, out PowerManagementNativeMethods.SystemBatteryState outputBuffer, (uint)Marshal.SizeOf(typeof(PowerManagementNativeMethods.SystemBatteryState))) == 3221225506u)
+'    {
+'        throw new UnauthorizedAccessException(LocalizedMessages.PowerInsufficientAccessBatteryState);
+'    }
+'    return outputBuffer;
+'}
+Private Function GetSystemBatteryState() As SystemBatteryState
+    Dim hr As Long: hr = CallNtPowerInformation(PowerInformationLevel.SystemBatteryState, 0, 0, GetSystemBatteryState, LenB(GetSystemBatteryState))
+    If hr = &HC0000022 Then Err.Raise hr, , "UnauthorizedAccessException(LocalizedMessages.PowerInsufficientAccessBatteryState)"
+End Function
+
+Public Property Get IsACOnLine() As Boolean
+    IsACOnLine = m_SystemBatteryState.IsACOnLine
 End Property
+
+Public Property Get IsBatteryPresent() As Boolean
+    IsBatteryPresent = m_SystemBatteryState.IsBatteryPresent
+End Property
+
+Public Property Get IsCharging() As Boolean
+    IsCharging = m_SystemBatteryState.IsCharging
+End Property
+
+Public Property Get IsDischarging() As Boolean
+    IsDischarging = m_SystemBatteryState.IsDischarging
+End Property
+
 Public Property Get ChargeRate() As Long
     ChargeRate = m_SystemBatteryState.Rate
 End Property
+
 Public Property Get CurrentCharge() As Long
     CurrentCharge = m_SystemBatteryState.RemainingCapacity
 End Property
+
 Public Property Get EstimatedTimeRemaining() As Long 'Date
     EstimatedTimeRemaining = m_SystemBatteryState.EstimatedTime
 End Property
+
 Public Property Get MaxCharge() As Long
     MaxCharge = m_SystemBatteryState.MaxCapacity
 End Property
+
 Public Property Get SuggestedBatteryWarningCharge() As Long
     SuggestedBatteryWarningCharge = m_SystemBatteryState.DefaultAlert2
 End Property
+
 Public Property Get SuggestedCriticalBatteryCharge() As Long
     SuggestedCriticalBatteryCharge = m_SystemBatteryState.DefaultAlert1
 End Property
+
+Public Property Get RemainingCapacity() As Long ' public uint
+    RemainingCapacity = m_SystemBatteryState.RemainingCapacity
+End Property
+
+Public Property Get MaxCapacity() As Long      ' public uint
+    MaxCapacity = m_SystemBatteryState.MaxCapacity
+End Property
+
 Private Function Secs_ToStr(ByVal secs As Long) As String
     Dim est As Long: est = secs
     Dim sec As Long: sec = est Mod 60
@@ -81,6 +201,16 @@ Private Function Secs_ToStr(ByVal secs As Long) As String
     Dim hor As Long: hor = Int(est \ 3600)
     Secs_ToStr = CStr(hor) & ":" & Format(min, "00") & ":" & Format(sec, "00")
 End Function
+
+Public Property Get BatteryLifePercent() As Long
+    'Dim aSystemBatteryState As SystemBatteryState: aSystemBatteryState = MPower.GetSystemBatteryState
+    If Not m_SystemBatteryState.IsBatteryPresent Then
+        'Err.Raise -1, , "InvalidOperationException(LocalizedMessages.PowerManagerBatteryNotPresent)"
+        MsgBox "InvalidOperationException(LocalizedMessages.PowerManagerBatteryNotPresent)"
+    End If
+    BatteryLifePercent = m_SystemBatteryState.RemainingCapacity / m_SystemBatteryState.MaxCapacity * 100
+End Property
+
 '[BatteryStateStringRepresentation,
 'ACOnline: {1}
 '{0}Max Charge: {2} mWh
@@ -90,7 +220,8 @@ End Function
 '{0}Suggested Critical Battery Charge: {6} mWh
 '{0}Suggested Battery Warning Charge: {7} mWh
 '{0}]
-Friend Function ToStr() As String
+
+Public Function ToStr() As String
 'return string.Format( CultureInfo.InvariantCulture, _
 '                      LocalizedMessages.BatteryStateStringRepresentation, _
 '                      Environment.NewLine, _
@@ -104,18 +235,25 @@ Friend Function ToStr() As String
     Dim s As String
         s = "BatteryState" & vbCrLf & _
             "{" & vbCrLf & _
-            "    ACOnline                       = " & Me.ACOnline & ";" & vbCrLf & _
+            "    IsACOnline                     = " & Me.IsACOnLine & ";" & vbCrLf & _
+            "    IsBatteryPresent               = " & Me.IsBatteryPresent & ";" & vbCrLf & _
+            "    IsCharging                     = " & Me.IsCharging & ";" & vbCrLf & _
+            "    IsDischarging                  = " & Me.IsDischarging & ";" & vbCrLf & _
             "    Max Charge                     = " & Me.MaxCharge & "mWh;" & vbCrLf
 If Me.MaxCharge <> 0 Then
     s = s & "    CurrentCharge                  = " & Me.CurrentCharge & " (" & CLng(Me.CurrentCharge / Me.MaxCharge * 100) & "%)" & "mWh;" & vbCrLf
 End If
     s = s & "    ChargeRate                     = " & Me.ChargeRate & "mWh;" & vbCrLf & _
+            "    RemainingCapacity              = " & Me.RemainingCapacity & "mWh;" & vbCrLf & _
+            "    MaxCapacity                    = " & Me.MaxCapacity & "mWh;" & vbCrLf & _
             "    EstimatedTimeRemaining         = " & Secs_ToStr(Me.EstimatedTimeRemaining) & ";" & vbCrLf & _
             "    SuggestedCriticalBatteryCharge = " & Me.SuggestedCriticalBatteryCharge & "mWh;" & vbCrLf & _
             "    SuggestedBatteryWarningCharge  = " & Me.SuggestedBatteryWarningCharge & "mWh;" & vbCrLf & _
             "}"
     ToStr = s
 End Function
+
+
 '/// <summary>A snapshot of the state of the battery.</summary>
 'public class BatteryState
 '{
