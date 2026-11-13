@@ -111,6 +111,21 @@ Friend Sub New_(aRoot As PFNDirectory, Name As String)
     Set m_Root = aRoot:       m_Name = Name
 End Sub
 
+'copy to MNew
+'Public Function PFNDirectory(aRoot As PFNDirectory, Name As String) As PFNDirectory
+'    Set PFNDirectory = New PFNDirectory: PFNDirectory.New_ aRoot, Name
+'End Function
+'
+'Public Function PFNDirectoryP(pfn As PathFileName) As PFNDirectory
+'    If Not pfn.IsPath Then Exit Function
+'    Dim Root As PFNDirectory: Set Root = MNew.PFNDrive(pfn.Drive)
+'    Dim i As Long
+'    For i = 0 To pfn.PathCount - 1
+'        Set Root = MNew.PFNDirectory(Root, pfn.PathI(i))
+'    Next
+'    Set PFNDirectoryP = Root
+'End Function
+
 Public Property Get Root() As PFNDirectory 'PathFileName
     Set Root = m_Root
 End Property
@@ -180,7 +195,7 @@ Try: On Error GoTo Catch
     End If
     Dim dirs As List: Set dirs = MNew.List(vbObject) ', TypeName(Me))     Of PFNDirectory
     Dim fils As List: Set fils = MNew.List(vbObject) ', TypeName(m_Root)) Of PathFileName
-    Dim f As PathFileName
+    Dim F As PathFileName
     Dim d As PFNDirectory
     
     Do
@@ -195,8 +210,8 @@ Try: On Error GoTo Catch
             'nf = nf + 1
             s = wfd.cFileName
             s = MString.Trim0(s)
-            Set f = MNew.PathFileName(MString.Trim0(wfd.cFileName))
-            fils.Add f
+            Set F = MNew.PathFileName(MString.Trim0(wfd.cFileName))
+            fils.Add F
         End If
     Loop While FindNextFileW(hnd, wfd) <> 0
     'Debug.Print nd

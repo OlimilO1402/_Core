@@ -54,6 +54,7 @@ Class=TabPage; Ctrl\TabPage.cls
 Class=TabPageCollection; Ctrl\TabPageCollection.cls
 Class=Twig; Ctrl\Twig.cls
 Class=VBListBox; Ctrl\VBListBox.cls
+Class=StatusBar; Ctrl\StatusBar.cls
 Class=ColorDialog; Dlg\ColorDialog.cls
 Class=FindReplaceDialog; Dlg\FindReplaceDialog.cls
 Class=FolderBrowserDialog; Dlg\FolderBrowserDialog.cls

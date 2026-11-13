@@ -1,0 +1,1 @@
+ResFile32="..\_Core\Resources\MyRes.res"

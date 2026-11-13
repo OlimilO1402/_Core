@@ -190,9 +190,9 @@ Friend Sub New_(ByVal aPathOrPFN As String, _
         End If
     End If
 End Sub
-Friend Sub NewC(other As PathFileName) 'Copy-ctor
-    m_PFN = other.Value: m_IsValid = other.IsValid
-    m_FShare = other.FileShare: m_FMode = other.FileMode: m_FAccess = other.FileAccess
+Friend Sub NewC(Other As PathFileName) 'Copy-ctor
+    m_PFN = Other.Value: m_IsValid = Other.IsValid
+    m_FShare = Other.FileShare: m_FMode = Other.FileMode: m_FAccess = Other.FileAccess
 End Sub
 Friend Function Clone() As PathFileName
     Set Clone = New PathFileName: Clone.NewC Me 'Value = m_PFN
@@ -428,14 +428,14 @@ End Property
 ' ^ ############################## ^ '  Public Properties   ' ^ ############################## ^ '
 
 ' v ####################### v ' Public ReadOnly Boolean Properties ' v ####################### v '
-Public Property Get Equals(other As PathFileName) As Boolean
-    Equals = Me.Value = other.Value
+Public Property Get Equals(Other As PathFileName) As Boolean
+    Equals = Me.Value = Other.Value
 End Property
-Public Property Get IsEqual(other As PathFileName) As Boolean
-    IsEqual = Me.Value = other.Value
+Public Property Get IsEqual(Other As PathFileName) As Boolean
+    IsEqual = Me.Value = Other.Value
 End Property
-Public Property Get IsSame(other As Object) As Boolean
-    IsSame = ObjPtr(Me) = ObjPtr(other)
+Public Property Get IsSame(Other As Object) As Boolean
+    IsSame = ObjPtr(Me) = ObjPtr(Other)
 End Property
 Public Property Get IsPath() As Boolean
     If Me.PathExists Then
@@ -1555,6 +1555,7 @@ Private Function Get_Drive(PFN_in As String) As String
         ElseIf pos > 2 Then
             'read to the next "\"
             'pos2 = pos
+            'hmm warum eigentlich?
             pos2 = InStr(pos + 1, PFN_in, "\")
             If pos2 > 0 Then pos = Max(pos, pos2)
             s = Left$(PFN_in, pos)

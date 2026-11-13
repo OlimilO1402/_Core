@@ -27,22 +27,56 @@ Private m_DT  As Long   'the drive type one value from above
 'https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-getdrivetypew
 Private Declare Function GetDriveTypeW Lib "kernel32" (ByVal nDrive As LongPtr) As Long
 
-Private m_Base As PFNDirectory
+Private m_Base  As PFNDirectory
+Private m_IsUNC As Boolean
+Private m_ServerOrIP As String
+Private m_FreeName   As String
+
 'Private m_Dirs  As List 'Of PFNDirectory 'is it possible to have 2 directories of the same name in one directory? no! so m_dirs could be hashed
 'Private m_Files As List 'Of PathFileName 'is it possible to have 2 files       of the same name in one directory? no! so m_Files could be hashed
 
 Friend Sub New_(ByVal aLetter As String)
     'm_DL = Left$(aLetter, 1) & ":\"
-    m_DL = AscW(Left(aLetter, 1))
-    
-    'Laufwerkstyp ermitteln
-    Dim s As String: s = Me.DriveLetter & ":" ' m_DL '& vbNullChar
-    m_DT = GetDriveTypeW(StrPtr(s))
+    Dim s As String
+    m_IsUNC = Left(aLetter, 2) = "\\"
+    If m_IsUNC Then
+        aLetter = Mid(aLetter, 3)
+        Dim sa() As String: sa = Split(aLetter, "\")
+        m_ServerOrIP = sa(0)
+        If UBound(sa) > 0 Then m_FreeName = sa(1)
+        s = "\\"
+    Else
+        m_DL = AscW(Left(aLetter, 1))
+        'Laufwerkstyp ermitteln
+        s = Me.DriveLetter & ":" ' m_DL '& vbNullChar
+        m_DT = GetDriveTypeW(StrPtr(s))
+    End If
     Set m_Base = MNew.PFNDirectory(Nothing, s)
 End Sub
 
+'copy top MNew
+'Public Function PFNDrive(ByVal aLetter As String) As PFNDrive
+'    Set PFNDrive = New PFNDrive: PFNDrive.New_ aLetter
+'End Function
+
 Public Property Get Name() As String
-    Name = Me.DriveLetter & ":" & "\"
+    If m_IsUNC Then
+        Name = "\\" & m_ServerOrIP & "\" & m_FreeName & "\"
+    Else
+        Name = Me.DriveLetter & ":" & "\"
+    End If
+End Property
+
+Public Property Get IsUNC() As Boolean
+    IsUNC = m_IsUNC
+End Property
+
+Public Property Get ServerNameOrIP() As String
+    ServerNameOrIP = m_ServerOrIP
+End Property
+
+Public Property Get FreeDir() As String
+    FreeDir = m_FreeName
 End Property
 
 Public Property Get DriveLetter() As String
