@@ -25,7 +25,7 @@ Option Explicit
 'Private Const PROGRESS_CLASS     As String = "msctls_progress32"  ' Creates progress bars. These controls indicate the progress of a lengthy operation.
 'Private Const REBARCLASSNAME     As String = "ReBarWindow32"      ' Creates rebar controls. These controls act as a container for child windows.
 'Private Const STANDARD_CLASSES   As String = "???"                ' Creates intrinsic User32 controls, such as button, edit, and scroll bar.
-'Private Const STATUSCLASSNAME    As String = "msctls_statusbar32" ' Creates status windows. These controls display status information in a horizontal window.
+Private Const STATUSCLASSNAME    As String = "msctls_statusbar32" ' Creates status windows. These controls display status information in a horizontal window.
 'Private Const TOOLBARCLASSNAME   As String = "ToolbarWindow"      ' Creates toolbars. These controls contain buttons that carry out menu commands.
 'Private Const TOOLTIPS_CLASS     As String = "tooltips_class"     ' Creates tooltip controls. These controls display a small pop-up window containing a line of text that describes the purpose of a tool in an application.
 'Private Const TRACKBAR_CLASS     As String = "msctls_trackbar32"  ' Creates trackbars. These controls let the user select from a range of values by moving a slider.
@@ -78,17 +78,6 @@ Public Enum ESBPartStyle ' Konstanten für Grundflächenstile
     sbrKana = 7    ' Kana
 End Enum
 
-
-'    SysTabControl32,
-'    SysTreeView32,
-'    msctls_hotkey32,
-'    msctls_progress32,
-'    msctls_statusbar32,
-Private Const STATUSCLASSNAME   As String = "msctls_statusbar32"
-'    msctls_trackbar32,
-'    msctls_updown32,
-'    ComboBoxEx32,
-'    ReBarWindow32
 
 'Status Bar Styles
 Private Const SBARS_SIZEGRIP    As Long = &H100 'Include a sizing grip at the right end of the status window.
@@ -305,8 +294,24 @@ Friend Sub New_(Owner As PictureBox) ', Parts() As Long)
     'SBT_POPOUT    ' The text is drawn with a border to appear higher 'than the plane of the window.
     
     m_Style = WS_VISIBLE Or WS_CHILD Or SBARS_SIZEGRIP Or SBT_TOOLTIPS ' 'Or SBT_POPOUT 'Or SBT_NOBORDERS '
-    Dim txt As String: txt = "" 'status bar..."
-    m_Handle = CreateStatusWindowW(m_Style, StrPtr(txt), mOwner.hWnd, 0)
+    Dim txt As String: txt = "StatusBar..."
+    'm_Handle = CreateStatusWindowW(m_Style, StrPtr(txt), mOwner.hWnd, 0)
+    
+    
+'hwndStatus = CreateWindowEx(
+'        0,                       // no extended styles
+'        STATUSCLASSNAME,         // name of status bar class
+'        (PCTSTR) NULL,           // no text when first created
+'        SBARS_SIZEGRIP |         // includes a sizing grip
+'        WS_CHILD | WS_VISIBLE,   // creates a visible child window
+'        0, 0, 0, 0,              // ignores size and position
+'        hwndParent,              // handle to parent window
+'        (HMENU) idStatus,       // child window identifier
+'        hinst,                   // handle to application instance
+'        NULL);                   // no window creation data
+    
+    m_Handle = CreateWindowExW(0, ByVal StrPtr(STATUSCLASSNAME), ByVal StrPtr(txt), m_Style, 0, 0, 0, 0, mOwner.hWnd, ByVal 0, App.hInstance, ByVal 0)
+    
     'Dim minh As Long: minh = mOwner.ScaleHeight '/ 3
     'SendMessageW m_Handle, SB_SETMINHEIGHT, ByVal minh, ByVal 0
     'SendMessageW m_Handle, WM_SIZE, 0, ByVal 0
@@ -518,6 +523,8 @@ Public Property Let Part_Text(ByVal Index As Byte, ByVal ValueMax255Chars As Str
     'Dim wNewDrawOp As Integer
     'Set the text w/ the drawing operation
     'SendMessageW m_Handle, SB_SETTEXT, ByVal Index Or wNewDrawOp, ByVal StrPtr(Value)
+    
+    
     SendMessageW m_Handle, SB_SETTEXTW, ByVal Index, ByVal StrPtr(ValueMax255Chars)
     
     'Redraw the status bar only if the part's drawing
@@ -526,20 +533,22 @@ Public Property Let Part_Text(ByVal Index As Byte, ByVal ValueMax255Chars As Str
     
 End Property
 
+'The tooltip text is displayed in two situations:
+'* When the corresponding part in the status bar contains only an icon.
+'* When the corresponding part in the status bar contains text that is truncated due to the size of the part.
 Public Property Let Part_ToolTipText(ByVal Index As Byte, ByVal ValueMax255Chars As String)
-'    Private Const SB_SETTIPTEXTW       As Long = (WM_USER + 17) ' Sets the tooltip text for a part in a status bar. The status bar must have been created with the SBT_TOOLTIPS style to enable tooltips.
-'    Private Const SB_GETTIPTEXTW       As Long = (WM_USER + 19) ' Retrieves the tooltip text for a part in a status bar. The status bar must be created with the SBT_TOOLTIPS style to enable tooltips.
-    Dim txt As String: txt = ValueMax255Chars & vbNullChar
-    Dim rv As Long: rv = SendMessageW(m_Handle, SB_SETTIPTEXTW, ByVal Index, ByVal StrPtr(txt))
+    ' Sets the tooltip text for a part in a status bar. The status bar must have been created with the SBT_TOOLTIPS style to enable tooltips.
+    Dim txt As String: txt = ValueMax255Chars & vbNullChar & vbNullChar
+    SendMessageW m_Handle, SB_SETTIPTEXTW, ByVal Index, ByVal StrPtr(txt)
 End Property
 
 Public Property Get Part_ToolTipText(ByVal Index As Byte) As String
-    Dim bufflen As Long: bufflen = 254
-    Dim buffer As String: buffer = Space(bufflen) & vbNullChar
-    'Dim wp As Long: wp = bufflen * &H10000 Or Index
-    'Debug.Print Hex(wp)
-    Dim rv As Long: rv = SendMessageW(m_Handle, SB_GETTIPTEXTW, ByVal Index, ByVal StrPtr(buffer))
-    Part_ToolTipText = buffer ' Left(buffer, rv)
+    ' Retrieves the tooltip text for a part in a status bar. The status bar must be created with the SBT_TOOLTIPS style to enable tooltips.
+    Dim bufflen As Long:  bufflen = 255
+    Dim buffer  As String: buffer = Space(bufflen) & vbNullChar & vbNullChar
+    Dim wParam  As Long:   wParam = bufflen * &H10000 Or Index
+    SendMessageW m_Handle, SB_GETTIPTEXTW, ByVal wParam, ByVal StrPtr(buffer)
+    Part_ToolTipText = Trim(buffer) ' Left(buffer, rv)
 End Property
 
 Public Property Get Part_Width(ByVal Index As Byte) As Single
@@ -560,49 +569,52 @@ Public Property Get PartsWidth() As Single()
     PartsWidth = m_PartWidth
 End Property
 
-Private Function GetCurDrawOp(ByVal Index As Byte, Optional ByVal fRtnString As Boolean = False) ' As Integer 'String 'wieso String????
-    
-   'Returns the current text drawing operation for the specified part.
-   '
-   'SB_GETTEXTLENGTH is used to determine the part's current
-   'drawing operation. SB_GETTEXT will rtn the exact same value,
-   'but requires a text buffer.
-   '
-   'When not in simple mode, SB_GETTEXTLENGTH  retrieves the
-   'text length for the part specified by bPart (0-254, 255 parts max).
-   'If in simple mode, SB_GETTEXTLENGTH will retrieve the simple
-   'mode text length *only* if bPart specifies any *valid* part index.
-   'The simple mode text length is NOT retrieved when bPart = 255
-   '(as is used to set text w/ SB_SETTEXT). Also applies to
-   'SB_GETTEXT.
-   '
-   'If fRtnString = True, returns the text drawing operation constant
-   'string. If False, returns the text drawing operation constant value.
 
-   Dim dwRtn As Long
 
-   dwRtn = SendMessageW(m_Handle, SB_GETTEXTLENGTHW, ByVal Index, 0)
 
-   'The text drawing operation for the specified
-   'part is contained in the high word of dwRtn.
-   dwRtn = (dwRtn And &HFFFF0000) \ &HFFFF&
-
-   If fRtnString Then
-
-     'Returning the string
-      Select Case dwRtn
-        Case SBT_SUNKEN:    GetCurDrawOp = "SBT_SUNKEN"
-        Case SBT_NOBORDERS: GetCurDrawOp = "SBT_NOBORDERS"
-        Case SBT_POPOUT:    GetCurDrawOp = "SBT_POPOUT"
-      End Select
-
-   Else
-
-     'Returning the value
-      GetCurDrawOp = dwRtn
-  
-   End If
-End Function
+'Private Function GetCurDrawOp(ByVal Index As Byte, Optional ByVal fRtnString As Boolean = False) ' As Integer 'String 'wieso String????
+'
+'   'Returns the current text drawing operation for the specified part.
+'   '
+'   'SB_GETTEXTLENGTH is used to determine the part's current
+'   'drawing operation. SB_GETTEXT will rtn the exact same value,
+'   'but requires a text buffer.
+'   '
+'   'When not in simple mode, SB_GETTEXTLENGTH  retrieves the
+'   'text length for the part specified by bPart (0-254, 255 parts max).
+'   'If in simple mode, SB_GETTEXTLENGTH will retrieve the simple
+'   'mode text length *only* if bPart specifies any *valid* part index.
+'   'The simple mode text length is NOT retrieved when bPart = 255
+'   '(as is used to set text w/ SB_SETTEXT). Also applies to
+'   'SB_GETTEXT.
+'   '
+'   'If fRtnString = True, returns the text drawing operation constant
+'   'string. If False, returns the text drawing operation constant value.
+'
+'   Dim dwRtn As Long
+'
+'   dwRtn = SendMessageW(m_Handle, SB_GETTEXTLENGTHW, ByVal Index, 0)
+'
+'   'The text drawing operation for the specified
+'   'part is contained in the high word of dwRtn.
+'   dwRtn = (dwRtn And &HFFFF0000) \ &HFFFF&
+'
+'   If fRtnString Then
+'
+'     'Returning the string
+'      Select Case dwRtn
+'        Case SBT_SUNKEN:    GetCurDrawOp = "SBT_SUNKEN"
+'        Case SBT_NOBORDERS: GetCurDrawOp = "SBT_NOBORDERS"
+'        Case SBT_POPOUT:    GetCurDrawOp = "SBT_POPOUT"
+'      End Select
+'
+'   Else
+'
+'     'Returning the value
+'      GetCurDrawOp = dwRtn
+'
+'   End If
+'End Function
 
 
 'Class StatusBar
@@ -751,7 +763,7 @@ End Function
 ' v ' ############################## ' v '     all mOwner-Events (PictureBox)    ' v ' ############################## ' v '
 
 Private Sub mOwner_Click()
-    '
+    MsgBox "User Clicked mOwner!"
 End Sub
 
 Private Sub mOwner_DblClick()

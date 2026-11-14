@@ -1186,3 +1186,66 @@ Public Function IsAdmin() As Boolean
 End Function
 ' ^ ############################## ^ '    Special Functions    ' ^ ############################## ^ '
 
+
+' v ' ############################## ' v '    LOWORD    ' v ' ############################## ' v '
+Public Property Let LOWORD(this As Long, ByVal Value As Long) 'should Value be Integer? nope, does not work!
+    'replaces the low-order word of this_inout with the low-order word of Value
+    this = HIWORD(this) Or LOWORD(Value)
+End Property
+Public Property Get LOWORD(this As Long) As Long
+    'returns only the low-order word of this
+    LOWORD = &HFFFF& And this
+End Property
+
+
+Public Property Let LOWORD_LOBYTE(this As Long, ByVal Value As Long)
+    'replaces the low-order word of this with the low-order word of Value
+    this = HIWORD(this) Or (LOWORD_HIBYTE(this) Or LOWORD_LOBYTE(Value))
+End Property
+Public Property Get LOWORD_LOBYTE(this As Long) As Long
+    'returns only the low-order byte of the low-order word of this
+    LOWORD_LOBYTE = &HFF& And this
+End Property
+
+
+Public Property Let LOWORD_HIBYTE(this As Long, ByVal Value As Long)
+    'replaces the low-order word of this with the low-order word of Value
+    this_inout = HIWORD(this) Or (LOWORD_HIBYTE(Value) Or LOWORD_LOBYTE(this))
+End Property
+Public Property Get LOWORD_HIBYTE(this As Long) As Long
+    'returns only the  hi-order byte of the low-order word of this
+    LOWORD_HIBYTE = &HFF00& And this
+End Property
+'
+'
+'' v ' ############################## ' v '    HIWORD    ' v ' ############################## ' v '
+Public Property Let HIWORD(this As Long, ByVal Value As Long)
+    'replaces the  hi-order word of this with the hi -order word of Value
+    this = HIWORD(Value) Or LOWORD(this)
+End Property
+Public Property Get HIWORD(this As Long) As Long
+    'returns only the  hi-order word of this
+    HIWORD = &HFFFF0000 And this
+End Property
+'
+
+Public Property Let HIWORD_LOBYTE(this As Long, ByVal Value As Long)
+    'replaces the low-order word of this with the low-order word of Value
+    this = (HIWORD_HIBYTE(this) Or HIOWORD_LOBYTE(Value)) Or LOWORD_LOBYTE(this)
+End Property
+Public Property Get HIWORD_LOBYTE(this As Long) As Long
+    'returns only the low-order byte of the  hi-order word of this
+    HIWORD_LOBYTE = &HFF0000 And this
+End Property
+
+
+Public Property Let HIWORD_HIBYTE(this As Long, ByVal Value As Long)
+    'replaces the low-order word of this with the low-order word of Value
+    this = (HIWORD_HIBYTE(Value) Or HIWORD_LOBYTE(this)) Or LOWORD(this)
+End Property
+Public Property Get HIWORD_HIBYTE(this As Long) As Long
+    'returns only the  hi-order byte of the  hi-order word of this
+    HIWORD_HIBYTE = &HFF000000 And this
+End Property
+
+
