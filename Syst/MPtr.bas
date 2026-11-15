@@ -816,15 +816,15 @@ Private Function PtrToString(ByVal pStr As LongPtr, Optional ByVal sLen As Long)
         MsgBox "Marshal.PtrToString: pStr=Nullpointer"
         Exit Function
     End If
-    Dim l As Long: l = lstrlen(pStr)
+    Dim l As Long: l = lstrlenW(pStr)
     PtrToString = Space$(l)
-    lstrcpy StrPtr(PtrToString), pStr
-#If defUnicode Then
+    lstrcpyW StrPtr(PtrToString), pStr
+'#If defUnicode Then
     'ist es dann schon der richtige String?
     'MsgBox PtrToString
-#Else
-    PtrToString = Left$(StrConv(PtrToString, vbUnicode), num1)
-#End If
+'#Else
+    'PtrToString = Left$(StrConv(PtrToString, vbUnicode), l)
+'#End If
 End Function
 
 
@@ -1307,35 +1307,45 @@ Public Property Get LOWORD(this As Long) As Long 'does not return Integer!
 End Property
 Public Property Let LOWORD(this As Long, ByVal Value As Long) 'should Value be Integer? nope, does not work!
     'replaces the low-order word of this_inout with the low-order word of Value
-    this = (&HFFFF0000 And this) Or LOWORD(Value)
+    this = (&HFFFF0000 And this) Or (&HFFFF& And Value)
 End Property
+
+'Public Function HIWORD(ByVal lngValue As Long) As Integer 'Long
+'    If (lngValue And &H80000000) = &H80000000 Then
+'        HIWORD = ((lngValue And &H7FFF0000) \ &H10000) Or &H8000
+'    Else
+'        HIWORD = (lngValue And &HFFFF0000) \ &H10000
+'    End If
+'End Function
 
 Public Property Get HIWORD(this As Long) As Long 'does not return Integer!
     'returns only the  hi-order word of this sitting inside the loword of the return value
-    'HIWORD = &HFFFF0000 And this 'Nope
-    Dim tt As TLong:    tt.Value = this
-    Dim ti As TInteger2: LSet ti = tt
-    ti.ValLOWORD = ti.ValHIWORD: ti.ValHIWORD = 0
-    LSet tt = ti: HIWORD = tt.Value
-    'Dim tb As TByte4:  LSet tb = tt
-    'ti.ValLOWORD = ti.ValHIWORD: ti.ValHIWORD = 0
-    'tb.ValLOWORD_HIBYTE = tb.ValHIWORD_HIBYTE
-    'tb.ValLOWORD_LOBYTE = tb.ValHIWORD_LOBYTE
-    'tb.ValHIWORD_HIBYTE = 0
-    'tb.ValHIWORD_LOBYTE = 0
-    'LSet tt = tb: HIWORD = tt.Value
-    
+'    Dim tt As TLong:    tt.Value = this
+'    Dim ti As TInteger2: LSet ti = tt
+'    ti.ValLOWORD = ti.ValHIWORD: ti.ValHIWORD = 0
+'    LSet tt = ti: HIWORD = tt.Value
+    If (this And &H80000000) = &H80000000 Then
+        HIWORD = ((this And &H7FFF0000) \ &H10000) Or &H8000&
+    Else
+        HIWORD = (this And &HFFFF0000) \ &H10000
+    End If
 End Property
 Public Property Let HIWORD(this As Long, ByVal Value As Long)
-    'replaces the  hi-order word of this with the hi -order word of Value
-    'this = &HFFFF0000 And Value Or LOWORD(this)
-    Dim tt As TLong: tt.Value = this
-    Dim tv As TLong: tv.Value = Value
-    Dim tt2 As TInteger2: LSet tt2 = tt
-    Dim tv2 As TInteger2: LSet tv2 = tv
-    tt2.ValHIWORD = tv2.ValLOWORD
-    LSet tt = tt2
-    this = tt.Value
+    'replaces the  hi-order word of this with the low-order word of Value
+'    Dim tt As TLong: tt.Value = this
+'    Dim tv As TLong: tv.Value = Value
+'    Dim tt2 As TInteger2: LSet tt2 = tt
+'    Dim tv2 As TInteger2: LSet tv2 = tv
+'    tt2.ValHIWORD = tv2.ValLOWORD
+'    LSet tt = tt2
+'    this = tt.Value
+    Value = Value And &HFFFF&
+    If (Value And &H8000&) = &H8000& Then
+        Value = ((Value And &H7FFF&) * &H10000) Or &H80000000
+    Else
+        Value = ((Value And &HFFFF&) * &H10000)
+    End If
+    this = (this And &HFFFF&) Or Value
 End Property
 
 
@@ -1347,44 +1357,48 @@ End Property
 Public Property Get LOWORD_HIBYTE(this As Long) As Byte
     'returns only the  hi-order byte of the low-order word of this
     'LOWORD_HIBYTE = (&HFF00& And this) / &HFF&
-    Dim tt As TLong:  tt.Value = this
-    Dim tb As TByte4:  LSet tb = tt
-    LOWORD_HIBYTE = tb.ValLOWORD_HIBYTE
+'    Dim tt As TLong:  tt.Value = this
+'    Dim tb As TByte4:  LSet tb = tt
+'    LOWORD_HIBYTE = tb.ValLOWORD_HIBYTE
+    LOWORD_HIBYTE = (&HFF00& And this) \ &H100&
 End Property
 
 Public Property Get HIWORD_LOBYTE(this As Long) As Byte
     'returns only the low-order byte of the  hi-order word of this
     'HIWORD_LOBYTE = &HFF0000 And this
-    Dim tt As TLong:  tt.Value = this
-    Dim tb As TByte4:  LSet tb = tt
-    HIWORD_LOBYTE = tb.ValHIWORD_LOBYTE
+'    Dim tt As TLong:  tt.Value = this
+'    Dim tb As TByte4:  LSet tb = tt
+'    HIWORD_LOBYTE = tb.ValHIWORD_LOBYTE
+    HIWORD_LOBYTE = (&HFF0000 And this) \ &H10000
+
 End Property
 Public Property Get HIWORD_HIBYTE(this As Long) As Byte
     'returns only the  hi-order byte of the  hi-order word of this
     'HIWORD_HIBYTE = CByte((&HFF000000 And this) \ &H1000000)
-    Dim tt As TLong:  tt.Value = this
-    Dim tb As TByte4:  LSet tb = tt
-    HIWORD_HIBYTE = tb.ValHIWORD_HIBYTE
+'    Dim tt As TLong:  tt.Value = this
+'    Dim tb As TByte4:  LSet tb = tt
+'    HIWORD_HIBYTE = tb.ValHIWORD_HIBYTE
+    HIWORD_HIBYTE = ((this And &H7F000000) \ &H1000000) Or (IIf(this < 0, &H80, 0))
 End Property
-
-
 
 Public Property Let LOWORD_LOBYTE(this As Long, ByVal Value As Byte)
     'replaces the low-order word of this with the low-order byte of Value
     'this = HIWORD(this) Or (LOWORD_HIBYTE(this) Or LOWORD_LOBYTE(Value))
-    Dim tt As TLong: tt.Value = this
-    Dim tb As TByte4: LSet tb = tt
-    tb.ValLOWORD_LOBYTE = Value
-    LSet tt = tb: this = tt.Value
+'    Dim tt As TLong: tt.Value = this
+'    Dim tb As TByte4: LSet tb = tt
+'    tb.ValLOWORD_LOBYTE = Value
+'    LSet tt = tb: this = tt.Value
+    this = (this And &HFFFFFF00) Or Value
 End Property
 
 
 Public Property Let LOWORD_HIBYTE(this As Long, ByVal Value As Byte)
     'replaces the low-order word of this with the low-order word of Value
-    Dim tt As TLong: tt.Value = this
-    Dim tb As TByte4: LSet tb = tt
-    tb.ValLOWORD_HIBYTE = Value
-    LSet tt = tb: this = tt.Value
+'    Dim tt As TLong: tt.Value = this
+'    Dim tb As TByte4: LSet tb = tt
+'    tb.ValLOWORD_HIBYTE = Value
+'    LSet tt = tb: this = tt.Value
+    this = (this And Not &HFF00&) Or (CLng(Value) * &H100&)
 End Property
 '
 '
@@ -1393,19 +1407,23 @@ End Property
 
 Public Property Let HIWORD_LOBYTE(this As Long, ByVal Value As Byte)
     'replaces the low-order word of this with the low-order word of Value
-    Dim tt As TLong: tt.Value = this
-    Dim tb As TByte4: LSet tb = tt
-    tb.ValHIWORD_LOBYTE = Value
-    LSet tt = tb: this = tt.Value
+'    Dim tt As TLong: tt.Value = this
+'    Dim tb As TByte4: LSet tb = tt
+'    tb.ValHIWORD_LOBYTE = Value
+'    LSet tt = tb: this = tt.Value
+    this = (this And &HFF00FFFF) Or (CLng(Value) * &H10000)
 End Property
 
 
 Public Property Let HIWORD_HIBYTE(this As Long, ByVal Value As Byte)
-    'replaces the low-order word of this with the low-order word of Value
-    Dim tt As TLong: tt.Value = this
-    Dim tb As TByte4: LSet tb = tt
-    tb.ValHIWORD_HIBYTE = Value
-    LSet tt = tb: this = tt.Value
+    'replaces the hi -order byte of the hi -order word of this with Value
+    Dim hib As Long
+    If (Value And &H80) = &H80 Then
+        hib = ((Value And &H7F) * &H1000000) Or &H80000000
+    Else
+        hib = Value * &H1000000
+    End If
+    this = (this And &HFFFFFF) Or hib
 End Property
 
 
