@@ -79,6 +79,47 @@ Public Type TCharPointer
     Chars() As Integer
 End Type
 
+' v ' ############################## ' v '   HIWORD,LOWORD,HIBYTE,LOBYTE   ' v ' ############################## ' v '
+
+Public Type TByte4
+    ValLOWORD_LOBYTE As Byte
+    ValLOWORD_HIBYTE As Byte
+    ValHIWORD_LOBYTE As Byte
+    ValHIWORD_HIBYTE As Byte
+End Type
+
+Public Type TByte2
+    ValLOBYTE As Byte
+    ValHIBYTE As Byte
+End Type
+
+Public Type TIntByte2
+    ValLOWORD As TByte2
+    ValHIWORD As TByte2
+End Type
+
+Public Type TInteger2
+    ValLOWORD As Integer
+    ValHIWORD As Integer
+End Type
+
+Public Type TByte
+    Value As Byte
+End Type
+
+Public Type TInteger
+    Value As Integer
+End Type
+
+Public Type TLong
+    Value As Long
+End Type
+
+' ^ ' ############################## ' ^ '   HIWORD,LOWORD,HIBYTE,LOBYTE   ' ^ ' ############################## ' ^ '
+
+
+' v ' ############################## ' v '    All Copy Memory Functions    ' v ' ############################## ' v '
+
 #If Win64 Then
     Public Declare PtrSafe Sub GetMemArr Lib "msvbvm60" Alias "GetMem8" (ByRef Arr() As Any, ByRef Value As LongPtr) 'same as ArrPtr
     Public Declare PtrSafe Sub PutMemArr Lib "msvbvm60" Alias "PutMem8" (ByRef Dst As Any, ByVal Src As LongPtr)
@@ -116,6 +157,9 @@ End Type
     #End If
     Private Declare PtrSafe Function IsBadCodePtr Lib "kernel32" (ByVal lpfn As LongPtr) As Long
     Public Declare PtrSafe Function ArrPtr Lib "msvbvm60" Alias "VarPtr" (ByRef pArr() As Any) As LongPtr
+    
+    Private Declare PtrSafe Function lstrlen Lib "kernel32.dll" Alias "lstrlenA" (ByVal lpString As String) As Long
+    Private Declare PtrSafe Function lstrcpy Lib "kernel32.dll" Alias "lstrcpyA" (ByVal lpStrDst As String, ByVal lpStrSrc As String) As Long
 #Else
     'GetMem and PutMem are copying memory just like RtlMoveMemory but only for a certain amount of bytes
     Public Declare Sub GetMem1 Lib "msvbvm60" (ByRef src As Any, ByRef Dst As Any)
@@ -144,7 +188,13 @@ End Type
     'RtlCompareMemory returns the number of bytes in the two blocks that match. If all bytes match up to the specified Length value, the Length value is returned.
     
     Public Declare Function ArrPtr Lib "msvbvm60" Alias "VarPtr" (ByRef pArr() As Any) As LongPtr
+    
+    Public Declare Function lstrlenW Lib "kernel32" (ByVal lpString As LongPtr) As Long
+    Public Declare Function lstrcpyW Lib "kernel32" (ByVal lpStrDst As LongPtr, ByVal lpStrSrc As LongPtr) As Long
+    
 #End If
+' ^ ' ############################## ' ^ '    All Copy Memory Functions    ' ^ ' ############################## ' ^ '
+
 
 ' v ############################## v '    MByteSwapper Declarations    ' v ############################## v '
 '
@@ -754,6 +804,30 @@ Public Function PtrToObject(ByVal p As LongPtr) As Object
     Set PtrToObject = obj: ZeroObject obj
 End Function
 
+'Public Shared Function PtrToStructure(ByVal ptr As System.IntPtr, ByVal structureType As System.Type) As Object
+Public Sub PtrToStructure(ByVal pSrc As LongPtr, ByVal pDstStruct As LongPtr, ByVal LenBStruct As Long)
+    'hier wird nicht der Pointer übertragen, sondern vielmehr der gesamte Speicherbereich
+    'in das Objekt structure hineinkopiert
+    RtlMoveMemory ByVal pDstStruct, ByVal pSrc, LenBStruct
+End Sub
+
+Private Function PtrToString(ByVal pStr As LongPtr, Optional ByVal sLen As Long) As String
+    If (pStr = 0) Then
+        MsgBox "Marshal.PtrToString: pStr=Nullpointer"
+        Exit Function
+    End If
+    Dim l As Long: l = lstrlen(pStr)
+    PtrToString = Space$(l)
+    lstrcpy StrPtr(PtrToString), pStr
+#If defUnicode Then
+    'ist es dann schon der richtige String?
+    'MsgBox PtrToString
+#Else
+    PtrToString = Left$(StrConv(PtrToString, vbUnicode), num1)
+#End If
+End Function
+
+
 Public Sub ZeroObject(ByVal obj As Object)
     'RtlZeroMemory ByVal VarPtr(obj), MPtr.SizeOf_LongPtr
     RtlZeroMemory obj, MPtr.SizeOf_LongPtr
@@ -1187,65 +1261,151 @@ End Function
 ' ^ ############################## ^ '    Special Functions    ' ^ ############################## ^ '
 
 
-' v ' ############################## ' v '    LOWORD    ' v ' ############################## ' v '
-Public Property Let LOWORD(this As Long, ByVal Value As Long) 'should Value be Integer? nope, does not work!
-    'replaces the low-order word of this_inout with the low-order word of Value
-    this = HIWORD(this) Or LOWORD(Value)
-End Property
-Public Property Get LOWORD(this As Long) As Long
+' v ' ############################## ' v '   HILOWORD_HILOBYTE   ' v ' ############################## ' v '
+' v ' ############################## ' v '        LOWORD         ' v ' ############################## ' v '
+
+'Public Type TByte4
+'    ValHIWORD_HIBYTE As Byte
+'    ValHIWORD_LOBYTE As Byte
+'    ValLOWORD_HIBYTE As Byte
+'    ValLOWORD_LOBYTE As Byte
+'End Type
+'
+'Public Type TByte2
+'    ValHIBYTE As Byte
+'    ValLOBYTE As Byte
+'End Type
+'
+'Public Type TIntByte2
+'    ValHIWORD As TByte2
+'    ValLOWORD As TByte2
+'End Type
+'
+'Public Type TInteger2
+'    ValHIWORD As Integer
+'    ValLOWORD As Integer
+'End Type
+'
+'Public Type TByte
+'    Value As Byte
+'End Type
+'
+'Public Type TInteger
+'    Value As Integer
+'End Type
+'
+'Public Type TLong
+'    Value As Long
+'End Type
+
+'HALT STOP SO IST DAS KÄSE
+'Wenn ein Word abgefragt wird dann soll auch nur ein Word zurückgegeben werden, => immer ein 32-bit-LOWORD in einem Long
+'Wenn ein Byte abgefragt wird dann soll auch nur ein Byte zurückgegeben werden, Byte is unsigned => in einem Byte
+Public Property Get LOWORD(this As Long) As Long 'does not return Integer!
     'returns only the low-order word of this
     LOWORD = &HFFFF& And this
 End Property
-
-
-Public Property Let LOWORD_LOBYTE(this As Long, ByVal Value As Long)
-    'replaces the low-order word of this with the low-order word of Value
-    this = HIWORD(this) Or (LOWORD_HIBYTE(this) Or LOWORD_LOBYTE(Value))
+Public Property Let LOWORD(this As Long, ByVal Value As Long) 'should Value be Integer? nope, does not work!
+    'replaces the low-order word of this_inout with the low-order word of Value
+    this = (&HFFFF0000 And this) Or LOWORD(Value)
 End Property
-Public Property Get LOWORD_LOBYTE(this As Long) As Long
+
+Public Property Get HIWORD(this As Long) As Long 'does not return Integer!
+    'returns only the  hi-order word of this sitting inside the loword of the return value
+    'HIWORD = &HFFFF0000 And this 'Nope
+    Dim tt As TLong:    tt.Value = this
+    Dim ti As TInteger2: LSet ti = tt
+    ti.ValLOWORD = ti.ValHIWORD: ti.ValHIWORD = 0
+    LSet tt = ti: HIWORD = tt.Value
+    'Dim tb As TByte4:  LSet tb = tt
+    'ti.ValLOWORD = ti.ValHIWORD: ti.ValHIWORD = 0
+    'tb.ValLOWORD_HIBYTE = tb.ValHIWORD_HIBYTE
+    'tb.ValLOWORD_LOBYTE = tb.ValHIWORD_LOBYTE
+    'tb.ValHIWORD_HIBYTE = 0
+    'tb.ValHIWORD_LOBYTE = 0
+    'LSet tt = tb: HIWORD = tt.Value
+    
+End Property
+Public Property Let HIWORD(this As Long, ByVal Value As Long)
+    'replaces the  hi-order word of this with the hi -order word of Value
+    'this = &HFFFF0000 And Value Or LOWORD(this)
+    Dim tt As TLong: tt.Value = this
+    Dim tv As TLong: tv.Value = Value
+    Dim tt2 As TInteger2: LSet tt2 = tt
+    Dim tv2 As TInteger2: LSet tv2 = tv
+    tt2.ValHIWORD = tv2.ValLOWORD
+    LSet tt = tt2
+    this = tt.Value
+End Property
+
+
+Public Property Get LOWORD_LOBYTE(this As Long) As Byte
     'returns only the low-order byte of the low-order word of this
     LOWORD_LOBYTE = &HFF& And this
 End Property
 
-
-Public Property Let LOWORD_HIBYTE(this As Long, ByVal Value As Long)
-    'replaces the low-order word of this with the low-order word of Value
-    this_inout = HIWORD(this) Or (LOWORD_HIBYTE(Value) Or LOWORD_LOBYTE(this))
-End Property
-Public Property Get LOWORD_HIBYTE(this As Long) As Long
+Public Property Get LOWORD_HIBYTE(this As Long) As Byte
     'returns only the  hi-order byte of the low-order word of this
-    LOWORD_HIBYTE = &HFF00& And this
+    'LOWORD_HIBYTE = (&HFF00& And this) / &HFF&
+    Dim tt As TLong:  tt.Value = this
+    Dim tb As TByte4:  LSet tb = tt
+    LOWORD_HIBYTE = tb.ValLOWORD_HIBYTE
+End Property
+
+Public Property Get HIWORD_LOBYTE(this As Long) As Byte
+    'returns only the low-order byte of the  hi-order word of this
+    'HIWORD_LOBYTE = &HFF0000 And this
+    Dim tt As TLong:  tt.Value = this
+    Dim tb As TByte4:  LSet tb = tt
+    HIWORD_LOBYTE = tb.ValHIWORD_LOBYTE
+End Property
+Public Property Get HIWORD_HIBYTE(this As Long) As Byte
+    'returns only the  hi-order byte of the  hi-order word of this
+    'HIWORD_HIBYTE = CByte((&HFF000000 And this) \ &H1000000)
+    Dim tt As TLong:  tt.Value = this
+    Dim tb As TByte4:  LSet tb = tt
+    HIWORD_HIBYTE = tb.ValHIWORD_HIBYTE
+End Property
+
+
+
+Public Property Let LOWORD_LOBYTE(this As Long, ByVal Value As Byte)
+    'replaces the low-order word of this with the low-order byte of Value
+    'this = HIWORD(this) Or (LOWORD_HIBYTE(this) Or LOWORD_LOBYTE(Value))
+    Dim tt As TLong: tt.Value = this
+    Dim tb As TByte4: LSet tb = tt
+    tb.ValLOWORD_LOBYTE = Value
+    LSet tt = tb: this = tt.Value
+End Property
+
+
+Public Property Let LOWORD_HIBYTE(this As Long, ByVal Value As Byte)
+    'replaces the low-order word of this with the low-order word of Value
+    Dim tt As TLong: tt.Value = this
+    Dim tb As TByte4: LSet tb = tt
+    tb.ValLOWORD_HIBYTE = Value
+    LSet tt = tb: this = tt.Value
 End Property
 '
 '
 '' v ' ############################## ' v '    HIWORD    ' v ' ############################## ' v '
-Public Property Let HIWORD(this As Long, ByVal Value As Long)
-    'replaces the  hi-order word of this with the hi -order word of Value
-    this = HIWORD(Value) Or LOWORD(this)
-End Property
-Public Property Get HIWORD(this As Long) As Long
-    'returns only the  hi-order word of this
-    HIWORD = &HFFFF0000 And this
-End Property
 '
 
-Public Property Let HIWORD_LOBYTE(this As Long, ByVal Value As Long)
+Public Property Let HIWORD_LOBYTE(this As Long, ByVal Value As Byte)
     'replaces the low-order word of this with the low-order word of Value
-    this = (HIWORD_HIBYTE(this) Or HIOWORD_LOBYTE(Value)) Or LOWORD_LOBYTE(this)
-End Property
-Public Property Get HIWORD_LOBYTE(this As Long) As Long
-    'returns only the low-order byte of the  hi-order word of this
-    HIWORD_LOBYTE = &HFF0000 And this
+    Dim tt As TLong: tt.Value = this
+    Dim tb As TByte4: LSet tb = tt
+    tb.ValHIWORD_LOBYTE = Value
+    LSet tt = tb: this = tt.Value
 End Property
 
 
-Public Property Let HIWORD_HIBYTE(this As Long, ByVal Value As Long)
+Public Property Let HIWORD_HIBYTE(this As Long, ByVal Value As Byte)
     'replaces the low-order word of this with the low-order word of Value
-    this = (HIWORD_HIBYTE(Value) Or HIWORD_LOBYTE(this)) Or LOWORD(this)
-End Property
-Public Property Get HIWORD_HIBYTE(this As Long) As Long
-    'returns only the  hi-order byte of the  hi-order word of this
-    HIWORD_HIBYTE = &HFF000000 And this
+    Dim tt As TLong: tt.Value = this
+    Dim tb As TByte4: LSet tb = tt
+    tb.ValHIWORD_HIBYTE = Value
+    LSet tt = tb: this = tt.Value
 End Property
 
 
