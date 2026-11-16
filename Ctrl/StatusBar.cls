@@ -63,8 +63,8 @@ Public Enum ESBPartBevel ' Konstanten für Grundflächenkanten
 '    sbrInset = 1   ' Abgesenkt
 '    sbrRaised = 2  ' Abgehoben
     sbrInset = 0       ' Abgesenkt, 'SBT_SUNKEN    =     0
-    sbrNoBevel = &H100 ' Keine      'SBT_NOBORDERS = &H100
-    sbrRaised = &H200  ' Abgehoben  'SBT_POPOUT    = &H200
+    sbrNoBevel = 1 '&H1 '00 ' Keine      'SBT_NOBORDERS = &H100
+    sbrRaised = 2 '&H2 '00  ' Abgehoben  'SBT_POPOUT    = &H200
 End Enum
 
 Public Enum ESBPartStyle ' Konstanten für Grundflächenstile
@@ -250,7 +250,7 @@ Private m_Handle  As LongPtr
 Private m_Style   As Long
 'Private m_Parts() As StatusBarPart
 Private m_PartWidth() As Single
-Private m_PartIcons() As IPictureDisp 'StdPicture '
+Private m_PartIcons() As StdPicture '
 'Private m_PartBevel() As ESBPartBevel
 'Negativer Wert -> SBPanel nimmt den restlich verbleibenden Teil der StatusBar ein
 'Positiver Wert zwischen 0 und 1 -> Prozentualer Anteil der Gesamtbreite des Forms
@@ -419,64 +419,27 @@ Public Property Get Part_TextLen(ByVal Index As Byte) As Long
 End Property
 
 Public Property Let Part_Bevel(ByVal Index As Byte, ByVal Value As ESBPartBevel)
-
 '    'The Bevel property for the specified part is contained in the high word of the return value you get when asking for TEXTLENGTHW
-    Dim txt  As String: txt = Me.Part_Text(Index)
-    Dim bvli As Long:  bvli = (Value * &H10000)
-    'Debug.Print Hex(bvli)
-    bvli = bvli Or CLng(Index)
-    Dim rv As Long: rv = SendMessageW(m_Handle, SB_SETTEXTW, ByVal bvli, ByVal StrPtr(txt))
-    'Debug.Print rv
-    'Part_Bevel = (bvtl And &HFFFF0000) \ &HFFFF&
-'   If fRtnString Then
-'     'Returning the string
-'      Select Case dwRtn
-'        Case SBT_SUNKEN:    GetCurDrawOp = "SBT_SUNKEN"
-'        Case SBT_NOBORDERS: GetCurDrawOp = "SBT_NOBORDERS"
-'        Case SBT_POPOUT:    GetCurDrawOp = "SBT_POPOUT"
-'      End Select
+    BevelText Index, Value, Me.Part_Text(Index)
 '
-'   Else
-'
-'     'Returning the value
-'      GetCurDrawOp = dwRtn
-'
-'   End If
+'    Dim txt  As String: txt = Me.Part_Text(Index)
+'    Dim wParam As Long: wParam = Index: LOWORD_HIBYTE(wParam) = Value
+'    Dim rv As Long: rv = SendMessageW(m_Handle, SB_SETTEXTW, ByVal wParam, ByVal StrPtr(txt))
+'                    rv = SendMessageW(m_Handle, WM_PAINT, ByVal 0, ByVal 0)
 End Property
 
 Public Property Get Part_Bevel(ByVal Index As Byte) As ESBPartBevel
     'The Bevel property for the specified part is contained in the high word of the return value you get when asking for TEXTLENGTHW
     Dim rv As Long: rv = SendMessageW(m_Handle, SB_GETTEXTLENGTHW, ByVal Index, ByVal 0)
-    Part_Bevel = (rv And &HFFFF0000) \ &HFFFF&
-'   If fRtnString Then
-'     'Returning the string
-'      Select Case dwRtn
-'        Case SBT_SUNKEN:    GetCurDrawOp = "SBT_SUNKEN"
-'        Case SBT_NOBORDERS: GetCurDrawOp = "SBT_NOBORDERS"
-'        Case SBT_POPOUT:    GetCurDrawOp = "SBT_POPOUT"
-'      End Select
-'
-'   Else
-'
-'     'Returning the value
-'      GetCurDrawOp = dwRtn
-'
-'   End If
+    Part_Bevel = HIWORD_HIBYTE(rv) ' (rv And &HFFFF0000) \ &HFFFF&
 End Property
-
-
-'SB_SETICON
-'SB_GETICON
 
 Public Property Let Part_hIcon(ByVal Index As Byte, ByVal hIcon As LongPtr) ' StdPicture) 'or IPictureDisp ?
     Dim hr As LongPtr: hr = SendMessageW(m_Handle, SB_SETICON, ByVal Index, ByVal hIcon)
-    Debug.Print "SB_SETICON: " & hr
 End Property
 
 Public Property Get Part_hIcon(ByVal Index As Byte) As LongPtr 'StdPicture 'or IPictureDisp ?
     Dim hi As LongPtr: hi = SendMessageW(m_Handle, SB_GETICON, ByVal Index, ByVal 0)
-    'Set Part_hIcon = New StdPicture
-    'Part_hIcon.Handle = hi
     Part_hIcon = hi
 End Property
 
@@ -493,8 +456,8 @@ End Property
 Public Function ESBPartBevel_ToStr(ByVal e As ESBPartBevel) As String
     Dim s As String
     Select Case e
-    Case ESBPartBevel.sbrNoBevel: s = "NoBevel"
     Case ESBPartBevel.sbrInset:   s = "Inset"
+    Case ESBPartBevel.sbrNoBevel: s = "NoBevel"
     Case ESBPartBevel.sbrRaised:  s = "Raised"
     End Select
     ESBPartBevel_ToStr = s
@@ -525,7 +488,8 @@ Public Property Let Part_Text(ByVal Index As Byte, ByVal ValueMax255Chars As Str
     'SendMessageW m_Handle, SB_SETTEXT, ByVal Index Or wNewDrawOp, ByVal StrPtr(Value)
     
     
-    SendMessageW m_Handle, SB_SETTEXTW, ByVal Index, ByVal StrPtr(ValueMax255Chars)
+    'SendMessageW m_Handle, SB_SETTEXTW, ByVal Index, ByVal StrPtr(ValueMax255Chars)
+    BevelText Index, Me.Part_Bevel(Index), ValueMax255Chars
     
     'Redraw the status bar only if the part's drawing
     'operation changed (reduces flicker).
@@ -533,6 +497,11 @@ Public Property Let Part_Text(ByVal Index As Byte, ByVal ValueMax255Chars As Str
     
 End Property
 
+Private Sub BevelText(ByVal Index As Byte, ByVal BevelStyle As ESBPartBevel, ByVal Text As String)
+    Dim wParam As Long: wParam = Index: LOWORD_HIBYTE(wParam) = BevelStyle
+    Dim rv As Long: rv = SendMessageW(m_Handle, SB_SETTEXTW, ByVal wParam, ByVal StrPtr(Text))
+                    rv = SendMessageW(m_Handle, WM_PAINT, ByVal 0, ByVal 0)
+End Sub
 'The tooltip text is displayed in two situations:
 '* When the corresponding part in the status bar contains only an icon.
 '* When the corresponding part in the status bar contains text that is truncated due to the size of the part.
@@ -546,8 +515,8 @@ Public Property Get Part_ToolTipText(ByVal Index As Byte) As String
     ' Retrieves the tooltip text for a part in a status bar. The status bar must be created with the SBT_TOOLTIPS style to enable tooltips.
     Dim bufflen As Long:  bufflen = 255
     Dim buffer  As String: buffer = Space(bufflen) & vbNullChar & vbNullChar
-    Dim wParam  As Long:   wParam = bufflen * &H10000 Or Index
-    SendMessageW m_Handle, SB_GETTIPTEXTW, ByVal wParam, ByVal StrPtr(buffer)
+    Dim wParam  As Long: wParam = Index: MPtr.HIWORD(wParam) = bufflen
+    Dim hr As Long: hr = SendMessageW(m_Handle, SB_GETTIPTEXTW, ByVal wParam, ByVal StrPtr(buffer))
     Part_ToolTipText = Trim(buffer) ' Left(buffer, rv)
 End Property
 
@@ -751,74 +720,74 @@ End Property
 '    Const sbrKana = 7    ' Kana
 'End Enum
 
-Private Function StatusBarPart(ByVal Alignment As ESBPartAlignment, ByVal AutoSize As ESBPartAutoSize, ByVal Bevel As ESBPartBevel, ByVal Style As ESBPartStyle, _
-                               ByVal Enabled As Boolean, ByVal Visible As Boolean, ByVal Index As Byte, ByVal Left As Single, ByVal Width As Single, MinWidth As Single, _
-                               Picture As StdPicture, ByVal Key As String, ByVal Text As String, ByVal ToolTipText As String, Tag As Variant) As StatusBarPart
-    With StatusBarPart
-        .Alignment = Alignment: .AutoSize = AutoSize: .Bevel = Bevel: .Style = Style: .Enabled = Enabled: .Visible = Visible: .Index = Index
-        .Left = Left: .Width = Width: .MinWidth = MinWidth: Set .Picture = Picture: .Key = Key: .Text = Text: .ToolTipText = ToolTipText: .Tag = Tag
-    End With
-End Function
+'Private Function StatusBarPart(ByVal Alignment As ESBPartAlignment, ByVal AutoSize As ESBPartAutoSize, ByVal Bevel As ESBPartBevel, ByVal Style As ESBPartStyle, _
+'                               ByVal Enabled As Boolean, ByVal Visible As Boolean, ByVal Index As Byte, ByVal Left As Single, ByVal Width As Single, MinWidth As Single, _
+'                               Picture As StdPicture, ByVal Key As String, ByVal Text As String, ByVal ToolTipText As String, Tag As Variant) As StatusBarPart
+'    With StatusBarPart
+'        .Alignment = Alignment: .AutoSize = AutoSize: .Bevel = Bevel: .Style = Style: .Enabled = Enabled: .Visible = Visible: .Index = Index
+'        .Left = Left: .Width = Width: .MinWidth = MinWidth: Set .Picture = Picture: .Key = Key: .Text = Text: .ToolTipText = ToolTipText: .Tag = Tag
+'    End With
+'End Function
 
-' v ' ############################## ' v '     all mOwner-Events (PictureBox)    ' v ' ############################## ' v '
-
-Private Sub mOwner_Click()
-    MsgBox "User Clicked mOwner!"
-End Sub
-
-Private Sub mOwner_DblClick()
-    '
-End Sub
-
-Private Sub mOwner_GotFocus()
-    '
-End Sub
-
-Private Sub mOwner_KeyDown(KeyCode As Integer, Shift As Integer)
-    '
-End Sub
-
-Private Sub mOwner_KeyPress(KeyAscii As Integer)
-    '
-End Sub
-
-Private Sub mOwner_KeyUp(KeyCode As Integer, Shift As Integer)
-    '
-End Sub
-
-Private Sub mOwner_MouseDown(Button As Integer, Shift As Integer, X As Single, Y As Single)
-    '
-End Sub
-
-Private Sub mOwner_MouseMove(Button As Integer, Shift As Integer, X As Single, Y As Single)
-    '
-End Sub
-
-Private Sub mOwner_MouseUp(Button As Integer, Shift As Integer, X As Single, Y As Single)
-    '
-End Sub
-
-Private Sub mOwner_OLECompleteDrag(Effect As Long)
-    '
-End Sub
-
-Private Sub mOwner_OLEDragDrop(Data As DataObject, Effect As Long, Button As Integer, Shift As Integer, X As Single, Y As Single)
-    '
-End Sub
-
-Private Sub mOwner_OLEDragOver(Data As DataObject, Effect As Long, Button As Integer, Shift As Integer, X As Single, Y As Single, State As Integer)
-    '
-End Sub
-
-Private Sub mOwner_OLEGiveFeedback(Effect As Long, DefaultCursors As Boolean)
-    '
-End Sub
-
-Private Sub mOwner_OLESetData(Data As DataObject, DataFormat As Integer)
-    '
-End Sub
-
-Private Sub mOwner_OLEStartDrag(Data As DataObject, AllowedEffects As Long)
-    '
-End Sub
-
+'' v ' ############################## ' v '     all mOwner-Events (PictureBox)    ' v ' ############################## ' v '
+'
+'Private Sub mOwner_Click()
+'    MsgBox "User Clicked mOwner!"
+'End Sub
+'
+'Private Sub mOwner_DblClick()
+'    '
+'End Sub
+'
+'Private Sub mOwner_GotFocus()
+'    '
+'End Sub
+'
+'Private Sub mOwner_KeyDown(KeyCode As Integer, Shift As Integer)
+'    '
+'End Sub
+'
+'Private Sub mOwner_KeyPress(KeyAscii As Integer)
+'    '
+'End Sub
+'
+'Private Sub mOwner_KeyUp(KeyCode As Integer, Shift As Integer)
+'    '
+'End Sub
+'
+'Private Sub mOwner_MouseDown(Button As Integer, Shift As Integer, X As Single, Y As Single)
+'    '
+'End Sub
+'
+'Private Sub mOwner_MouseMove(Button As Integer, Shift As Integer, X As Single, Y As Single)
+'    '
+'End Sub
+'
+'Private Sub mOwner_MouseUp(Button As Integer, Shift As Integer, X As Single, Y As Single)
+'    '
+'End Sub
+'
+'Private Sub mOwner_OLECompleteDrag(Effect As Long)
+'    '
+'End Sub
+'
+'Private Sub mOwner_OLEDragDrop(Data As DataObject, Effect As Long, Button As Integer, Shift As Integer, X As Single, Y As Single)
+'    '
+'End Sub
+'
+'Private Sub mOwner_OLEDragOver(Data As DataObject, Effect As Long, Button As Integer, Shift As Integer, X As Single, Y As Single, State As Integer)
+'    '
+'End Sub
+'
+'Private Sub mOwner_OLEGiveFeedback(Effect As Long, DefaultCursors As Boolean)
+'    '
+'End Sub
+'
+'Private Sub mOwner_OLESetData(Data As DataObject, DataFormat As Integer)
+'    '
+'End Sub
+'
+'Private Sub mOwner_OLEStartDrag(Data As DataObject, AllowedEffects As Long)
+'    '
+'End Sub
+'
