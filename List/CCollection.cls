@@ -15,6 +15,7 @@ Option Explicit 'om 2025-11-30 lines: 410; 2025-12-04 lines: 464;
 'Class CCollection : replaces and extends the vb intrinsic-Collection with new additional functions
 'works as a wrapper class for your Collections, is fully compatible to your existing Code
 'the VB-Collection is 1-based and so is CCollection as we do not break with compatibility
+'but you can also have 0 as lower boundary or any other number, if you change OptionBaseLBound
 'Implements Collection 'nope
 Private m_Name      As String
 Private m_Col       As VBA.Collection 'Of Object/Variant
@@ -39,7 +40,7 @@ End Sub
 '    Set CCollection = New CCollection: CCollection.New_ IsHashed, Col, Name, OptionBaseLBound
 'End Function
 
-Public Sub NewC(Other As CCollection, Optional deep As Boolean = False)
+Public Sub NewC(Other As CCollection, Optional deep As Boolean = False, Optional PreserveHashes As Boolean = False)
     Dim i As Long, obj As Object
     With Other
         m_Name = .Name
@@ -47,10 +48,20 @@ Public Sub NewC(Other As CCollection, Optional deep As Boolean = False)
         m_LowB = .LLBound
         Set m_Col = New Collection
         If deep Then
-            For i = .LLBound To .UUBound
-                Set obj = .Item(i + m_LowB)
-                m_Col.Add obj.Clone(deep)
-            Next
+            If PreserveHashes Then
+                Dim key As String
+                For i = .LLBound To .UUBound
+                    Set obj = .Item(i + m_LowB)
+                    key = obj.key
+                    Set obj = obj.Clone(deep, PreserveHashes)
+                    m_Col.Add obj, key
+                Next
+            Else
+                For i = .LLBound To .UUBound
+                    Set obj = .Item(i + m_LowB)
+                    m_Col.Add obj.Clone(deep)
+                Next
+            End If
         Else
             For i = .LLBound To .UUBound
                 Set obj = .Item(i + m_LowB)
@@ -94,11 +105,12 @@ Public Function Equals(Other As CCollection) As Boolean
 End Function
 
 Public Property Get Ptr()
+    'since we return variant do not forget to cast it to LongPtr if needed
     Ptr = ObjPtr(Me)
 End Property
 
-Public Property Get Key() As String
-    If Len(m_Name) Then Key = Me.Name Else Key = Me.Ptr
+Public Property Get key() As String
+    If Len(m_Name) Then key = Me.Name Else key = Me.Ptr
 End Property
 
 Public Property Get DataType() As VbVarType
@@ -132,15 +144,15 @@ Private Function DataType_ToStr(ByVal vt As VbVarType) As String
     DataType_ToStr = s
 End Function
 
-Public Function Add(Item, Optional Key, Optional Before, Optional After)
+Public Function Add(Item, Optional key, Optional Before, Optional After)
     If IsObject(Item) Then
         Dim obj As Object: Set obj = Item
         Set Add = obj
         If m_IsHashed Then
-            If IsMissing(Key) Then Key = obj.Key
+            If IsMissing(key) Then key = obj.key
         End If
     End If
-    If IsMissing(Key) Then
+    If IsMissing(key) Then
         If IsMissing(Before) Then
             If IsMissing(After) Then
                 m_Col.Add Item
@@ -153,12 +165,12 @@ Public Function Add(Item, Optional Key, Optional Before, Optional After)
     Else
         If IsMissing(Before) Then
             If IsMissing(After) Then
-                m_Col.Add Item, Key
+                m_Col.Add Item, key
             Else
-                m_Col.Add Item, Key, , After
+                m_Col.Add Item, key, , After
             End If
         Else
-            m_Col.Add Item, Key, Before
+            m_Col.Add Item, key, Before
         End If
     End If
     IncVersion
@@ -166,24 +178,24 @@ End Function
 
 Public Function AddKey(obj As Object) As Object
     ' the object needs to have a Public Function/PropertyGet Key As String
-    Set AddKey = obj: m_Col.Add obj, obj.Key
+    Set AddKey = obj: m_Col.Add obj, obj.key
     IncVersion
 End Function
 
 Public Function AddOrGet(obj As Object) As Object
-    Dim Key As String: Key = obj.Key ' the object needs to have a Public Function/PropertyGet Key As String
-    If Me.Contains(Key) Then
-        Set AddOrGet = m_Col.Item(Key)
+    Dim key As String: key = obj.key ' the object needs to have a Public Function/PropertyGet Key As String
+    If Me.Contains(key) Then
+        Set AddOrGet = m_Col.Item(key)
     Else
         Set AddOrGet = obj
-        m_Col.Add obj, Key
+        m_Col.Add obj, key
         m_Version = m_Version + CDec(1)
     End If
 End Function
 
-Public Function TryAddObject(obj As Object, ByVal Key As String) As Boolean
+Public Function TryAddObject(obj As Object, ByVal key As String) As Boolean
 Try: On Error GoTo Catch
-    m_Col.Add obj, Key
+    m_Col.Add obj, key
     TryAddObject = True
     IncVersion
 Catch: On Error GoTo 0
@@ -213,12 +225,12 @@ Attribute NewEnum.VB_UserMemId = -4
     Set NewEnum = m_Col.[_NewEnum]
 End Function
 
-Public Function Contains(ByVal Key As String) As Boolean
+Public Function Contains(ByVal key As String) As Boolean
     'for this function all credits go to the incredible www.vb-tec.de alias Jost Schwider
     'you can find the original version of the function "IsInCollection" here: https://vb-tec.de/collctns.htm
     On Error Resume Next
     '"Extras->Optionen->Allgemein->Unterbrechen bei Fehlern->Bei nicht verarbeiteten Fehlern"
-    If IsEmpty(m_Col(Key)) Then: 'DoNothing
+    If IsEmpty(m_Col(key)) Then: 'DoNothing
     Contains = (Err.Number = 0)
     On Error GoTo 0
 End Function
@@ -248,7 +260,7 @@ Public Function IndexFromObject(obj As Object) As Long
     Dim i As Long, V, o As Object
     For Each V In m_Col
         Set o = V
-        If o.Key = obj.Key Then
+        If o.key = obj.key Then
             IndexFromObject = i
             Exit Function
         End If
@@ -332,8 +344,8 @@ Public Sub MoveUpKey(ByVal i As Long)
     Dim i2 As Long: i2 = i - 1
     Dim Obj1 As Object: Set Obj1 = m_Col.Item(i1)
     Dim Obj2 As Object: Set Obj2 = m_Col.Item(i2)
-    Dim Key1 As String: Key1 = Obj1.Key
-    Dim Key2 As String: Key2 = Obj2.Key
+    Dim Key1 As String: Key1 = Obj1.key
+    Dim Key2 As String: Key2 = Obj2.key
     SwapItemsKey i1, Key1, i2, Key2
     IncVersion
 End Sub
@@ -353,8 +365,8 @@ Public Sub MoveDownKey(ByVal i As Long)
     Dim i2 As Long: i2 = i + 1
     Dim Obj1 As Object: Set Obj1 = m_Col.Item(i1)
     Dim Obj2 As Object: Set Obj2 = m_Col.Item(i2)
-    Dim Key1 As String: Key1 = Obj1.Key
-    Dim Key2 As String: Key2 = Obj2.Key
+    Dim Key1 As String: Key1 = Obj1.key
+    Dim Key2 As String: Key2 = Obj2.key
     SwapItemsKey i1, Key1, i2, Key2
     IncVersion
 End Sub
@@ -443,8 +455,8 @@ Public Property Get ObjectFromListCtrl(ComboBoxOrListBox, ByRef i_out As Long) A
     Dim li As Long: li = ComboBoxOrListBox.ListIndex
     If i_out < 0 Then i_out = li
     If i_out < 0 Then Exit Property
-    Dim Key As String: Key = ComboBoxOrListBox.ItemData(i_out)
-    If Contains(Key) Then Set ObjectFromListCtrl = m_Col.Item(Key)
+    Dim key As String: key = ComboBoxOrListBox.ItemData(i_out)
+    If Contains(key) Then Set ObjectFromListCtrl = m_Col.Item(key)
 End Property
 
 Public Function ToStr(Optional ByVal isLong As Boolean = False) As String
@@ -631,8 +643,8 @@ Private Sub SwapObj(ByVal i1 As Long, ByVal i2 As Long)
     Dim Obj2 As Object: Set Obj2 = m_Col.Item(i2)
     If m_IsHashed Then
         
-        Dim Key1 As String: Key1 = Obj1.Key
-        Dim Key2 As String: Key2 = Obj2.Key
+        Dim Key1 As String: Key1 = Obj1.key
+        Dim Key2 As String: Key2 = Obj2.key
         Me.SwapItemsKey i1, Key1, i2, Key2
         
         m_Col.Remove Key2
