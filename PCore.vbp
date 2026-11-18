@@ -185,6 +185,7 @@ Class=CalendarYear; Syst\Date\CalendarYear.cls
 Class=FestivalDay; Syst\Date\FestivalDay.cls
 Class=PersonalEvent; Syst\Date\PersonalEvent.cls
 ResFile32="Resources\MyRes.res"
+Class=MathFunction; Syst\FunAct\MathFunction.cls
 IconForm="Form1"
 Startup="Form1"
 ExeName32="Core.exe"

@@ -1,8 +1,8 @@
 Attribute VB_Name = "MString"
 Option Explicit 'lines 129; 2022.01.06 lines 336; 2022.11.01 lines 625; 2024-06-24 lines 1595; 2024-07-17 lines 1948; 2024-08-25 lines: 2102; 2025-09-13 lines: 2378; 2025-10-25 lines: 2543; 2026-02-15 lines: 2730;
 'For using this module you have to include:
-'..\Ptr_Pointers\MPtr.bas
-'..\Math\MMath.bas
+'..\_Core\Syst\MPtr.bas
+'..\_Core\Math\MMath.bas
 
 'https://learn.microsoft.com/de-de/cpp/text/how-to-convert-between-various-string-types?view=msvc-170
 'https://de.wikipedia.org/wiki/Byte_Order_Mark
@@ -1915,6 +1915,66 @@ End Function
 's = s.Remove(-1, 19) ' "" und Fehlermeldung
 's = s.Remove(0, 19)  ' ""
 's = s.Remove(1, 19)  ' "" und Fehlermeldung
+
+Private Sub ParseTel(ByVal TelefonNr As String, lvw_out As String, ovw_out As String, tln_out As String, dw_out As String)
+    Dim Tel As String: Tel = Trim(TelefonNr)
+    If Left(Tel, 1) = "+" Or Left(Tel, 2) = "00" Then
+        lvw_out = MString.BiteLeftUntil(Tel, " ")
+    Else
+        'lvw_out = "+49" 'really?
+    End If
+    ovw_out = BiteLeftUntil(Tel, "/")
+    If Len(ovw_out) = 0 Then ovw_out = BiteLeftUntil(Tel, "-")
+    If Len(ovw_out) = 0 Then ovw_out = BiteLeftUntil(Tel, "\")
+    tln_out = BiteLeftUntil(Tel, "-")
+    If Len(tln_out) Then
+        dw_out = Tel
+    Else
+        tln_out = Tel
+    End If
+End Sub
+
+Function FormatTel(ByVal LandesVorwahl As String, ByVal OrtsVorwahl As String, ByVal Teilnehmer As String, ByVal Durchwahl As String) As String
+    LandesVorwahl = Trim(LandesVorwahl)
+    OrtsVorwahl = Trim(OrtsVorwahl)
+    Teilnehmer = Trim(Teilnehmer)
+    Durchwahl = Trim(Durchwahl)
+    If Len(LandesVorwahl) Then
+        If Left(LandesVorwahl, 1) <> "+" And Left(LandesVorwahl, 2) <> "00" Then
+            If Left(LandesVorwahl, 1) <> "0" Then
+                LandesVorwahl = "+" & LandesVorwahl
+            Else
+                'maybe it is Ortsvorwahl?
+            End If
+        End If
+        If Len(OrtsVorwahl) > 0 Or Len(Teilnehmer) > 0 Or Len(Durchwahl) > 0 Then
+            LandesVorwahl = LandesVorwahl & " "
+        End If
+    Else
+        'LandesVorwahl = "+49 " 'really?
+    End If
+    If Len(OrtsVorwahl) Then
+        If Len(LandesVorwahl) Then
+            If Left(OrtsVorwahl, 1) = "0" Then OrtsVorwahl = Mid(OrtsVorwahl, 2)
+        Else
+            If Left(OrtsVorwahl, 1) <> "0" Then OrtsVorwahl = "0" & OrtsVorwahl
+        End If
+        If Len(Teilnehmer) > 0 Or Len(Durchwahl) > 0 Then
+            OrtsVorwahl = OrtsVorwahl & "/"
+        End If
+    End If
+    If Len(Teilnehmer) Then
+        If Len(Durchwahl) > 0 Then Teilnehmer = Teilnehmer & "-"
+    End If
+    FormatTel = LandesVorwahl & OrtsVorwahl & Teilnehmer & Durchwahl
+End Function
+
+Public Function BiteLeftUntil(s_inout As String, ByVal UntilChar As String) As String
+    Dim pos As Long: pos = InStr(s_inout, UntilChar)
+    If pos <= 0 Then Exit Function
+    BiteLeftUntil = Left(s_inout, pos - 1)
+    s_inout = Mid(s_inout, pos + 1)
+End Function
 
 Public Function Remove(s As String, ByVal startIndex As Long, Optional ByVal Count As Long = -1) As String
     'Remove(Int32, Int32)

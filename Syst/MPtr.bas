@@ -236,9 +236,13 @@ End Type
 
 #If VBA7 Then
     '  http://visualbasic.happycodings.com/code-snippets/code5.html
-    Private Declare ptrsafe Function IsNTAdmin Lib "advpack.dll" (ByVal dwReserved As Long, ByRef lpdwReserved As Any) As Long
+    Private Declare PtrSafe Function IsNTAdmin Lib "advpack" (ByVal dwReserved As Long, ByRef lpdwReserved As Any) As Long
+    'Private Declare PtrSafe Function AppRunsAsAdmin Lib "shell32" Alias "#680" () As Integer
 #Else
-    Private Declare Function IsNTAdmin Lib "advpack.dll" (ByVal dwReserved As Long, ByRef lpdwReserved As Any) As Long
+    Private Declare Function IsNTAdmin Lib "advpack" (ByVal dwReserved As Long, ByRef lpdwReserved As Any) As Long
+    '  http://www.vbforums.com/showthread.php?794967-RESOLVED-Application-Run-With-Admin-Rights
+    'Private Declare Function AppRunsAsAdmin Lib "shell32" Alias "#680" () As Integer
+    
 #End If
 Private m_Col As Collection
 
@@ -1258,6 +1262,10 @@ End Function
 Public Function IsAdmin() As Boolean
     IsAdmin = CBool(IsNTAdmin(ByVal 0&, ByVal 0&))
 End Function
+'Public Function IsAdmin() As Boolean
+'    IsAdmin = CBool(AppRunsAsAdmin)
+'End Function
+
 ' ^ ############################## ^ '    Special Functions    ' ^ ############################## ^ '
 
 

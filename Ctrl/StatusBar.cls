@@ -131,13 +131,14 @@ Private Const SB_GETTEXTLENGTHW    As Long = (WM_USER + 12) ' The SB_GETTEXTLENG
 Private Const SB_GETTEXTW          As Long = (WM_USER + 13) ' The SB_GETTEXT message retrieves the text from the specified part of a status window.
 Private Const SB_ISSIMPLE          As Long = (WM_USER + 14) ' Checks a status bar control to determine if it is in simple mode.
 Private Const SB_SETICON           As Long = (WM_USER + 15) ' Sets the icon for a part in a status bar.
+Private Const SB_SETTIPTEXT        As Long = (WM_USER + 16) ' Sets the tooltip text for a part in a status bar. The status bar must have been created with the SBT_TOOLTIPS style to enable tooltips.
 Private Const SB_SETTIPTEXTW       As Long = (WM_USER + 17) ' Sets the tooltip text for a part in a status bar. The status bar must have been created with the SBT_TOOLTIPS style to enable tooltips.
+Private Const SB_GETTIPTEXT        As Long = (WM_USER + 18) ' Retrieves the tooltip text for a part in a status bar. The status bar must be created with the SBT_TOOLTIPS style to enable tooltips.
 Private Const SB_GETTIPTEXTW       As Long = (WM_USER + 19) ' Retrieves the tooltip text for a part in a status bar. The status bar must be created with the SBT_TOOLTIPS style to enable tooltips.
 Private Const SB_GETICON           As Long = (WM_USER + 20) ' Retrieves the icon for a part in a status bar.
 Private Const SB_SETBKCOLOR        As Long = CCM_SETBKCOLOR ' Sets the background color in a status bar.
 Private Const SB_GETUNICODEFORMAT  As Long = CCM_SETUNICODEFORMAT ' Retrieves the Unicode character format flag for the control.
 Private Const SB_SETUNICODEFORMAT  As Long = CCM_SETUNICODEFORMAT 'Sets the Unicode character format flag for the control. This message allows you to change the character set used by the control at run time rather than having to re-create the control.
-
 
 
 Private Const SB_CONST_ALPHA    As Long = &H1
@@ -220,6 +221,9 @@ Private Declare Function IsWindow Lib "user32" (ByVal hWnd As LongPtr) As Long
 Private Declare Function MoveWindow Lib "user32" (ByVal hWnd As LongPtr, ByVal X As Long, ByVal Y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal bRepaint As Long) As Long
 Private Declare Function SendMessageW Lib "user32" (ByVal hWnd As LongPtr, ByVal wMsg As Long, wParam As Any, lParam As Any) As LongPtr
 
+Private Declare Function lstrlenW Lib "kernel32.dll" (ByVal lpString As LongPtr) As Long
+Private Declare Function lstrcpynW Lib "kernel32.dll" (ByVal lpString1 As LongPtr, ByVal lpString2 As LongPtr, ByVal iMaxLength As Long) As Long
+
 'The data type for lpRect was changed from "As RECT" to
 '"As Any" to allow a null pointer to be passed (i.e. ByRef 0)
 'BTW the RECT structure is declared in MStatusDefs
@@ -244,10 +248,20 @@ Private Type StatusBarPart
     Tag         As Variant
 End Type
 
+Private Const sizeof_WCHAR As Long = 2
+
+Private Declare Function HeapAlloc Lib "kernel32" (ByVal hHeap As LongPtr, ByVal dwFlags As Long, ByVal dwBytes As Long) As LongPtr
+Private Declare Function GetProcessHeap Lib "kernel32" () As LongPtr
+Private Declare Function HeapFree Lib "kernel32" (ByVal hHeap As LongPtr, ByVal dwFlags As Long, ByRef lpMem As Any) As Long
+
+Private Const HEAP_ZERO_MEMORY As Long = &H8
+Private Const MAX_PATH         As Long = 260
+
+
 Private WithEvents mOwner As PictureBox
 Attribute mOwner.VB_VarHelpID = -1
-Private m_Handle  As LongPtr
-Private m_Style   As Long
+Private m_Handle      As LongPtr
+Private m_Style       As Long
 'Private m_Parts() As StatusBarPart
 Private m_PartWidth() As Single
 Private m_PartIcons() As StdPicture '
@@ -255,21 +269,31 @@ Private m_PartIcons() As StdPicture '
 'Negativer Wert -> SBPanel nimmt den restlich verbleibenden Teil der StatusBar ein
 'Positiver Wert zwischen 0 und 1 -> Prozentualer Anteil der Gesamtbreite des Forms
 'Positiver Wert größer 1 -> Länge in Pixel
-'
-
+'Private m_tmpStr As String
+'Private m_pToolTipBuffer As LongPtr
+Private m_pTmpBuffer  As LongPtr 'String
+Private m_BufferLen   As Long
 
 Private Sub Class_Initialize()
     ReDim m_PartWidth(0)
     ReDim m_PartIcons(0)
     m_PartWidth(0) = -1 '50 ' mOwner.ScaleWidth / 2
+    'm_pToolTipBuffer = HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, (MAX_PATH + 1) * sizeof(WCHAR));
+    'm_pToolTipBuffer = HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, (MAX_PATH + 1) * sizeof_WCHAR)
+    m_BufferLen = (MAX_PATH + 1) * sizeof_WCHAR
+    m_pTmpBuffer = HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, m_BufferLen)
 End Sub
 
 Private Sub Class_Terminate()
-   If IsWindow(m_Handle) Then
-      DestroyWindow m_Handle
-      m_Handle = 0
-      'EnableCtrls False
-   End If
+    If IsWindow(m_Handle) Then
+        DestroyWindow m_Handle
+        m_Handle = 0
+        'EnableCtrls False
+        'm_tmpStr = vbNullString
+        If m_pTmpBuffer Then
+            HeapFree GetProcessHeap(), 0, m_pTmpBuffer
+        End If
+    End If
 End Sub
 
 Friend Sub New_(Owner As PictureBox) ', Parts() As Long)
@@ -335,7 +359,7 @@ End Property
 
 Public Property Let MinHeight(ByVal Value As Long)
     SendMessageW m_Handle, SB_SETMINHEIGHT, ByVal Value, ByVal 0
-    SendMessageW m_Handle, WM_SIZE, 0, ByVal 0
+    SendMessageW m_Handle, WM_SIZE, ByVal 0, ByVal 0
 End Property
 
 Public Property Get MinHeight() As Long
@@ -346,7 +370,7 @@ Public Property Get Part_Count() As Byte
     'Returns the current number of existing parts in the status bar.
     'The SB_GETPARTS message also retrieve individual part
     'information. See the comments in Status.bas for more info.
-    Part_Count = SendMessageW(m_Handle, SB_GETPARTS, 0, ByVal 0)
+    Part_Count = SendMessageW(m_Handle, SB_GETPARTS, ByVal 0, ByVal 0)
 End Property
 
 Public Property Let Part_Count(ByVal Value As Byte) '1-255 max!
@@ -390,7 +414,7 @@ Public Sub Resize(Optional ByVal SetDefaultPartWidth As Boolean = False)
     Dim W As Single, c As Long: c = u + 1
     Dim dpw As Single: dpw = scw / c
     ReDim tmpParts(0 To u) As Long
-    Dim L As Long
+    Dim l As Long
     For i = 0 To u
         If i = u Then
             m_PartWidth(i) = -1
@@ -406,8 +430,8 @@ Public Sub Resize(Optional ByVal SetDefaultPartWidth As Boolean = False)
         If W < 0 Then
             tmpParts(i) = -1
         Else
-            L = L + W
-            tmpParts(i) = L
+            l = l + W
+            tmpParts(i) = l
         End If
     Next
     SendMessageW m_Handle, SB_SETPARTS, ByVal c, tmpParts(0)
@@ -419,19 +443,12 @@ Public Property Get Part_TextLen(ByVal Index As Byte) As Long
 End Property
 
 Public Property Let Part_Bevel(ByVal Index As Byte, ByVal Value As ESBPartBevel)
-'    'The Bevel property for the specified part is contained in the high word of the return value you get when asking for TEXTLENGTHW
     BevelText Index, Value, Me.Part_Text(Index)
-'
-'    Dim txt  As String: txt = Me.Part_Text(Index)
-'    Dim wParam As Long: wParam = Index: LOWORD_HIBYTE(wParam) = Value
-'    Dim rv As Long: rv = SendMessageW(m_Handle, SB_SETTEXTW, ByVal wParam, ByVal StrPtr(txt))
-'                    rv = SendMessageW(m_Handle, WM_PAINT, ByVal 0, ByVal 0)
 End Property
-
 Public Property Get Part_Bevel(ByVal Index As Byte) As ESBPartBevel
     'The Bevel property for the specified part is contained in the high word of the return value you get when asking for TEXTLENGTHW
     Dim rv As Long: rv = SendMessageW(m_Handle, SB_GETTEXTLENGTHW, ByVal Index, ByVal 0)
-    Part_Bevel = HIWORD_HIBYTE(rv) ' (rv And &HFFFF0000) \ &HFFFF&
+    Part_Bevel = HIWORD_HIBYTE(rv)
 End Property
 
 Public Property Let Part_hIcon(ByVal Index As Byte, ByVal hIcon As LongPtr) ' StdPicture) 'or IPictureDisp ?
@@ -464,10 +481,14 @@ Public Function ESBPartBevel_ToStr(ByVal e As ESBPartBevel) As String
 End Function
 
 Public Property Get Part_Text(ByVal Index As Byte) As String
-    Dim L As Long: L = Part_TextLen(Index)
-    Dim Value As String: Value = Space(L) & vbNullChar
-    L = SendMessageW(m_Handle, SB_GETTEXTW, ByVal Index, ByVal StrPtr(Value))
-    Part_Text = Left(Value, L)
+    Dim l As Long: l = Part_TextLen(Index)
+    'Dim Value As String: Value = Space(L) & vbNullChar
+    'm_tmpStr = Space(L) & vbNullChar & vbNullChar 'tmpStr is a class-member
+    'L = SendMessageW(m_Handle, SB_GETTEXTW, ByVal Index, ByVal StrPtr(Value))
+    Dim pBuffer As LongPtr: pBuffer = GetBufferPtr
+    l = SendMessageW(m_Handle, SB_GETTEXT, ByVal Index, ByVal pBuffer) 'StrPtr(m_tmpStr))
+    'Part_Text = Left(m_tmpStr, L)
+    Part_Text = GetStringFromBuffer '(l)
 End Property
 
 Public Property Let Part_Text(ByVal Index As Byte, ByVal ValueMax255Chars As String)
@@ -507,18 +528,79 @@ End Sub
 '* When the corresponding part in the status bar contains text that is truncated due to the size of the part.
 Public Property Let Part_ToolTipText(ByVal Index As Byte, ByVal ValueMax255Chars As String)
     ' Sets the tooltip text for a part in a status bar. The status bar must have been created with the SBT_TOOLTIPS style to enable tooltips.
-    Dim txt As String: txt = ValueMax255Chars & vbNullChar & vbNullChar
-    SendMessageW m_Handle, SB_SETTIPTEXTW, ByVal Index, ByVal StrPtr(txt)
+    'Dim txt As String: txt = ValueMax255Chars & vbNullChar & vbNullChar
+    'm_tmpBuffer =
+    Dim pBuffer As LongPtr: pBuffer = GetBufferPtr(ValueMax255Chars)
+    SendMessageW m_Handle, SB_SETTIPTEXT, ByVal Index, ByVal pBuffer 'StrPtr(txt)
 End Property
+
+'STDMETHODIMP StatusBarPanel::put_ToolTipText(BSTR newValue)
+'{
+'    if(properties.toolTipText != newValue) {
+'        properties.toolTipText.AssignBSTR(newValue);
+'        m_bRequiresSave = TRUE;
+'        properties.pOwnerStatBar->SetDirty(TRUE);
+'
+'        if(properties.panelIndex != SB_SIMPLEID) {
+'            HWND hWndStatBar = properties.GetStatBarHWnd();
+'            if(IsWindow(hWndStatBar)) {
+'                TCHAR buffer[MAX_PATH + 1];
+'                LPTSTR pBuffer = NULL;
+'                if(lstrlen(COLE2CT(newValue)) > 0) {
+'                    pBuffer = buffer;
+'                    lstrcpyn(pBuffer, COLE2CT(newValue), MAX_PATH);
+'                }
+'                SendMessage(hWndStatBar, SB_SETTIPTEXT, properties.panelIndex, reinterpret_cast<LPARAM>(pBuffer));
+'            }
+'        }
+'    }
+'
+'    return S_OK;
+'}
+
 
 Public Property Get Part_ToolTipText(ByVal Index As Byte) As String
     ' Retrieves the tooltip text for a part in a status bar. The status bar must be created with the SBT_TOOLTIPS style to enable tooltips.
-    Dim bufflen As Long:  bufflen = 255
-    Dim buffer  As String: buffer = Space(bufflen) & vbNullChar & vbNullChar
-    Dim wParam  As Long: wParam = Index: MPtr.HIWORD(wParam) = bufflen
-    Dim hr As Long: hr = SendMessageW(m_Handle, SB_GETTIPTEXTW, ByVal wParam, ByVal StrPtr(buffer))
-    Part_ToolTipText = Trim(buffer) ' Left(buffer, rv)
+    'Dim bufflen As Long:  bufflen = 254
+    'Dim buffer  As String: buffer = Space(bufflen) & vbNullChar & vbNullChar
+    'm_tmpStr = Space(bufflen) & vbNullChar & vbNullChar
+    Dim pBuffer As LongPtr: pBuffer = GetBufferPtr()
+    Dim wParam  As Long: wParam = Index: MPtr.HIWORD(wParam) = m_BufferLen / 2 ' LenB(m_tmpBuffer)
+    Dim hr As Long: hr = SendMessageW(m_Handle, SB_GETTIPTEXT, ByVal wParam, ByVal pBuffer) 'm_pToolTipBuffer) 'StrPtr(m_tmpStr))
+    'Part_ToolTipText = Trim(m_tmpStr)  ' Left(buffer, rv)
+    Part_ToolTipText = GetStringFromBuffer
 End Property
+
+Private Function GetBufferPtr(Optional Value) As LongPtr
+    'm_tmpBuffer = Value & String(MAX_PATH + 1 - Len(Value), vbNullChar)
+    If Not IsMissing(Value) Then
+        'm_tmpBuffer = String(vbNullChar, MAX_PATH + 1)
+        Dim s As String: s = Value
+        RtlMoveMemory ByVal m_pTmpBuffer, ByVal StrPtr(s), LenB(s)
+    'Else
+        'm_tmpBuffer = Value &
+    End If
+    'GetBufferPtr = StrPtr(m_tmpBuffer)
+    GetBufferPtr = m_pTmpBuffer
+End Function
+
+
+'lstrlenW
+'lstrcpynW
+
+
+
+Private Function GetStringFromBuffer() As String 'ByVal bufferlength As Long) As String
+    'RtlMoveMemory ByVal StrPtr(s), ByVal m_pTmpBuffer, bufferlength * sizeof_WCHAR
+    'GetStringFromBuffer = Left(m_tmpBuffer, bufferlength)
+    'GetStringFromBuffer = s
+    Dim l As Long: l = lstrlenW(m_pTmpBuffer)
+    Dim s As String: s = String(l, vbNullChar)
+    
+    lstrcpynW StrPtr(s), ByVal m_pTmpBuffer, l
+    GetStringFromBuffer = Left(s, l)
+End Function
+    
 
 Public Property Get Part_Width(ByVal Index As Byte) As Single
     Part_Width = m_PartWidth(Index)
@@ -537,8 +619,6 @@ End Property
 Public Property Get PartsWidth() As Single()
     PartsWidth = m_PartWidth
 End Property
-
-
 
 
 'Private Function GetCurDrawOp(ByVal Index As Byte, Optional ByVal fRtnString As Boolean = False) ' As Integer 'String 'wieso String????

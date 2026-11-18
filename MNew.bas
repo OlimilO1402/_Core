@@ -205,8 +205,8 @@ Public Function City(ByVal Name As String, ByVal PostalCode As String) As City
     Set City = New City: City.New_ Name, PostalCode
 End Function
 
-Public Function CMatOp(ByVal P As Long, S As String, Optional ByVal nk As Byte) As CMatOp
-    Set CMatOp = New CMatOp: CMatOp.New_ P, S, nk
+Public Function CMatOp(ByVal P As Long, s As String, Optional ByVal nk As Byte) As CMatOp
+    Set CMatOp = New CMatOp: CMatOp.New_ P, s, nk
 End Function
 Public Function CMatOpByVal(ByVal pDbl As Long, Optional ByVal mRows As Byte = 1, Optional ByVal nCols As Byte = 1) As CMatOp
     Set CMatOpByVal = New CMatOp: CMatOpByVal.NewByVal pDbl, mRows, nCols
@@ -411,16 +411,16 @@ Public Function FocusRect(ByVal aHDC As LongPtr) As FocusRect
 End Function
 
 Public Function FormatRange(ByVal vt As VbVarType, ByVal Min As Double, ByVal Max As Double) As String
-    Dim S As String
+    Dim s As String
     Select Case vt
     Case VbVarType.vbDate
         Dim datMin As Date: datMin = Min
         Dim datMax As Date: datMax = Max
-        S = datMin & " | " & datMax
+        s = datMin & " | " & datMax
     Case Else
-        S = Min & " | " & Max
+        s = Min & " | " & Max
     End Select
-    FormatRange = S
+    FormatRange = s
 End Function
 'ist Shared muﬂ deshalb in ein Modul
 'von Bitmap:
@@ -475,8 +475,8 @@ End Function
 Public Function GeoPos(Latitude As AngleDec, Longitude As AngleDec, Optional ByVal Height As Double, Optional ByVal Name As String) As GeoPos
     Set GeoPos = New GeoPos: GeoPos.New_ Latitude, Longitude, Height, Name
 End Function
-Public Function GeoPosS(S As String) As GeoPos
-    Set GeoPosS = New GeoPos: GeoPosS.Parse S
+Public Function GeoPosS(s As String) As GeoPos
+    Set GeoPosS = New GeoPos: GeoPosS.Parse s
 End Function
 
 Public Function GetDefaultYear() As Integer
@@ -526,9 +526,9 @@ End Function
 Public Function GuidPK(ByVal sGuid As String, ByVal PID As Long) As GUID
     Set GuidPK = New GUID: GuidPK.NewPK sGuid, PID
 End Function
-Public Function GuidS(S As String) As GUID
+Public Function GuidS(s As String) As GUID
     Set GuidS = New GUID
-    If Not GuidS.Parse(S) Then Set GuidS = Nothing
+    If Not GuidS.Parse(s) Then Set GuidS = Nothing
 End Function
 
 Public Function HeapEntry(aSnapShot As Snapshot, ByVal Index As Long) As HeapEntry
@@ -675,17 +675,17 @@ Public Function LoadFromResource(nID As Long) As IPictureDisp
 End Function
 
 Function LogModeConstants_ToStr(e As LogModeConstants) As String
-    Dim S As String
+    Dim s As String
     Select Case e
-    Case LogModeConstants.vbLogAuto:      S = "vbLogAuto"      ' 0
-    Case LogModeConstants.vbLogOff:       S = "vbLogOff"       ' 1
-    Case LogModeConstants.vbLogToFile:    S = "vbLogToFile"    ' 2
-    Case LogModeConstants.vbLogToNT:      S = "vbLogToNT"      ' 3
-    Case LogModeConstants.vbLogOverwrite: S = "vbLogOverwrite" '16 &H10
-    Case LogModeConstants.vbLogThreadID:  S = "vbLogThreadID"  '32 &H20
-    Case Else: S = CStr(e)
+    Case LogModeConstants.vbLogAuto:      s = "vbLogAuto"      ' 0
+    Case LogModeConstants.vbLogOff:       s = "vbLogOff"       ' 1
+    Case LogModeConstants.vbLogToFile:    s = "vbLogToFile"    ' 2
+    Case LogModeConstants.vbLogToNT:      s = "vbLogToNT"      ' 3
+    Case LogModeConstants.vbLogOverwrite: s = "vbLogOverwrite" '16 &H10
+    Case LogModeConstants.vbLogThreadID:  s = "vbLogThreadID"  '32 &H20
+    Case Else: s = CStr(e)
     End Select
-    LogModeConstants_ToStr = S
+    LogModeConstants_ToStr = s
 End Function
 
 Public Function LuDecomposition(Value As Matrix) As LuDecomposition
@@ -700,36 +700,36 @@ Public Function MACAddressA(bytes05() As Byte, Optional sep As String = "-") As 
     Set MACAddressA = New MACADDress: MACAddressA.New_ bytes05(0), bytes05(1), bytes05(2), bytes05(3), bytes05(4), bytes05(5), sep
 End Function
 
-Public Function MACAddressS(S As String) As MACADDress
-    Set MACAddressS = New MACADDress: MACAddressS.NewS S
+Public Function MACAddressS(s As String) As MACADDress
+    Set MACAddressS = New MACADDress: MACAddressS.NewS s
 End Function
 
-Public Function MatBereich(Optional Value, Optional Bereich_von, Optional Bereich_bis, Optional ByVal Auswahl As EBereichAuswahl = EBereichAuswahl.Mittelwert) As MatBereich
-    Set MatBereich = New MatBereich: MatBereich.New_ Value, Bereich_von, Bereich_bis, Auswahl
-End Function
-
-Public Function MatBereichB(Optional Bereich_von, Optional Bereich_bis, Optional ByVal Auswahl As EBereichAuswahl = EBereichAuswahl.Mittelwert) As MatBereich
-    Set MatBereichB = New MatBereich: MatBereich.NewB Bereich_von, Bereich_bis, Auswahl
-End Function
-
-Public Function MaterialMC(ByVal EModul As Double, ByVal GModul As Double, ByVal KModul As Double, ByVal Nue As Double, ByVal Dichte_rho As Double, Optional ByVal Wichte_gam As Double = 0, Optional ByVal Name As String = "", Optional ByVal norm As String = "") As MaterialMC
-    Set MaterialMC = New MaterialMC: MaterialMC.New_ EModul, GModul, KModul, Nue, Dichte_rho, Wichte_gam, Name, norm
-End Function
+'Public Function MatBereich(Optional Value, Optional Bereich_von, Optional Bereich_bis, Optional ByVal Auswahl As EBereichAuswahl = EBereichAuswahl.Mittelwert) As MatBereich
+'    Set MatBereich = New MatBereich: MatBereich.New_ Value, Bereich_von, Bereich_bis, Auswahl
+'End Function
+'
+'Public Function MatBereichB(Optional Bereich_von, Optional Bereich_bis, Optional ByVal Auswahl As EBereichAuswahl = EBereichAuswahl.Mittelwert) As MatBereich
+'    Set MatBereichB = New MatBereich: MatBereich.NewB Bereich_von, Bereich_bis, Auswahl
+'End Function
+'
+'Public Function MaterialMC(ByVal EModul As Double, ByVal GModul As Double, ByVal KModul As Double, ByVal Nue As Double, ByVal Dichte_rho As Double, Optional ByVal Wichte_gam As Double = 0, Optional ByVal Name As String = "", Optional ByVal norm As String = "") As MaterialMC
+'    Set MaterialMC = New MaterialMC: MaterialMC.New_ EModul, GModul, KModul, Nue, Dichte_rho, Wichte_gam, Name, norm
+'End Function
 
 Function MathFunction(ByVal addrof As LongPtr) As MathFunction
     Set MathFunction = New MathFunction
     Dim pVTable As LongPtr
-    GetMem4 ByVal ObjPtr(MathFunction), pVTable
-    GetMem4 addrof, ByVal (pVTable + 28)
+    RtlMoveMemory ByVal ObjPtr(MathFunction), pVTable, SizeOf_LongPtr
+    RtlMoveMemory ByVal addrof, ByVal (pVTable + 28), SizeOf_LongPtr
 End Function
 
 Public Function MathFunctionD(aDF As TDelegateFunction, ByVal pFncAddr As LongPtr) As MathFunction 'ICallDoubleReturnDouble
     Set MathFunctionD = New_DelegateFunction(aDF, pFncAddr)
 End Function
 
-Public Function MathFunctionView(Canvas As PictureBox) As MathFunctionView
-    Set MathFunctionView = New MathFunctionView: MathFunctionView.New_ Canvas
-End Function
+'Public Function MathFunctionView(Canvas As PictureBox) As MathFunctionView
+'    Set MathFunctionView = New MathFunctionView: MathFunctionView.New_ Canvas
+'End Function
 
 Public Function Matrix(ByVal Rows As Long, ByVal Columns As Long, Optional ByVal Value) As Matrix
     Set Matrix = New Matrix: Matrix.New_ Rows, Columns, Value
@@ -751,22 +751,6 @@ Public Function MessageDialog(ByVal OwnerHwnd As Long, ByVal Content As String, 
     Set MessageDialog = New MessageDialog: MessageDialog.New_ OwnerHwnd, Content, Title
 End Function
 
-'Public Function ModalDialog(aDialog As Form, BtnOK As CommandButton, BtnCancel As CommandButton, Optional ByVal IsReadOnly As Boolean = False) As ModalDialog
-'    Set ModalDialog = New ModalDialog: ModalDialog.New_ aDialog, BtnOK, BtnCancel, IsReadOnly
-'End Function
-'
-'Public Function ModalDialog(Dialog As Form, BtnOK As CommandButton, BtnCancel As CommandButton) As ModalDialog
-'    Set ModalDialog = New ModalDialog: ModalDialog.New_ Dialog, BtnOK, BtnCancel
-'End Function
-'Public Function ModalDialog(Dialog As Form, BtnOK As CommandButton, BtnCancel As CommandButton) As ModalDialog
-'    Set ModalDialog = New ModalDialog: ModalDialog.New_ Dialog, BtnOK, BtnCancel
-'End Function
-'Public Function ModalDialog(Dialog As Form, BtnOK As CommandButton, BtnCancel As CommandButton, Optional ByVal IsReadOnly As Boolean = False) As ModalDialog
-'    Set ModalDialog = New ModalDialog: ModalDialog.New_ Dialog, BtnOK, BtnCancel, IsReadOnly
-'End Function
-'Public Function ModalDialog(Dialog As Form, BtnOK As CommandButton, BtnCancel As CommandButton) As ModalDialog
-'    Set ModalDialog = New ModalDialog: ModalDialog.New_ Dialog, BtnOK, BtnCancel
-'End Function
 
 Public Function ModalDialog(Dialog As Form, BtnOK As CommandButton, BtnCancel As CommandButton, Optional ByVal IsReadOnly As Boolean = False) As ModalDialog
     Set ModalDialog = New ModalDialog: ModalDialog.New_ Dialog, BtnOK, BtnCancel, IsReadOnly
@@ -817,12 +801,6 @@ Public Function nTupel(Of_Type As VbVarType, ByVal nCount As Long, ParamArray pa
     End If
 End Function
 
-'Public Function Nullable(ByVal vt As EVbVarType) As Nullable
-'    Set Nullable = New Nullable: Nullable.New_ vt
-'End Function
-'Public Function Nullable(ByVal vt As EVbVarType) As Nullable
-'    Set Nullable = New Nullable: Nullable.New_ vt
-'End Function
 Public Function Nullable(ByVal vt As EVbVarType) As Nullable
     Set Nullable = New Nullable: Nullable.New_ vt
 End Function
@@ -852,76 +830,6 @@ Public Function PathFileName(ByVal aPathOrPFN As String, _
                     Optional ByVal aExt As String) As PathFileName
     Set PathFileName = New PathFileName: PathFileName.New_ aPathOrPFN, aFileName, aExt
 End Function
-'Public Function PathFileName(ByVal aPathOrPFN As String, _
-'                    Optional ByVal aFileName As String, _
-'                    Optional ByVal aExt As String) As PathFileName
-'    Set PathFileName = New PathFileName: PathFileName.New_ aPathOrPFN, aFileName, aExt
-'End Function
-'Public Function PathFileName(ByVal aPathFileName As String, _
-'                    Optional ByVal aFileName As String, _
-'                    Optional ByVal aExt As String) As PathFileName
-'    Set PathFileName = New PathFileName: PathFileName.New_ aPathFileName, aFileName, aExt
-'End Function
-'Public Function PathFileName(ByVal aPathFileName As String, _
-'                    Optional ByVal aFileName As String, _
-'                    Optional ByVal aExt As String) As PathFileName
-'    Set PathFileName = New PathFileName: PathFileName.New_ aPathFileName, aFileName, aExt
-'End Function
-'Public Function PathFileName(ByVal aPathFileName As String, _
-'                    Optional ByVal aFileName As String, _
-'                    Optional ByVal aExt As String) As PathFileName
-'    Set PathFileName = New PathFileName: PathFileName.New_ aPathFileName, aFileName, aExt
-'End Function
-'Public Function PathFileName(ByVal aPathOrPFN As String, _
-'                    Optional ByVal aFileName As String, _
-'                    Optional ByVal aExt As String) As PathFileName
-'    Set PathFileName = New PathFileName: PathFileName.New_ aPathOrPFN, aFileName, aExt
-'End Function
-'Public Function PathFileName(ByVal aPathOrPFN As String, _
-'                    Optional ByVal aFileName As String, _
-'                    Optional ByVal aExt As String) As PathFileName
-'    Set PathFileName = New PathFileName: PathFileName.New_ aPathOrPFN, aFileName, aExt
-'End Function
-'Public Function PathFileName(ByVal aPathFileName As String, _
-'                     Optional ByVal aFileName As String, _
-'                     Optional ByVal aExt As String) As PathFileName
-'    Set PathFileName = New PathFileName: PathFileName.New_ aPathFileName, aFileName, aExt
-'End Function
-'Public Function PathFileName(ByVal aPathFileName As String, _
-'                     Optional ByVal aFileName As String, _
-'                     Optional ByVal aExt As String) As PathFileName
-'    Set PathFileName = New PathFileName: PathFileName.New_ aPathFileName, aFileName, aExt
-'End Function
-'Public Function PathFileName(ByVal aPathFileName As String, _
-'                     Optional ByVal aFileName As String, _
-'                     Optional ByVal aExt As String) As PathFileName
-'    Set PathFileName = New PathFileName: PathFileName.New_ aPathFileName, aFileName, aExt
-'End Function
-'Public Function PathFileName(ByVal aPathFileName As String, _
-'                         Optional ByVal aFileName As String, _
-'                         Optional ByVal aExt As String) As PathFileName
-'    Set PathFileName = New PathFileName: PathFileName.New_ aPathFileName, aFileName, aExt
-'End Function
-'Public Function PathFileName(ByVal aPathOrPFN As String, _
-'                    Optional ByVal aFileName As String, _
-'                    Optional ByVal aExt As String) As PathFileName
-'    Set PathFileName = New PathFileName: PathFileName.New_ aPathOrPFN, aFileName, aExt
-'End Function
-'Public Function PathFileName(ByVal aPathFileName As String, _
-'                     Optional ByVal aFileName As String, _
-'                     Optional ByVal aExt As String) As PathFileName
-'    Set PathFileName = New PathFileName: PathFileName.New_ aPathFileName, aFileName, aExt
-'End Function
-'Public Function PathFileName(ByVal aPathFileName As String, _
-'                    Optional ByVal aFileName As String, _
-'                    Optional ByVal aExt As String) As PathFileName
-'    Set PathFileName = New PathFileName: PathFileName.New_ aPathFileName, aFileName, aExt
-'End Function
-'Public Function PathFileName(ByVal aPathFileName As String, _
-'                     Optional ByVal aFileName As String, _
-'                     Optional ByVal aExt As String) As PathFileName
-'    Set PathFileName = New PathFileName: PathFileName.New_ aPathFileName, aFileName, aExt
-'End Function
 
 Public Function Pdf(ByVal aPdfPFN As PathFileName) As Pdf
     Set Pdf = New Pdf: Pdf.New_ aPdfPFN
@@ -1465,12 +1373,12 @@ Public Function WinAPIPoint(ByVal x As Long, ByVal y As Long) As WinAPIPoint
     With WinAPIPoint: .x = x: .y = y: End With
 End Function
 
-Public Function WinAPIRect(ByVal Left As Long, ByVal Top As Long, ByVal Right As Long, ByVal Bottom As Long) As WinAPIRect
-    With WinAPIRect: .Left = Left: .Top = Top: .Right = Right: .Bottom = Bottom: End With
+Public Function WinApiRECT(ByVal Left As Long, ByVal Top As Long, ByVal Right As Long, ByVal Bottom As Long) As WinApiRECT
+    With WinApiRECT: .Left = Left: .Top = Top: .Right = Right: .Bottom = Bottom: End With
 End Function
 
-Public Function WinAPIRectXYWH(ByVal x As Long, ByVal y As Long, ByVal Width As Long, ByVal Height As Long) As WinAPIRect
-    With WinAPIRect: .Left = x: .Top = y: .Right = x + Width: .Bottom = y + Height: End With
+Public Function WinAPIRectXYWH(ByVal x As Long, ByVal y As Long, ByVal Width As Long, ByVal Height As Long) As WinApiRECT
+    With WinApiRECT: .Left = x: .Top = y: .Right = x + Width: .Bottom = y + Height: End With
 End Function
 
 Public Function WinAPISize(ByVal W As Long, ByVal H As Long) As WinAPISize
@@ -1521,7 +1429,7 @@ Public Function WndPicker(aTimer As Timer, aButton As CommandButton, ByVal bDraw
     Set WndPicker = New WndPicker: WndPicker.New_ aTimer, aButton, bDrawFocusRect
 End Function
 
-Public Function WndRect(r As WinAPIRect) As WndRect
+Public Function WndRect(r As WinApiRECT) As WndRect
     Set WndRect = New WndRect: WndRect.New_ r
 End Function
 
