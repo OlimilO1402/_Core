@@ -543,193 +543,6 @@ Public Function Long_TryParseValidate(ByVal NewValue As String, ByVal mess As St
     Long_TryParseValidate = IIf(Len(sFormat), Format(OldValueIn_NewValueOut, sFormat), OldValueIn_NewValueOut)
 End Function
 
-
-Private Sub Form_Load()
-    Dim i As Long
-    For i = 0 To 30
-        Debug.Print IntToLangText(i)
-    Next
-    'Debug.Print IntToLangText(9913)
-End Sub
-
-Public Function IntToTextDe(ByVal n As Long) As String
-    Dim s As String
-    Const tausend As String = "tausend"
-    Const hundert As String = "hundert"
-    Const und     As String = "und"
-    Dim Zehner(): Zehner = Array("", "zehn", "zwanzig", "dreißig", "vierzig", "fünfzig", "sechzig", "siebzig", "achtzig", "neunzig")
-    Dim ziffern012(): ziffern012 = Array("null", "eins", "zwei", "drei", "vier", "fünf", "sechs", "sieben", "acht", "neun", "zehn", "elf", "zwölf")
-    
-    Dim n1    As Long:    n1 = n Mod 10
-    Dim n10   As Long:   n10 = ((n - n1) Mod 100) / 10
-    Dim n100  As Long:  n100 = ((n - n1 - n10 * 10) Mod 1000) / 100
-    Dim n1000 As Long: n1000 = ((n - n1 - n10 * 10 - n100 * 100) Mod 10000) / 1000
-    
-    Dim s1000 As String
-    If n1000 Then
-        s1000 = ziffern012(n1000)
-        If n1000 = 1 Then s1000 = Left(s1000, 3)
-        s1000 = s1000 & tausend
-    End If
-    
-    Dim s100 As String
-    If n100 Then
-        s100 = ziffern012(n100)
-        If n100 = 1 Then s100 = Left(s100, 3)
-        s100 = s100 & hundert
-    End If
-    
-    
-    Dim s1 As String
-    If n10 < 2 Then
-    
-    'If n1 Then
-        s1 = ziffern012(n1) '& und
-    'ElseIf n1 < 2 Then
-    '    'IntToLangText = UCase(Left(s, 1)) & Mid(s, 2)
-    '    'Exit Function
-    '    s1 = ziffern012(n1) '& und
-    'Else
-    '    If n = 0 Then s1 = ziffern012(n1)
-    End If
-    
-    Dim s10 As String
-    If n10 Then
-        s10 = Zehner(n10)
-    End If
-    
-    If n10 > 1 Then
-        If n1 = 1 Then s1 = Left(s1, Len(s1) - 1) 'ein-und-fünzig nicht eins-und-fünzig
-        If n10 < 2 Then
-            If n1 = 6 Then s1 = Left(s1, Len(s1) - 1) 'sech-zehn nicht sechs-zehn
-            If n1 = 7 Then s1 = Left(s1, Len(s1) - 2) 'sieb-zehn nicht sieben-zehn
-            'aber sechsundfünzig
-        End If
-        s1 = s1 & und
-    End If
-    'elseif n<
-    'End If
-    ' Einerstelle
-    
-'    'Dim s1 As String
-'    If n1 Then
-'        s1 = ziffern012(n1)
-'        If n1 = 1 Then s1 = Left(s1, Len(s1) - 1) 'ein-und-fünzig nicht eins-und-fünzig
-'        If n10 < 2 Then
-'            If n1 = 6 Then s1 = Left(s1, Len(s1) - 1) 'sech-zehn nicht sechs-zehn
-'            If n1 = 7 Then s1 = Left(s1, Len(s1) - 2) 'sieb-zehn nicht sieben-zehn
-'            'aber sechsundfünzig
-'        End If
-'    End If
-'    Dim s100 As String
-'    If n100 Then
-'        s100 = ziffern012(n100)
-'        If n100 = 1 Then s100 = Left(s100, 3)
-'        s100 = s100 & hundert
-'    End If
-    s = s1000 & s100 & s1 & s10
-'    'n = n - n1
-'    'dim n2 as Byte:n2 = n mod
-    IntToTextDe = UCase(Left(s, 1)) & Mid(s, 2)
-    
-End Function
-'Hier ist eine fertige VBA-Funktion, die jede ganze Zahl (von -999.999.999 bis 999.999.999) korrekt als deutschen Text ausschreibt.
-'Obwohl nach Integer gefragt wurde, verwendet der Code als Eingabetyp Long. In VBA geht ein Integer nämlich nur bis 32.767
-'mit Long funktioniert die Funktion genauso mit kleinen Zahlen, stürzt aber bei größeren Werten (z. B. 50.000) nicht ab.
-'Besonderheiten der deutschen Sprache im Code
-'• Eins vs. Ein: Steht die 1 ganz am Ende (z. B. 101), gibt die Funktion "einhunderteins" aus. Steht sie vor Tausend (z. B. 1000),
-'wird daraus "eintausend".
-'• Zusammenschreibung: Nach deutscher Rechtschreibung werden Zahlen unter einer Million kleingeschrieben und zusammengeschrieben
-'(z. B. 42 -> "zweiundvierzig").
-'• Anwendung in Excel: Schreibe in eine beliebige Zelle =ZahlInWorten(123) oder verweise auf eine Zelle wie =ZahlInWorten(A1).
-'Möchtest du die Funktion noch an spezielle Anforderungen anpassen? Sag mir gerne Bescheid, falls du:
-'• Großschreibung am Wortanfang (z. B. "Zweiundvierzig" statt "zweiundvierzig") benötigst
-'• Währungsbeträge mit Nachkommastellen (z. B. für Schecks oder Rechnungen) ausgeben willst
-'• Leerzeichen bei Millionen (z. B. "eine Million" statt "einemillion") bevorzugst
-Public Function ZahlInWorten(ByVal Zahl As Long) As String
-    Dim Ergebnis As String
-    
-    ' Sonderfall 0
-    If Zahl = 0 Then
-        ZahlInWorten = "null"
-        Exit Function
-    End If
-    
-    ' Negative Zahlen abfangen
-    If Zahl < 0 Then
-        Ergebnis = "minus "
-        Zahl = Abs(Zahl)
-    End If
-    
-    ' Millionen
-    If Zahl >= 1000000 Then
-        If Int(Zahl / 1000000) = 1 Then
-            Ergebnis = Ergebnis & "einemillion"
-        Else
-            Ergebnis = Ergebnis & BlockInWorten(Int(Zahl / 1000000), False) & "millionen"
-        End If
-        Zahl = Zahl Mod 1000000
-    End If
-    
-    ' Tausender
-    If Zahl >= 1000 Then
-        If Int(Zahl / 1000) = 1 Then
-            Ergebnis = Ergebnis & "eintausend"
-        Else
-            Ergebnis = Ergebnis & BlockInWorten(Int(Zahl / 1000), False) & "tausend"
-        End If
-        Zahl = Zahl Mod 1000
-    End If
-    
-    ' Hunderter, Zehner und Einer (Rest unter 1000)
-    If Zahl > 0 Then
-        Ergebnis = Ergebnis & BlockInWorten(Zahl, True)
-    End If
-    
-    ZahlInWorten = Ergebnis
-End Function
-
-' Hilfsfunktion für Zahlenblöcke von 1 bis 999
-Private Function BlockInWorten(ByVal n As Long, ByVal IstEnde As Boolean) As String
-    Dim Einer As Variant
-    Dim Zehner As Variant
-    Dim text As String
-    Dim h As Long, z As Long, e As Long
-    
-    Einer = Array("", "ein", "zwei", "drei", "vier", "fünf", "sechs", "sieben", "acht", "neun", "zehn", "elf", "zwölf", "dreizehn", "vierzehn", "fünfzehn", "sechzehn", "siebzehn", "achtzehn", "neunzehn")
-    Zehner = Array("", "", "zwanzig", "dreißig", "vierzig", "fünfzig", "sechzig", "siebzig", "achtzig", "neunzig")
-    
-    ' Hunderterstelle
-    h = Int(n / 100)
-    If h > 0 Then
-        text = text & Einer(h) & "hundert"
-        n = n Mod 100
-    End If
-    
-    ' Zehner- und Einerstelle
-    If n > 0 Then
-        If n < 20 Then
-            ' Besonderheit am Wortende: "eins" statt "ein" (z. B. "hunderteins", aber "eintausend")
-            If n = 1 And IstEnde Then
-                text = text & "eins"
-            Else
-                text = text & Einer(n)
-            End If
-        Else
-            e = n Mod 10
-            z = Int(n / 10)
-            If e > 0 Then
-                text = text & Einer(e) & "und" & Zehner(z)
-            Else
-                text = text & Zehner(z)
-            End If
-        End If
-    End If
-    
-    BlockInWorten = text
-End Function
-
-
 #If VBA7 Then
     Public Function LongLong_TryParse(ByVal Value As String, ByRef Value_out As LongLong) As Boolean
 Try:     On Error GoTo Catch
@@ -3116,3 +2929,88 @@ End Function
 '    return NULL;
 '}
 ' ^ ' ############################## ' ^ '    Boyer, Moore, Horspool finding text    ' ^ ' ############################## ' ^ '
+
+Public Function Number_ToWords(ByVal n As Long) As String
+    
+    ' Sonderfall 0
+    If n = 0 Then Number_ToWords = "Null": Exit Function
+    
+    ' Negative Zahlen abfangen
+    Dim s As String
+    If n < 0 Then
+        s = "minus "
+        n = Abs(n)
+    End If
+    
+    Const c1e9 As Long = 1000000000
+    Const c1e6 As Long = 1000000
+    Const c1e3 As Long = 1000
+    Const milliarde  As String = "milliarde"
+    Const million    As String = "million"
+    Const tausend    As String = "tausend"
+    Dim n1e9 As Long: n1e9 = Int(n / c1e9)
+    Dim n1e6 As Long: n1e6 = Int(n / c1e6)
+    
+    ' Milliarden
+    If n1e9 Then
+        If n1e9 = 1 Then
+            s = s & "eine" & milliarde
+        Else
+            s = s & Block3_ToWords(n1e9, False) & milliarde & "n"
+        End If
+        n = n Mod c1e9
+    End If
+    
+    ' Millionen
+    If n1e6 Then
+        If n1e6 = 1 Then
+            s = s & "eine" & million
+        Else
+            s = s & Block3_ToWords(n1e6, False) & million & "en"
+        End If
+        n = n Mod c1e6
+    End If
+    
+    ' Tausender
+    Dim n1e3 As Long: n1e3 = Int(n / c1e3)
+    If n >= 1000 Then
+        If n1e3 = 1 Then
+            s = s & "ein" & tausend
+        Else
+            s = s & Block3_ToWords(n1e3, False) & tausend
+        End If
+        n = n Mod c1e3
+    End If
+    
+    ' Hunderter, Zehner und Einer (Rest unter 1000)
+    If n Then
+        s = s & Block3_ToWords(n, True)
+    End If
+    
+    Number_ToWords = UCase(Left(s, 1)) & Mid(s, 2)
+End Function
+
+' Zahlenblöcke 1 - 999
+Private Function Block3_ToWords(ByVal n As Long, ByVal isEnd As Boolean) As String
+    Dim Einer():   Einer = Array("", "ein", "zwei", "drei", "vier", "fünf", "sechs", "sieben", "acht", "neun", "zehn", "elf", "zwölf", "dreizehn", "vierzehn", "fünfzehn", "sechzehn", "siebzehn", "achtzehn", "neunzehn")
+    Dim Zehner(): Zehner = Array("", "", "zwanzig", "dreißig", "vierzig", "fünfzig", "sechzig", "siebzig", "achtzig", "neunzig")
+    Const hundert As String = "hundert"
+    Const und     As String = "und"
+    Dim n1    As Long:    n1 = n Mod 10
+    Dim n10   As Long:   n10 = ((n - n1) Mod 100) / 10
+    Dim n100  As Long:  n100 = ((n - n1 - n10 * 10) Mod 1000) / 100
+    Dim s As String
+    ' Hunderterstelle
+    If n100 Then s = s & Einer(n100) & hundert
+    ' Zehner- und Einerstelle
+    If n10 < 2 Then
+        n1 = n10 * 10 + n1
+        ' "eins" statt "ein" (z. B. "hunderteins", aber "einhundert")
+        s = s & Einer(n1) & IIf(n1 = 1 And isEnd, "s", "")
+    Else
+        If n1 Then s = s & Einer(n1) & und
+        s = s & Zehner(n10)
+    End If
+    Block3_ToWords = s
+End Function
+
