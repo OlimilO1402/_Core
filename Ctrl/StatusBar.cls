@@ -78,11 +78,26 @@ Public Enum ESBPartStyle ' Konstanten für Grundflächenstile
     sbrKana = 7    ' Kana
 End Enum
 
-
 'Status Bar Styles
-Private Const SBARS_SIZEGRIP    As Long = &H100 'Include a sizing grip at the right end of the status window.
+Private Const SBARS_SIZEGRIP    As Long = &H100&     'Include a sizing grip at the right end of the status window.
+Private Const SBARS_TOOLTIPS    As Long = &H800&
+
+Private Const WS_CLIPCHILDREN   As Long = &H2000000  'Excludes the area occupied by child windows when drawing occurs within the parent window.
+                                                     'This style is used when creating the parent window.
+Private Const WS_CLIPSIBLINGS   As Long = &H4000000  'Clips child windows relative to each other; that is, when a particular child window receives a WM_PAINT message,
+                                                     'the WS_CLIPSIBLINGS style clips all other overlapping child windows out of the region of the child window to be updated.
+                                                     'If WS_CLIPSIBLINGS is not specified and child windows overlap, it is possible, when drawing within the client area of a
+                                                     'child window, to draw within the client area of a neighboring child window.
 Private Const WS_VISIBLE        As Long = &H10000000 'Creates a window that is initially visible.
 Private Const WS_CHILD          As Long = &H40000000 'Creates a child window.
+'Private Const WS_CHILDWINDOW    As Long = WS_CHILD  'Creates a child window.
+
+Private Const WS_EX_LEFT        As Long = &H0&
+Private Const WS_EX_LTRREADING  As Long = &H0&     'left to right
+Private Const WS_EX_CLIENTEDGE  As Long = &H200&
+Private Const WS_EX_LAYOUTRTL   As Long = &H400000 'right to left
+Private Const WS_BORDER         As Long = &H800000
+
 'uFlags text drawing operation values:
 'also used by SB_SETTEXT, SB_SETTEXT, SB_GETTEXTLENGTH below
 
@@ -253,6 +268,7 @@ Private Const sizeof_WCHAR As Long = 2
 Private Declare Function HeapAlloc Lib "kernel32" (ByVal hHeap As LongPtr, ByVal dwFlags As Long, ByVal dwBytes As Long) As LongPtr
 Private Declare Function GetProcessHeap Lib "kernel32" () As LongPtr
 Private Declare Function HeapFree Lib "kernel32" (ByVal hHeap As LongPtr, ByVal dwFlags As Long, ByRef lpMem As Any) As Long
+Private Declare Function VirtualLock Lib "kernel32" (ByRef lpAddress As Any, ByVal dwSize As Long) As Long
 
 Private Const HEAP_ZERO_MEMORY As Long = &H8
 Private Const MAX_PATH         As Long = 260
@@ -282,6 +298,8 @@ Private Sub Class_Initialize()
     'm_pToolTipBuffer = HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, (MAX_PATH + 1) * sizeof_WCHAR)
     m_BufferLen = (MAX_PATH + 1) * sizeof_WCHAR
     m_pTmpBuffer = HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, m_BufferLen)
+    VirtualLock m_pTmpBuffer, m_BufferLen
+    
 End Sub
 
 Private Sub Class_Terminate()
@@ -317,7 +335,18 @@ Friend Sub New_(Owner As PictureBox) ', Parts() As Long)
     'SBT_NOBORDERS ' The text is drawn without borders.
     'SBT_POPOUT    ' The text is drawn with a border to appear higher 'than the plane of the window.
     
-    m_Style = WS_VISIBLE Or WS_CHILD Or SBARS_SIZEGRIP Or SBT_TOOLTIPS ' 'Or SBT_POPOUT 'Or SBT_NOBORDERS '
+'DWORD style = WS_CHILDWINDOW | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | WS_VISIBLE;
+'style |= CCS_NORESIZE;
+'style |= WS_BORDER;
+'style |= WS_DISABLED;
+'style |= SBARS_SIZEGRIP;
+'style |= SBARS_TOOLTIP
+'style |= CCS_NOPARENTALIGN;S;
+
+    m_Style = WS_VISIBLE Or WS_CHILD Or SBARS_SIZEGRIP Or SBT_TOOLTIPS Or WS_BORDER ' 'Or SBT_POPOUT 'Or SBT_NOBORDERS '
+    Dim extStyle As Long
+    extStyle = WS_EX_LEFT Or WS_EX_LTRREADING Or WS_EX_CLIENTEDGE 'Or WS_EX_STATICEDGE
+    'extStyle = extStyle Or WS_EX_LAYOUTRTL
     Dim txt As String: txt = "StatusBar..."
     'm_Handle = CreateStatusWindowW(m_Style, StrPtr(txt), mOwner.hWnd, 0)
     
@@ -334,7 +363,7 @@ Friend Sub New_(Owner As PictureBox) ', Parts() As Long)
 '        hinst,                   // handle to application instance
 '        NULL);                   // no window creation data
     
-    m_Handle = CreateWindowExW(0, ByVal StrPtr(STATUSCLASSNAME), ByVal StrPtr(txt), m_Style, 0, 0, 0, 0, mOwner.hWnd, ByVal 0, App.hInstance, ByVal 0)
+    m_Handle = CreateWindowExW(0, ByVal StrPtr(STATUSCLASSNAME), ByVal StrPtr(txt), m_Style, extStyle, 0, 0, 0, mOwner.hWnd, ByVal 0, App.hInstance, ByVal 0)
     
     'Dim minh As Long: minh = mOwner.ScaleHeight '/ 3
     'SendMessageW m_Handle, SB_SETMINHEIGHT, ByVal minh, ByVal 0
@@ -486,7 +515,7 @@ Public Property Get Part_Text(ByVal Index As Byte) As String
     'm_tmpStr = Space(L) & vbNullChar & vbNullChar 'tmpStr is a class-member
     'L = SendMessageW(m_Handle, SB_GETTEXTW, ByVal Index, ByVal StrPtr(Value))
     Dim pBuffer As LongPtr: pBuffer = GetBufferPtr
-    l = SendMessageW(m_Handle, SB_GETTEXT, ByVal Index, ByVal pBuffer) 'StrPtr(m_tmpStr))
+    l = SendMessageW(m_Handle, SB_GETTEXTW, ByVal Index, ByVal pBuffer) 'StrPtr(m_tmpStr))
     'Part_Text = Left(m_tmpStr, L)
     Part_Text = GetStringFromBuffer '(l)
 End Property
@@ -531,7 +560,7 @@ Public Property Let Part_ToolTipText(ByVal Index As Byte, ByVal ValueMax255Chars
     'Dim txt As String: txt = ValueMax255Chars & vbNullChar & vbNullChar
     'm_tmpBuffer =
     Dim pBuffer As LongPtr: pBuffer = GetBufferPtr(ValueMax255Chars)
-    SendMessageW m_Handle, SB_SETTIPTEXT, ByVal Index, ByVal pBuffer 'StrPtr(txt)
+    SendMessageW m_Handle, SB_SETTIPTEXTW, ByVal Index, ByVal pBuffer 'StrPtr(txt)
 End Property
 
 'STDMETHODIMP StatusBarPanel::put_ToolTipText(BSTR newValue)
@@ -566,13 +595,14 @@ Public Property Get Part_ToolTipText(ByVal Index As Byte) As String
     'm_tmpStr = Space(bufflen) & vbNullChar & vbNullChar
     Dim pBuffer As LongPtr: pBuffer = GetBufferPtr()
     Dim wParam  As Long: wParam = Index: MPtr.HIWORD(wParam) = m_BufferLen / 2 ' LenB(m_tmpBuffer)
-    Dim hr As Long: hr = SendMessageW(m_Handle, SB_GETTIPTEXT, ByVal wParam, ByVal pBuffer) 'm_pToolTipBuffer) 'StrPtr(m_tmpStr))
+    Dim hr As Long: hr = SendMessageW(m_Handle, SB_GETTIPTEXTW, ByVal wParam, ByVal pBuffer) 'm_pToolTipBuffer) 'StrPtr(m_tmpStr))
     'Part_ToolTipText = Trim(m_tmpStr)  ' Left(buffer, rv)
     Part_ToolTipText = GetStringFromBuffer
 End Property
 
 Private Function GetBufferPtr(Optional Value) As LongPtr
     'm_tmpBuffer = Value & String(MAX_PATH + 1 - Len(Value), vbNullChar)
+    RtlZeroMemory ByVal m_pTmpBuffer, m_BufferLen
     If Not IsMissing(Value) Then
         'm_tmpBuffer = String(vbNullChar, MAX_PATH + 1)
         Dim s As String: s = Value
@@ -595,9 +625,10 @@ Private Function GetStringFromBuffer() As String 'ByVal bufferlength As Long) As
     'GetStringFromBuffer = Left(m_tmpBuffer, bufferlength)
     'GetStringFromBuffer = s
     Dim l As Long: l = lstrlenW(m_pTmpBuffer)
+    'MsgBox l
     Dim s As String: s = String(l, vbNullChar)
-    
     lstrcpynW StrPtr(s), ByVal m_pTmpBuffer, l
+    RtlMoveMemory ByVal StrPtr(s), ByVal m_pTmpBuffer, l
     GetStringFromBuffer = Left(s, l)
 End Function
     

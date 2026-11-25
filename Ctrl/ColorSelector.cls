@@ -14,14 +14,18 @@ Attribute VB_Exposed = False
 Option Explicit
 
 Private Type POINTAPI
-    X As Long
+    x As Long
     Y As Long
 End Type
 
+Private Declare Function SetCapture Lib "user32" (ByVal hWnd As LongPtr) As Long
+'SetCapture funktioniert mit MouseDown MouseMove MouseUp
+Private Declare Function ReleaseCapture Lib "user32" () As Long 'Bool
+
 Private Declare Function GetCursorPos Lib "user32" (lpPoint As POINTAPI) As Long
-Private Declare Function GetDC Lib "user32" (ByVal hwnd As LongPtr) As LongPtr
-Private Declare Function GetPixel Lib "gdi32" (ByVal hDC As LongPtr, ByVal X As Long, ByVal Y As Long) As Long
-Private Declare Function ReleaseDC Lib "user32" (ByVal hwnd As LongPtr, ByVal hDC As LongPtr) As Long
+Private Declare Function GetDC Lib "user32" (ByVal hWnd As LongPtr) As LongPtr
+Private Declare Function GetPixel Lib "gdi32" (ByVal hDC As LongPtr, ByVal x As Long, ByVal Y As Long) As Long
+Private Declare Function ReleaseDC Lib "user32" (ByVal hWnd As LongPtr, ByVal hDC As LongPtr) As Long
 
 Private WithEvents mTimer  As VB.Timer
 Attribute mTimer.VB_VarHelpID = -1
@@ -59,17 +63,17 @@ End Sub
 Private Sub mTimer_Timer()
     GetCursorPos m_CurMousePos
     'Dim Color As Long: Color = ColorUnderMouse(m_CurMousePos.X, m_CurMousePos.Y)
-    m_CurColor = ColorUnderMouse(m_CurMousePos.X, m_CurMousePos.Y)
+    m_CurColor = ColorUnderMouse(m_CurMousePos.x, m_CurMousePos.Y)
     If Not m_PBColorView Is Nothing Then m_PBColorView.BackColor = m_CurColor
-    If Not m_LblCurColor Is Nothing Then m_LblCurColor.Caption = MouseCoordsNColor_ToStr(m_CurMousePos.X, m_CurMousePos.Y, m_CurColor)
+    If Not m_LblCurColor Is Nothing Then m_LblCurColor.Caption = MouseCoordsNColor_ToStr(m_CurMousePos.x, m_CurMousePos.Y, m_CurColor)
 End Sub
 
-Private Function ColorUnderMouse(ByVal X As Long, ByVal Y As Long) As Long
-    ColorUnderMouse = GetPixel(GetDC(0), X, Y)
+Private Function ColorUnderMouse(ByVal x As Long, ByVal Y As Long) As Long
+    ColorUnderMouse = GetPixel(GetDC(0), x, Y)
 End Function
 
-Private Function MouseCoordsNColor_ToStr(ByVal X As Single, ByVal Y As Single, ByVal Color As Long) As String
-    MouseCoordsNColor_ToStr = "X;Y: " & X & ";" & Y & vbCrLf & Color_ToStr(Color)
+Private Function MouseCoordsNColor_ToStr(ByVal x As Single, ByVal Y As Single, ByVal Color As Long) As String
+    MouseCoordsNColor_ToStr = "X;Y: " & x & ";" & Y & vbCrLf & Color_ToStr(Color)
 End Function
 
 Private Function Color_ToStr(ByVal this As Long) As String

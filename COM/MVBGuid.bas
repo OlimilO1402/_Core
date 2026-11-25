@@ -25,6 +25,8 @@ Public IID_IUnknown     As VBGuid
 Public IID_IDispatch    As VBGuid
 Public IID_IEnumVariant As VBGuid
 
+Private m_VBGuidZero    As VBGuid
+
 'https://learn.microsoft.com/en-us/windows/win32/api/combaseapi/nf-combaseapi-cocreateguid
 Private Declare Sub CoCreateGuid Lib "ole32" (ByRef pGuid_out As Any)
 
@@ -79,14 +81,14 @@ Public Function New_VBGuidS4(ByVal shx1 As String, ByVal shx2 As String, ByVal s
 End Function
 
 Public Function New_VBGuidS45(ByVal shx1 As String, ByVal shx2 As String, ByVal shx3 As String, ByVal shx4 As String, ByVal shx5 As String) As VBGuid
-    Dim l As Long: l = Len(shx5)
+    Dim L As Long: L = Len(shx5)
     Dim shx5_(2 To 7) As String
-    If 2 <= l Then shx5_(2) = Mid(shx5, 1, 2)
-    If 4 <= l Then shx5_(3) = Mid(shx5, 3, 2)
-    If 6 <= l Then shx5_(4) = Mid(shx5, 5, 2)
-    If 8 <= l Then shx5_(5) = Mid(shx5, 7, 2)
-    If 10 <= l Then shx5_(6) = Mid(shx5, 9, 2)
-    If 12 <= l Then shx5_(7) = Mid(shx5, 11, 2)
+    If 2 <= L Then shx5_(2) = Mid(shx5, 1, 2)
+    If 4 <= L Then shx5_(3) = Mid(shx5, 3, 2)
+    If 6 <= L Then shx5_(4) = Mid(shx5, 5, 2)
+    If 8 <= L Then shx5_(5) = Mid(shx5, 7, 2)
+    If 10 <= L Then shx5_(6) = Mid(shx5, 9, 2)
+    If 12 <= L Then shx5_(7) = Mid(shx5, 11, 2)
     New_VBGuidS45 = New_VBGuidS4(shx1, shx2, shx3, shx4, shx5_(2), shx5_(3), shx5_(4), shx5_(5), shx5_(6), shx5_(7))
 End Function
 
@@ -107,6 +109,11 @@ Public Function New_VBGuidS(ByVal sIID As String) As VBGuid
 '    Dim Data4 As String: If 3 <= u Then Data4 = sa(3)
 '    Dim Data5 As String: If 4 <= u Then Data5 = sa(4)
 '    New_VBGuidS = New_VBGuidS45(Data1, Data2, Data3, Data4, Data5) '(2), Data5(2), Data5(2), Data5(2), Data5(2), Data5(2))
+End Function
+
+Public Function New_VBGuidRnd() As VBGuid
+    'RtlGenRandom New_VBGuidRndm, LenB(New_VBGuidRnd)
+    CoCreateGuid New_VBGuidRnd
 End Function
 
 Public Sub VBGuid_Parse(this As VBGuid, ByVal sIID As String)
@@ -156,6 +163,10 @@ Public Function VBGuid_Equals(this As VBGuid, other As VBGuid) As Boolean
         If .Data5(6) <> this.Data5(6) Then Exit Function: If .Data5(7) <> this.Data5(7) Then Exit Function
     End With
     VBGuid_Equals = True
+End Function
+
+Public Function VBGuid_IsNull(this As VBGuid) As Boolean
+    VBGuid_IsNull = VBGuid_Equals(this, m_VBGuidZero)
 End Function
 
 'Private Function Hex2(ByVal b As Byte) As String

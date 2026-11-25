@@ -202,7 +202,7 @@ End Function
 Private Function New_PathFileName(ByVal aPathOrPFN As String, _
                          Optional ByVal aFileName As String, _
                          Optional ByVal aExt As String) As PathFileName
-    Set New_PathFileName = New PathFileName: New_PathFileName.New_ aPathFileName, aFileName, aExt
+    Set New_PathFileName = New PathFileName: New_PathFileName.New_ aPathOrPFN, aFileName, aExt
 End Function
 ''Copy to MNew:
 'Public Function PathFileName(ByVal aPathOrPFN As String, _
