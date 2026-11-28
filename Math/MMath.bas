@@ -2319,7 +2319,7 @@ Public Function ZetaT(ByVal s As Double, Optional ByVal t As Long = 100) As Doub
     'Berechnung der trivialen Lösung der Riemannschen Zeta-Funktion über die Hasse-Reihe
     ' Zeta(2) (ergibt ˜ 1,644934) oder = Zeta(2, 50)
     ' Sonderfall s = 1 (Polstelle / Unendlich)
-    If s = 1 Then Zeta = posINF: Exit Function
+    If s = 1 Then ZetaT = posINF: Exit Function
     Dim n As Long, k As Long
     Dim sign As Double, innerSum As Double, outerSum As Double
     For n = 0 To t - 1
