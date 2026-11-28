@@ -55,7 +55,7 @@ Private Type TLng
 End Type
 
 Private Type BGRA '
-    B As Byte
+    b As Byte
     G As Byte
     R As Byte
     A As Byte
@@ -136,6 +136,16 @@ Private Sub Class_Initialize()
     End With
 End Sub
 
+Friend Sub New_(aPFN As String)
+    Read aPFN
+End Sub
+
+'Copy to MNew:
+'Public Function ImagePNM(aPFN As String) As ImagePNM
+'    Set ImagePNM = New ImagePNM: ImagePNM.New_ aPFN
+'End Function
+
+
 Friend Function ToPicture() As StdPicture
 Try: On Error GoTo Catch
     With m_PicDesc
@@ -205,10 +215,6 @@ End Property
 'data startet mit Õ=&HD5=213
 'und endet mit &=&H26=38
 
-Friend Sub New_(aPFN As String)
-    Read aPFN
-End Sub
-
 Public Function ToStr() As String
     ToStr = Me.PNMType_ToStr & "; " & m_Comment & "; w: " & Me.Width & "; h: " & Me.Height & "; c: " & m_MaxCols
 End Function
@@ -272,7 +278,7 @@ Private Function IsAnymap(FNr As Integer) As Boolean
             End With
             For i = 0 To 255 'do not use i as byte -> overflow
                 With .bmiColors(i)
-                    .R = i: .G = i: .B = i
+                    .R = i: .G = i: .b = i
                 End With
             Next
         Case EPNMType.PortablePixmapAsc, EPNMType.PortablePixmapBin
@@ -286,9 +292,9 @@ Private Function IsAnymap(FNr As Integer) As Boolean
     End With
 End Function
 
-Private Function New_BGRA(ByVal R As Byte, ByVal G As Byte, ByVal B As Byte, ByVal A As Byte) As BGRA
+Private Function New_BGRA(ByVal R As Byte, ByVal G As Byte, ByVal b As Byte, ByVal A As Byte) As BGRA
     With New_BGRA
-        .R = R: .G = G: .B = B: .A = A
+        .R = R: .G = G: .b = b: .A = A
     End With
 End Function
 

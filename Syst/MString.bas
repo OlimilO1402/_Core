@@ -78,7 +78,7 @@ End Enum
     Private Declare Function MultiByteToWideChar Lib "kernel32" (ByVal CodePage As Long, ByVal dwFlags As Long, ByVal lpMultiByteStr As LongPtr, ByVal cbMultiByte As Long, ByVal lpWideCharStr As LongPtr, ByVal cchWideChar As Long) As Long
     Private Declare Function lstrlenW Lib "kernel32" (ByVal lpString As LongPtr) As Long
     Private Declare Function lstrcpyW Lib "kernel32" (ByVal pDst As LongPtr, ByVal pSrc As LongPtr) As Long
-    Private Declare Function MessageBoxW Lib "user32" (ByVal hwnd As LongPtr, ByVal lpText As LongPtr, ByVal lpCaption As LongPtr, ByVal wType As Long) As Long
+    Private Declare Function MessageBoxW Lib "user32" (ByVal hWnd As LongPtr, ByVal lpText As LongPtr, ByVal lpCaption As LongPtr, ByVal wType As Long) As Long
     Private Declare Sub CoTaskMemFree Lib "ole32" (ByVal pv As LongPtr)
     Private Declare Sub RtlMoveMemory Lib "kernel32" (ByRef pDst As Any, ByRef pSrc As Any, ByVal BytLen As Long)
 #End If
@@ -597,7 +597,7 @@ Try: On Error GoTo Catch
     If Right(Value, 1) = "!" Then Value = Left(Value, Len(Value) - 1)
     Value = Replace(Value, ",", ".")
     If Not IsNumeric(Value) Then Exit Function
-    Value_out = CSng(Val(Value)) 'hey was das für ne scheiße, warum nicht Val() ????
+    Value_out = CSng(val(Value)) 'hey was das für ne scheiße, warum nicht Val() ????
     'Value_out = CSng(Value)     'hey was das für ne scheiße, warum nicht Val() ????
     Single_TryParse = True
     Exit Function
@@ -634,7 +634,7 @@ Try: On Error GoTo Catch
     Value = Replace(Value, ",", ".") 'for using the function Val()
     If IsNumeric(Value) Then
         'If Right(Value, 1) = "#" Then Value = Left(Value, Len(Value) - 1)
-        value_inout = Val(Value)
+        value_inout = val(Value)
         Double_TryParse = True: Exit Function
     Else
         If StrComp(Value, "1.#QNAN") = 0 Then
@@ -1167,8 +1167,8 @@ Public Function CheckType(ByVal s As String, ByVal vt As VbVarType, Value_out) A
     If vt And vbBin Then vt = vt Xor vbBin
 
     Select Case vt
-    Case VbVarType.vbByte:        Dim BytVal As Byte:     CheckType = Byte_TryParse(s, BytVal):      Value_out = BytVal
-    Case VbVarType.vbInteger:     Dim IntVal As Integer:  CheckType = Integer_TryParse(s, IntVal):   Value_out = IntVal
+    Case VbVarType.vbByte:        Dim bytval As Byte:     CheckType = Byte_TryParse(s, bytval):      Value_out = bytval
+    Case VbVarType.vbInteger:     Dim intVal As Integer:  CheckType = Integer_TryParse(s, intVal):   Value_out = intVal
     Case VbVarType.vbBoolean:     Dim BolVal As Boolean:  CheckType = Boolean_TryParse(s, BolVal):   Value_out = BolVal
     Case VbVarType.vbLong:        Dim LngVal As Long:     CheckType = Long_TryParse(s, LngVal):      Value_out = LngVal
     Case 20:
@@ -1178,7 +1178,7 @@ Public Function CheckType(ByVal s As String, ByVal vt As VbVarType, Value_out) A
     Case 20:                      Dim LLngV As Currency:  CheckType = LongLong_TryParse(s, LLngV):   Value_out = LLngV
 #End If
     Case VbVarType.vbSingle:      Dim SngVal As Single:   CheckType = Single_TryParse(s, SngVal):    Value_out = SngVal
-    Case VbVarType.vbDouble:      Dim DblVal As Double:   CheckType = Double_TryParse(s, DblVal):    Value_out = DblVal
+    Case VbVarType.vbDouble:      Dim dblVal As Double:   CheckType = Double_TryParse(s, dblVal):    Value_out = dblVal
     Case VbVarType.vbCurrency:    Dim CurVal As Currency: CheckType = Currency_TryParse(s, CurVal):  Value_out = CurVal
     Case VbVarType.vbDecimal:     Dim DecVal As Variant:  CheckType = Decimal_TryParse(s, DecVal):   Value_out = DecVal
     Case VbVarType.vbDate:        Dim DatVal As Date:     CheckType = Date_TryParse(s, DatVal):      Value_out = DatVal
@@ -2308,9 +2308,9 @@ Public Function ConvertFromUTF8(ByRef Source() As Byte) As String
     Dim Size    As Long:       Size = UBound(Source) - LBound(Source) + 1
     Dim pSource As LongPtr: pSource = VarPtr(Source(LBound(Source)))
     Dim Length  As Long:     Length = MultiByteToWideChar(CP_UTF8, 0, pSource, Size, 0, 0)
-    Dim buffer  As String:   buffer = Space$(Length)
-    MultiByteToWideChar CP_UTF8, 0, pSource, Size, StrPtr(buffer), Length
-    ConvertFromUTF8 = buffer
+    Dim Buffer  As String:   Buffer = Space$(Length)
+    MultiByteToWideChar CP_UTF8, 0, pSource, Size, StrPtr(Buffer), Length
+    ConvertFromUTF8 = Buffer
 End Function
 
 ' ^ ' ############################## ' ^ '    Unicode-BOM functions    ' ^ ' ############################## ' ^ '
@@ -2350,16 +2350,16 @@ End Function
 Public Function GetTabbedText(s As String, Optional onlyNewLine As Boolean = False, Optional NumOnly As Boolean = False) As String
     'takes any string, first replaces any vbtab into normal space
     'then separates every value in the string with tabs, lines with vbcrlf
-    Dim t As String: t = Replace(s, vbTab, " ")
-    Dim lines() As String: lines = Split(t, vbCrLf)
+    Dim T As String: T = Replace(s, vbTab, " ")
+    Dim Lines() As String: Lines = Split(T, vbCrLf)
     Dim i As Long
     'Dim onlyNewLine As Boolean: onlyNewLine = False 'Me.cbNewlineOnly.Value
     Dim svbCrLf As String: If onlyNewLine Then svbCrLf = vbCrLf
     'jeden Wert in eine neue Zeile
-    For i = LBound(lines) To UBound(lines)
+    For i = LBound(Lines) To UBound(Lines)
         Dim line As String
         'alle mehrfachen Whitespaces enfernen
-        line = DeleteMultiWS(lines(i))
+        line = DeleteMultiWS(Lines(i))
         'für Excel: alle Zahlen mit Komma(",") statt Punkt(".")
         line = Replace(line, ".", ",")
         If Left(line, 3) = "K45" Then
@@ -2388,9 +2388,9 @@ Public Function GetTabbedText(s As String, Optional onlyNewLine As Boolean = Fal
                 line = Replace(line, " ", vbTab)
             End If
         End If
-        lines(i) = line
+        Lines(i) = line
     Next
-    GetTabbedText = Join(lines, vbCrLf)
+    GetTabbedText = Join(Lines, vbCrLf)
 End Function
 ' ^ ' ############################## ' ^ '    Special functions    ' ^ ' ############################## ' ^ '
 
@@ -3014,3 +3014,198 @@ Private Function Block3_ToWords(ByVal n As Long, ByVal isEnd As Boolean) As Stri
     Block3_ToWords = s
 End Function
 
+Public Function Words_ToNumber(ByVal Value As String) As Double  'Long
+    Dim s As String
+    ' Text bereinigen (Kleinschreibung, Leerzeichen und Bindestriche entfernen)
+    s = Replace(LCase(Trim(Value)), "-", "")
+    If Len(s) = 0 Then Exit Function
+    
+    ' Prüfen auf negative Zahlen
+    Dim isNegative As Boolean: isNegative = Left(s, 5) = "minus"
+    If isNegative Then s = Trim(Mid(s, 6))
+    
+    ' Prüfen auf Nachkommastellen ("komma")
+    Dim decStr As String
+    Dim intPart As Double, decPart As Double, parts() As String
+    If InStr(s, "komma") > 0 Then
+        parts = Split(s, "komma")
+        intPart = ParseGanzzahl(parts(0))
+        ' Nachkommastellen verarbeiten (z.B. "komma fünf zwei" -> 0,52)
+        decStr = Trim(parts(1))
+        decPart = ParseNachkomma(decStr)
+    Else
+        intPart = ParseGanzzahl(s)
+        decPart = 0
+    End If
+    
+    Words_ToNumber = intPart + decPart
+    If isNegative Then Words_ToNumber = -Words_ToNumber
+End Function
+
+Private Function ParseGanzzahl(ByVal s As String) As Double
+    
+    s = Replace(s, " ", "")
+    If s = "" Or s = "null" Then Exit Function
+    
+    ' 1. Milliarden
+    Dim pos As Long: pos = InStr(s, "milliarden")
+    Dim leftStr As String, total As Double
+    If pos > 0 Then
+        leftStr = Left(s, pos - 1)
+        total = total + ParseBis999(leftStr) * 1000000000#
+        s = Mid(s, pos + 10)
+    Else
+        pos = InStr(s, "milliarde")
+        If pos > 0 Then
+            total = total + 1000000000#
+            s = Mid(s, pos + 9)
+        End If
+    End If
+    
+    ' 2. Millionen
+    pos = InStr(s, "millionen")
+    If pos > 0 Then
+        leftStr = Left(s, pos - 1)
+        total = total + ParseBis999(leftStr) * 1000000#
+        s = Mid(s, pos + 9)
+    Else
+        pos = InStr(s, "million")
+        If pos > 0 Then
+            total = total + 1000000#
+            s = Mid(s, pos + 7)
+        End If
+    End If
+    
+    ' 3. Tausend
+    pos = InStr(s, "tausend")
+    If pos > 0 Then
+        leftStr = Left(s, pos - 1)
+        If leftStr = "" Then
+            total = total + 1000#
+        Else
+            total = total + ParseBis999(leftStr) * 1000#
+        End If
+        s = Mid(s, pos + 7)
+    End If
+    
+    ' 4. Rest (0 bis 999)
+    If s <> "" Then
+        total = total + ParseBis999(s)
+    End If
+    
+    ParseGanzzahl = total
+End Function
+
+Private Function ParseBis999(ByVal s As String) As Double
+    
+    If Len(s) = 0 Then Exit Function
+    
+    ' Hunderter prüfen
+    Dim pos As Long: pos = InStr(s, "hundert")
+    Dim hStr As String, val As Double
+    If pos > 0 Then
+        hStr = Left(s, pos - 1)
+        If hStr = "" Then
+            val = val + 100
+        Else
+            val = val + GetBasisZahl(hStr) * 100
+        End If
+        s = Mid(s, pos + 7)
+    End If
+    
+    ' Zehner und Einer (0 bis 99) prüfen
+    If s <> "" Then
+        val = val + ParseBis99(s)
+    End If
+    
+    ParseBis999 = val
+End Function
+
+Private Function ParseBis99(ByVal s As String) As Double
+    
+    ' Sonderfälle 10 bis 19
+    Select Case s
+    Case "zehn":     ParseBis99 = 10: Exit Function
+    Case "elf":      ParseBis99 = 11: Exit Function
+    Case "zwölf":    ParseBis99 = 12: Exit Function
+    Case "dreizehn": ParseBis99 = 13: Exit Function
+    Case "vierzehn": ParseBis99 = 14: Exit Function
+    Case "fünfzehn": ParseBis99 = 15: Exit Function
+    Case "sechzehn": ParseBis99 = 16: Exit Function
+    Case "siebzehn": ParseBis99 = 17: Exit Function
+    Case "achtzehn": ParseBis99 = 18: Exit Function
+    Case "neunzehn": ParseBis99 = 19: Exit Function
+    End Select
+    
+    ' Zusammengesetzte Zahlen mit "und" (z.B. "einundzwanzig")
+    If InStr(s, "und") > 0 Then
+        Dim parts() As String: parts = Split(s, "und")
+        ParseBis99 = GetBasisZahl(parts(0)) + GetZehner(parts(1))
+        Exit Function
+    End If
+    
+    ' Reine Zehner (z.B. "zwanzig", "dreißig")
+    If GetZehner(s) > 0 Then
+        ParseBis99 = GetZehner(s)
+        Exit Function
+    End If
+    
+    ' Reine Einer (1 bis 9)
+    ParseBis99 = GetBasisZahl(s)
+End Function
+
+Private Function GetBasisZahl(ByVal s As String) As Double
+    Select Case s
+    Case "ein", "eins", "eine": GetBasisZahl = 1
+    Case "zwei", "zwo":         GetBasisZahl = 2
+    Case "drei":                GetBasisZahl = 3
+    Case "vier":                GetBasisZahl = 4
+    Case "fünf":                GetBasisZahl = 5
+    Case "sechs":               GetBasisZahl = 6
+    Case "sieben":              GetBasisZahl = 7
+    Case "acht":                GetBasisZahl = 8
+    Case "neun":                GetBasisZahl = 9
+    Case Else:                  GetBasisZahl = 0
+    End Select
+End Function
+
+Private Function GetZehner(ByVal s As String) As Double
+    Select Case s
+    Case "zwanzig":             GetZehner = 20
+    Case "dreißig", "dreissig": GetZehner = 30
+    Case "vierzig":             GetZehner = 40
+    Case "fünfzig":             GetZehner = 50
+    Case "sechzig":             GetZehner = 60
+    Case "siebzig":             GetZehner = 70
+    Case "achtzig":             GetZehner = 80
+    Case "neunzig":             GetZehner = 90
+    Case Else:                  GetZehner = 0
+    End Select
+End Function
+
+Private Function ParseNachkomma(ByVal s As String) As Double
+    Dim words() As String
+    Dim i As Integer
+    Dim resStr As String
+    Dim ziffer As Double
+    
+    ' Falls Nachkommastellen einzeln gesprochen wurden (z.B. "komma fünf zwei")
+    words = Split(s, " ")
+    If UBound(words) > 0 Then
+        For i = 0 To UBound(words)
+            If words(i) = "null" Then
+                resStr = resStr & "0"
+            Else
+                ziffer = GetBasisZahl(words(i))
+                If ziffer > 0 Then resStr = resStr & CStr(ziffer)
+            End If
+        Next i
+        If resStr <> "" Then ParseNachkomma = CDbl("0," & resStr)
+    Else
+        ' Falls als ganze Zahl geschrieben (z.B. "komma zweiundfünfzig")
+        ziffer = ParseGanzzahl(s)
+        If ziffer > 0 Then
+            ParseNachkomma = CDbl("0," & CStr(ziffer))
+        End If
+    End If
+End Function

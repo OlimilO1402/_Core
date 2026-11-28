@@ -87,9 +87,9 @@ Private Sub UpdateView()
     m_Canvas.Cls
     m_Canvas.PaintPicture m_Image, 0, 0, W * m_ZoomFactor, H * m_ZoomFactor, 0, 0, W, H
 End Sub
-Function Min(V1, V2)
-    If V1 < V2 Then Min = V1 Else Min = V2
-End Function
+'Function Min(V1, V2)
+'    If V1 < V2 Then Min = V1 Else Min = V2
+'End Function
 
 Public Sub Refresh()
     UpdateView

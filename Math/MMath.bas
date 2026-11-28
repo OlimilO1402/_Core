@@ -617,6 +617,20 @@ Public Function Binomial(ByVal n As Long, ByVal k As Long) As Long
     Binomial = p
 End Function
 
+
+' Hilfsfunktion für den Binomialkoeffizienten (ersetzt scipy.special.binom)
+Public Function Binom(ByVal n As Long, ByVal k As Long) As Double
+    If k < 0 Or n < k Then Exit Function
+    Binom = 1#
+    If k = 0 Or k = n Then Exit Function
+    ' Symmetrie nutzen für schnellere Berechnung und weniger Überlauf-Risiko
+    If n - k < k Then k = n - k
+    Dim i As Long
+    For i = 1 To k
+        Binom = Binom * (n - i + 1) / i
+    Next
+End Function
+
 ' v ############################## v '    prime-functions    ' v ############################## v '
 
 Public Function GetPrime(ByVal Min As Long) As Long
@@ -1085,10 +1099,10 @@ Public Function Log10(ByVal d As Double) As Double
 End Function
 
 'Logarithm to a given base
-Public Function LogN(ByVal x As Double, Optional ByVal base As Double = 10#) As Double
+Public Function LogN(ByVal x As Double, Optional ByVal Base As Double = 10#) As Double
                      'base must not be 1 or 0
-    If base = 1 Or base = 0 Then Exit Function
-    LogN = VBA.Math.Log(x) / VBA.Math.Log(base)
+    If Base = 1 Or Base = 0 Then Exit Function
+    LogN = VBA.Math.Log(x) / VBA.Math.Log(Base)
 End Function
 
 'Public Shared Function Log(ByVal d As Double) As Double
@@ -1182,20 +1196,20 @@ End Function
 
 ' or without error handling:
 Public Function GetINF(Optional ByVal sign As Long = 1) As Double
-    Dim L(1 To 2) As Long
+    Dim l(1 To 2) As Long
     If Sgn(sign) > 0 Then
-        L(2) = &H7FF00000
+        l(2) = &H7FF00000
     ElseIf Sgn(sign) < 0 Then
-        L(2) = &HFFF00000
+        l(2) = &HFFF00000
     End If
-    Call RtlMoveMemory(GetINF, L(1), 8)
+    Call RtlMoveMemory(GetINF, l(1), 8)
 End Function
 
 Public Sub GetNaN(ByRef Value As Double)
-    Dim L(1 To 2) As Long
-    L(1) = 1
-    L(2) = &H7FF00000
-    Call RtlMoveMemory(Value, L(1), 8)
+    Dim l(1 To 2) As Long
+    l(1) = 1
+    l(2) = &H7FF00000
+    Call RtlMoveMemory(Value, l(1), 8)
 End Sub
 
 Public Sub GetINDef(ByRef Value As Double)
@@ -1337,12 +1351,12 @@ Public Function Bits(b00 As Bit, b01 As Bit, b02 As Bit, b03 As Bit, b04 As Bit,
     'Bits = Bits Or b31 * 2 ^ 31
     If b31 = b1 Then Bits = -Bits
 End Function
-Public Sub CheckBits(ByVal L As Long)
+Public Sub CheckBits(ByVal l As Long)
     'e.g.
     'check Bits(0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
     On Error Resume Next
-    Dim s As Single: s = LongToSingle(L)
-    Debug.Print L & " = &H" & Hex(L) & " = " & s & " ?isdenorm: " & IsDenormalisedSng(s)
+    Dim s As Single: s = LongToSingle(l)
+    Debug.Print l & " = &H" & Hex(l) & " = " & s & " ?isdenorm: " & IsDenormalisedSng(s)
     '170 = &HAA = 2,382207E-43 ?isdenorm: Wahr
 End Sub
 
@@ -1384,9 +1398,9 @@ End Sub
 Public Function IsDenormalisedSng(ByVal Value As Single) As Boolean
     'Dim ts As TSingle: ts.Value = SngVal
     'Dim tl As TLong:    LSet tl = ts
-    Dim L As Long
-    RtlMoveMemory L, Value, 4
-    IsDenormalisedSng = ((L And &H7F800000) = 0)
+    Dim l As Long
+    RtlMoveMemory l, Value, 4
+    IsDenormalisedSng = ((l And &H7F800000) = 0)
 End Function
 
 Public Sub UndenormaliseSng(ByRef value_inout As Single)
@@ -1424,7 +1438,7 @@ Private Sub SubstituteCode(StoreHere() As Byte, CodeString As String, ByVal Addr
     ReDim StoreHere(Len(CodeString) \ 2 - 1)
     
     For i = 0 To Len(CodeString) \ 2 - 1
-        StoreHere(i) = Val("&H" & Mid$(CodeString, i * 2 + 1, 2))
+        StoreHere(i) = val("&H" & Mid$(CodeString, i * 2 + 1, 2))
     Next
     
     VirtualProtect ByVal AddressOfFunctionToReplace, 21, PAGE_EXECUTE_READWRITE, OldProtection
@@ -2018,6 +2032,10 @@ Public Function Real_ToComplexP(ByVal v As Double) As ComplexP
     With Real_ToComplexP: .r = v: .phi = CDbl(Pi2): End With
 End Function
 
+Public Function Real_PowComplex(ByVal Base As Double, Exponent As Complex) As Complex
+    Real_PowComplex = ComplexP_ToComplex(ComplexP(Base ^ Exponent.Re, Exponent.Im * VBA.Math.Log(Base)))
+End Function
+
 Public Function Complex(ByVal Re As Double, ByVal Im As Double) As Complex
     With Complex: .Re = Re: .Im = Im: End With
 End Function
@@ -2044,8 +2062,13 @@ Public Function Complex_Mul(z1 As Complex, z2 As Complex) As Complex
     End With
 End Function
 
+Public Function Complex_Scale(c As Complex, ByVal Scalar As Double) As Complex
+    Complex_Scale.Im = c.Im * Scalar
+    Complex_Scale.Re = c.Re * Scalar
+End Function
+
 Public Function Complex_Div(z1 As Complex, z2 As Complex) As Complex
-    Dim d As Double: d = Complex_Abs2(z2)
+    Dim d   As Double:    d = Complex_Abs2(z2)
     Dim z2_ As Complex: z2_ = Complex_Conj(z2)
     Complex_Div = Complex_Mul(z1, z2_)
     With Complex_Div
@@ -2086,6 +2109,16 @@ Public Function Complex_ToComplexP(c As Complex) As ComplexP
         'oder:
         '.phi = Sgn(c.Im) * Arccos(c.Re / .r)
     End With
+End Function
+
+Public Function Complex_IsReal(c As Complex, ByVal RealNumber As Double) As Boolean
+    If c.Im <> 0 Then Exit Function
+    Complex_IsReal = c.Re = RealNumber
+End Function
+
+Public Function Complex_Equals(c1 As Complex, c2 As Complex) As Boolean
+    If c1.Im <> c2.Im Then Exit Function
+    Complex_Equals = c1.Re = c2.Re
 End Function
 
 'polar form
@@ -2281,4 +2314,51 @@ Public Function TempKelvin_ToFahrenheit(ByVal TempKelvin As Double) As Double
     TempKelvin_ToFahrenheit = (TempKelvin - 273.15) * 1.8 + 32
 End Function
 ' ^ ############################## ^ ' Celsius, Fahrenheit, Kelvin ' ^ ############################## ^ '
+
+Public Function ZetaT(ByVal s As Double, Optional ByVal t As Long = 100) As Double
+    'Berechnung der trivialen Lösung der Riemannschen Zeta-Funktion über die Hasse-Reihe
+    ' Zeta(2) (ergibt ˜ 1,644934) oder = Zeta(2, 50)
+    ' Sonderfall s = 1 (Polstelle / Unendlich)
+    If s = 1 Then Zeta = posINF: Exit Function
+    Dim n As Long, k As Long
+    Dim sign As Double, innerSum As Double, outerSum As Double
+    For n = 0 To t - 1
+        innerSum = 0
+        ' Innere Summe: k von 0 bis n
+        For k = 0 To n
+            If k Mod 2 = 0 Then sign = 1 Else sign = -1
+            innerSum = innerSum + sign * Binom(n, k) * ((k + 1) ^ -s)
+        Next
+        outerSum = outerSum + (1 / (2 ^ (n + 1))) * innerSum
+    Next
+    ZetaT = outerSum / (1 - (2 ^ (1 - s)))
+End Function
+
+Public Function ZetaC(s As Complex, Optional ByVal t As Long = 100) As Complex
+    'Berechnung der complexen Lösung der Riemannschen Zeta-Funktion über die Hasse-Reihe
+    ' Sonderfall s = 1 (Polstelle / Unendlich)
+    If Complex_IsReal(s, 1) Then ZetaC.Re = posINF: Exit Function
+    Dim n As Long, k As Long
+    Dim sign As Double, bi As Double, factorN As Double
+    Dim innerSum As Complex, outerSum As Complex, termK As Complex
+    For n = 0 To t - 1
+        innerSum.Im = 0
+        innerSum.Re = 0
+        For k = 0 To n
+            ' Berechne (k + 1)^(-s)
+            termK = Real_PowComplex(CDbl(k + 1), Complex_Neg(s))
+            ' Multipliziere mit (-1)^k * Binom(n, k) und addiere zur inneren Summe
+            If k Mod 2 = 0 Then bi = Binom(n, k) Else bi = -Binom(n, k)
+            innerSum = Complex_Add(innerSum, Complex_Scale(termK, bi))
+        Next
+        ' Multipliziere innere Summe mit 1 / 2^(n + 1)
+        factorN = 1# / (2# ^ (n + 1))
+        outerSum = Complex_Add(outerSum, Complex_Scale(innerSum, factorN))
+    Next
+    ' Nenner berechnen: 1 - 2^(1 - s)
+    Dim c2Pow1MinS As Complex: c2Pow1MinS = Real_PowComplex(2#, Complex(1 - s.Re, -s.Im))
+    Dim denom As Complex: denom = Complex(1 - c2Pow1MinS.Re, -c2Pow1MinS.Im)
+    ' Endergebnis: outerSum / denom
+    ZetaC = Complex_Div(outerSum, denom)
+End Function
 

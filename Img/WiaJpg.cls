@@ -33,6 +33,6 @@ Public Property Let Quality(ByVal Value As Single)
 End Property
 
 Public Function SaveAs(Optional AsPFN) As Boolean
-    If IsMmissing(AsPFN) Then AsPFN = m_pfnJpg
+    If IsMissing(AsPFN) Then AsPFN = m_pfnJpg
     m_wiaJpg.SaveFile AsPFN
 End Function

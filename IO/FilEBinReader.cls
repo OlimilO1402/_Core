@@ -12,6 +12,12 @@ Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
+
+Public Enum EEndianness ' determines ByteOrder; in which order bytes have to be read
+    IntelLittleEndian   ' = &H4949
+    MotorolaBigEndian   ' = &H4D4D
+End Enum
+
 Private m_FNr As Integer
 Private m_se As EEndianness
 Private m_en As EEndianness
@@ -26,6 +32,11 @@ Friend Sub New_(PathFileName As String)
     m_FNr = OOpen(PathFileName)
     m_se = MMain.SystemEndianness
 End Sub
+
+'Copy to MNew
+'Public Function FilEBinReader(PathFileName As String) As FilEBinReader
+'    Set FilEBinReader = New FilEBinReader: FilEBinReader.New_ PathFileName
+'End Function
 
 Private Sub Class_Terminate()
     CClose
@@ -49,6 +60,15 @@ Public Property Let Endianness(ByVal Value As EEndianness)
     m_en = Value
     Debug.Print Endianness_ToStr(m_en)
 End Property
+
+Public Function Endianness_ToStr(e As EEndianness) As String
+    Dim s As String
+    Select Case e
+    Case EEndianness.IntelLittleEndian: s = "IntelLittleEndian"
+    Case EEndianness.MotorolaBigEndian: s = "MotorolaBigEndian"
+    End Select
+    Endianness_ToStr = s
+End Function
 
 Public Property Let Position(ByVal Value As Long)
 Try: On Error GoTo Catch
